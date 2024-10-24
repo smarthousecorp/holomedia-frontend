@@ -5,11 +5,10 @@ import {SvgIcon} from "@mui/material";
 import {useDispatch, useSelector} from "react-redux";
 import {RootState} from "../../store";
 import {on} from "../../store/slices/modal";
-import LoginModal from "./LoginModal";
+import LoginModal from "./auth/LoginModal";
 
 const Header = () => {
   const modal = useSelector((state: RootState) => state.modal.loginModal);
-  console.log(modal);
 
   const dispatch = useDispatch();
 
