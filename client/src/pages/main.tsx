@@ -88,34 +88,50 @@ const MovieTitle = styled.h2`
   font-size: 2.4rem;
 `;
 
-const MovieGrid = styled.ul`
-  display: grid;
-  row-gap: 2rem;
-  column-gap: 1rem;
-  grid-template-columns: repeat(4, 1fr);
+const MovieGrid = styled.div`
+  display: flex;
+  flex-wrap: wrap; // 요소들이 줄 바꿈을 할 수 있도록 설정
+  justify-content: flex-start;
+  gap: 1rem; // 요소 간의 간격 설정
   margin-top: 2rem;
 
   @media (max-width: 1200px) {
-    grid-template-columns: repeat(3, 1fr); // 1200px 이하에서 3열
+    justify-content: space-between; // 1200px 이하에서 요소 간의 간격 조정
   }
 
   @media (max-width: 900px) {
-    grid-template-columns: repeat(2, 1fr); // 900px 이하에서 2열
+    justify-content: space-around; // 900px 이하에서 요소 간의 간격 조정
   }
 
   @media (max-width: 600px) {
-    grid-template-columns: 1fr; // 600px 이하에서 1열
+    justify-content: center; // 600px 이하에서 요소를 중앙 정렬
   }
 `;
 
 const MovieLi = styled.li`
+  flex: 0 0 calc(25% - 1rem); // 기본적으로 4열로 설정, 여백을 고려하여 계산
+  list-style: none; // 기본 리스트 스타일 제거
   border-radius: 10px;
-  width: 100%;
   font-family: "Pretendard-Light";
+  margin-bottom: 1.5rem;
+
+  @media (max-width: 1200px) {
+    flex: 0 0 calc(33.33% - 1rem); // 1200px 이하에서 3열
+  }
+
+  @media (max-width: 900px) {
+    flex: 0 0 calc(50% - 1rem); // 900px 이하에서 2열
+  }
+
+  @media (max-width: 600px) {
+    flex: 0 0 100%; // 600px 이하에서 1열
+  }
 
   > img {
-    width: 100%;
-    height: auto; // 비율 유지
+    width: 100%; // 가로 100%
+    height: auto;
+    object-fit: cover;
+    border-radius: 10px; // 상단 모서리 둥글게
   }
 `;
 
@@ -128,6 +144,10 @@ const MovieInfo = styled.div`
   > h6 {
     font-family: "Pretendard-Light";
     font-size: 1.4rem;
+
+    @media (max-width: 600px) {
+      font-size: 1.2rem; // 600px 이하에서 폰트 크기 조정
+    }
   }
 
   .views {
@@ -138,6 +158,10 @@ const MovieInfo = styled.div`
 
     > svg {
       width: 1.6rem;
+    }
+
+    @media (max-width: 600px) {
+      font-size: 1rem; // 600px 이하에서 폰트 크기 조정
     }
   }
 `;

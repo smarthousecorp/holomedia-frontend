@@ -98,7 +98,7 @@ const Input = styled.input`
 
 const LoginBtn = styled.button`
   font-family: "Pretendard-Medium";
-  width: 12%;
+  width: 14rem;
   height: 4.5rem;
   background: #323232;
   border-radius: 10px;
