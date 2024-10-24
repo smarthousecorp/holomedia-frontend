@@ -5,6 +5,7 @@ import {SvgIcon} from "@mui/material";
 import {useDispatch, useSelector} from "react-redux";
 import {RootState} from "../../store";
 import {on} from "../../store/slices/modal";
+import LoginModal from "./LoginModal";
 
 const Header = () => {
   const modal = useSelector((state: RootState) => state.modal.loginModal);
@@ -30,6 +31,7 @@ const Header = () => {
           <LoginBtn onClick={handleClickLoginBtn}>로그인 / 회원가입</LoginBtn>
         </Right>
       </Container>
+      {modal && <LoginModal />}
     </>
   );
 };

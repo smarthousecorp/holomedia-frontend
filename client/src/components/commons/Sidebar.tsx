@@ -21,7 +21,7 @@ const SidebarContainer = styled.nav`
   top: 9.6rem;
   bottom: 0;
   left: 0;
-  z-index: 1499;
+  z-index: 599;
   width: 25rem;
   height: 100%;
   border-right: 1px solid rgb(226, 226, 226);
