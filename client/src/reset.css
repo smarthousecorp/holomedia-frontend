@@ -88,7 +88,6 @@ video {
   padding: 0;
   border: 0;
   font-size: 100%;
-  font: inherit;
   vertical-align: baseline;
 }
 /* HTML5 display-role reset for older browsers */
@@ -133,4 +132,31 @@ table {
 *::before,
 *::after {
   box-sizing: border-box;
+}
+
+input,
+button {
+  outline: none;
+  border: none;
+}
+
+button {
+  background: transparent;
+  padding: 0;
+  cursor: pointer;
+  color: inherit;
+}
+
+a {
+  text-decoration: none;
+  color: inherit;
+  cursor: pointer;
+  display: block;
+}
+
+html,
+body {
+  font-size: 10px;
+  font-family: "Pretendard-Medium";
+  font-weight: 400;
 }
