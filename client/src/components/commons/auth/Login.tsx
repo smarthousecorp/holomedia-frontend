@@ -1,11 +1,30 @@
 import styled from "styled-components";
 import Social from "./Social";
+import Input from "../Input";
 
 const Login = () => {
+  const handleChangeId = () => {};
+
+  const handleChangePwd = () => {};
+
   return (
     <LoginContainer>
       <Social auth={"로그인"} />
-      <Title>로그인</Title>
+      <LoginInputContainer>
+        <Title>로그인</Title>
+        <Input
+          type="id"
+          name="id"
+          placeholder="아이디"
+          onChange={handleChangeId}
+        />
+        <Input
+          type="password"
+          name="password"
+          placeholder="비밀번호"
+          onChange={handleChangePwd}
+        />
+      </LoginInputContainer>
     </LoginContainer>
   );
 };
@@ -21,3 +40,5 @@ const Title = styled.div`
   font-family: "Pretendard-Bold";
   font-size: 1.4rem;
 `;
+
+const LoginInputContainer = styled.div``;
