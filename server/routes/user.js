@@ -1,4 +1,5 @@
 const express = require("express");
+const session = require("express-session");
 const router = express.Router();
 
 const db = require("../db/db");
@@ -19,9 +20,7 @@ router.post("/login", function (request, response) {
           // db에서의 반환값이 있으면 로그인 성공
           request.session.is_logined = true; // 세션 정보 갱신
           request.session.nickname = user_id;
-          request.session.save(function () {
-            response.redirect(`/`);
-          });
+          response.status(200).send({message: "로그인이 완료되었습니다."});
         } else {
           response
             .status(404)
@@ -35,9 +34,14 @@ router.post("/login", function (request, response) {
 });
 
 // 로그아웃
-router.get("/logout", function (request, response) {
-  request.session.destroy(function (err) {
-    response.redirect("/");
+router.post("/logout", function (request, response) {
+  request.session.destroy((err) => {
+    if (err) {
+      return response
+        .status(500)
+        .send({message: "로그아웃 중 오류가 발생했습니다."});
+    }
+    response.status(200).send({message: "로그아웃되었습니다."});
   });
 });
 
