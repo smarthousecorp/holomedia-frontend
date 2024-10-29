@@ -51,7 +51,7 @@ const StyledButton = styled.button<buttonProps>`
   padding: ${({padding}) => padding};
 
   &:hover {
-    background-color: var(--color-point-hover);
+    background-color: #ff627c;
   }
 
   ${({width}) =>

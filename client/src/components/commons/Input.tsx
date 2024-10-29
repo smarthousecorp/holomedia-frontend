@@ -55,7 +55,7 @@ const InputWrapper = styled.div`
 
 const StyledLabel = styled.label`
   display: inline-block;
-  margin: 0 0 0.4rem 0.4rem;
+  margin: 0 0 0.4rem 0;
   font-size: 1.4rem;
   font-weight: 700;
 `;
@@ -81,8 +81,8 @@ const StyledInput = styled.input<inputProps>`
 `;
 
 const ErrorMessage = styled.p`
-  margin: 0.4rem 0 0 0.4rem;
-  color: var(--color-danger);
+  margin: 0.4rem 0 0 0;
+  color: rgb(253, 110, 78);
   font-size: 1.2rem;
 `;
 
