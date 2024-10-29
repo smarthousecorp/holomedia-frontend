@@ -3,33 +3,51 @@ const session = require("express-session");
 const router = express.Router();
 
 const db = require("../db/db");
+const tokenService = require("../module/jwt");
 
 // 로그인 프로세스
 router.post("/login", function (request, response) {
   const user_id = request.body.user_id;
   const password = request.body.password;
+
   if (user_id && password) {
     // id와 pw가 입력되었는지 확인
     db.query(
-      "SELECT * FROM user WHERE user_id = ? AND password = ?",
-      [user_id, password],
+      "SELECT * FROM user WHERE user_id = ?",
+      [user_id],
       function (error, results, fields) {
         if (error) throw error;
-        if (results.length > 0) {
-          console.log(results);
-          // db에서의 반환값이 있으면 로그인 성공
-          request.session.is_logined = true; // 세션 정보 갱신
-          request.session.nickname = user_id;
-          response.status(200).send({message: "로그인이 완료되었습니다."});
-        } else {
-          response
+
+        if (results.length === 0) {
+          // user_id가 존재하지 않을 때
+          return response
             .status(404)
-            .send({message: "로그인 정보가 일치하지 않습니다."});
+            .send({message: "해당 아이디가 존재하지 않습니다.", status: 404});
         }
+
+        // user_id가 존재할 경우 비밀번호 확인
+        const user = results[0];
+        if (user.password !== password) {
+          // 비밀번호가 틀릴 때
+          return response
+            .status(400)
+            .send({message: "비밀번호가 틀립니다.", status: 400});
+        }
+
+        // 로그인 성공
+        request.session.is_logined = true; // 세션 정보 갱신
+        request.session.nickname = user_id;
+        response.status(200).send({
+          message: "로그인이 완료되었습니다.",
+          accessToken: tokenService.getToken(user_id),
+          status: 200,
+        });
       }
     );
   } else {
-    response.status(400).send({message: "아이디와 비밀번호를 입력하세요."});
+    response
+      .status(400)
+      .send({message: "아이디와 비밀번호를 입력하세요.", status: 400});
   }
 });
 
@@ -49,10 +67,10 @@ router.post("/logout", function (request, response) {
 router.post("/signup", function (request, response) {
   const user_id = request.body.user_id;
   const password = request.body.password;
-  const password2 = request.body.password2;
+  const passwordCheck = request.body.passwordCheck;
   const username = request.body.username;
 
-  if (user_id && password && password2 && username) {
+  if (user_id && password && passwordCheck && username) {
     // username 체크 추가
     // user_id 중복 확인
     db.query(
@@ -62,7 +80,7 @@ router.post("/signup", function (request, response) {
         if (error) throw error;
 
         // user_id와 username 중복 확인
-        if (results.length <= 0 && password === password2) {
+        if (results.length <= 0 && password === passwordCheck) {
           // DB에 같은 이름의 회원아이디와 닉네임이 없고, 비밀번호가 올바르게 입력된 경우
           db.query(
             "INSERT INTO user (user_id, password, username) VALUES(?,?,?)",
@@ -79,7 +97,7 @@ router.post("/signup", function (request, response) {
           } else if (results[0].username === username) {
             response.status(409).send("이미 존재하는 닉네임입니다.");
           }
-        } else if (password !== password2) {
+        } else if (password !== passwordCheck) {
           // 비밀번호가 올바르게 입력되지 않은 경우
           response.status(400).send("입력된 비밀번호가 서로 다릅니다.");
         }
