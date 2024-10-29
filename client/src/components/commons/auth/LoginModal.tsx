@@ -70,7 +70,6 @@ const ModalContainer = styled.div`
   transform: translate(-50%, -50%);
   z-index: 999;
   width: 36rem;
-  height: 53rem;
   background-color: #ffffff;
   border-radius: 17px;
   border: 1px solid gray;

@@ -63,7 +63,7 @@ const StyledInput = styled.input<inputProps>`
   font-family: "Pretendard-Medium";
   width: 100%;
   padding: 1rem 0;
-  border-bottom: 1px solid gray;
+  border-bottom: 1px solid #adadad;
 
   &::placeholder {
     color: gray;

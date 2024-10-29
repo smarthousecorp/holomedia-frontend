@@ -1,11 +1,44 @@
 import styled from "styled-components";
 import Social from "./Social";
 import Input from "../Input";
+import Button from "../Button";
+import React, {useState} from "react";
+import axios from "axios";
+
+interface Login {
+  user_id: string;
+  password: string;
+}
 
 const Login = () => {
-  const handleChangeId = () => {};
+  const [inputVal, setInputVal] = useState<Login>({
+    user_id: "",
+    password: "",
+  });
 
-  const handleChangePwd = () => {};
+  const handleChangeId = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setInputVal({...inputVal, user_id: e.target.value});
+  };
+
+  const handleChangePwd = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setInputVal({...inputVal, password: e.target.value});
+  };
+
+  const onClickLoginBtn = () => {
+    const fetchData = async () => {
+      try {
+        const response = await axios.post(
+          `${import.meta.env.VITE_SERVER_DOMAIN}/login`,
+          inputVal
+        );
+        console.log(response);
+      } catch (error) {
+        console.error("Error fetching data:", error.response);
+      }
+    };
+
+    fetchData();
+  };
 
   return (
     <LoginContainer>
@@ -24,6 +57,14 @@ const Login = () => {
           placeholder="비밀번호"
           onChange={handleChangePwd}
         />
+        <Button
+          width="80%"
+          radius="50px"
+          padding="1.8rem 1.6rem"
+          onClick={onClickLoginBtn}
+        >
+          로그인
+        </Button>
       </LoginInputContainer>
     </LoginContainer>
   );
@@ -41,4 +82,8 @@ const Title = styled.div`
   font-size: 1.4rem;
 `;
 
-const LoginInputContainer = styled.div``;
+const LoginInputContainer = styled.div`
+  > button {
+    margin-top: 3rem;
+  }
+`;
