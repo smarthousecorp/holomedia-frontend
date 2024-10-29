@@ -6,6 +6,7 @@ import {useDispatch, useSelector} from "react-redux";
 import {RootState} from "../../store";
 import {on} from "../../store/slices/modal";
 import LoginModal from "./auth/LoginModal";
+import {getCookie} from "../../utils/cookie";
 
 const Header = () => {
   const modal = useSelector((state: RootState) => state.modal.loginModal);
@@ -27,7 +28,11 @@ const Header = () => {
             <Input placeholder="검색어를 입력해주세요" />
             <SvgIcon component={SearchIcon} />
           </InputContainer>
-          <LoginBtn onClick={handleClickLoginBtn}>로그인 / 회원가입</LoginBtn>
+          {getCookie("accessToken") ? (
+            <ProfileContainer>로그인</ProfileContainer>
+          ) : (
+            <LoginBtn onClick={handleClickLoginBtn}>로그인 / 회원가입</LoginBtn>
+          )}
         </Right>
       </Container>
       {modal && <LoginModal />}
@@ -106,4 +111,8 @@ const LoginBtn = styled.button`
   color: #ffffff;
   padding: 0 1rem;
   white-space: nowrap;
+`;
+
+const ProfileContainer = styled.div`
+  display: flex;
 `;
