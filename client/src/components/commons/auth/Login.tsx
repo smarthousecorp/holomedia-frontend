@@ -8,6 +8,7 @@ import {setCookie} from "../../../utils/cookie";
 import {useNavigate} from "react-router-dom";
 import {useDispatch} from "react-redux";
 import {off} from "../../../store/slices/modal";
+import {login} from "../../../store/slices/user";
 
 interface Login {
   user_id: string;
@@ -49,6 +50,16 @@ const Login = () => {
         //   path: "/",
         //   expires: current,
         // });
+
+        // 전역상태 user에 로그인 상태 및 이름 저장
+        dispatch(
+          login({
+            isLoggedIn: true,
+            username: res.data.username,
+          })
+        );
+
+        // 모달 종료 후 메인화면 이동
         dispatch(off());
         navigate("/");
       })

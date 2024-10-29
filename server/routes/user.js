@@ -27,13 +27,13 @@ router.post("/login", function (request, response) {
 
         // user_id가 존재할 경우 비밀번호 확인
         const user = results[0];
+
         if (user.password !== password) {
           // 비밀번호가 틀릴 때
           return response
             .status(400)
             .send({message: "비밀번호가 틀립니다.", status: 400});
         }
-
         // 로그인 성공
         request.session.is_logined = true; // 세션 정보 갱신
         request.session.nickname = user_id;
@@ -41,6 +41,7 @@ router.post("/login", function (request, response) {
           message: "로그인이 완료되었습니다.",
           accessToken: tokenService.getToken(user_id),
           status: 200,
+          username: user.username,
         });
       }
     );

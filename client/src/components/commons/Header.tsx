@@ -10,6 +10,7 @@ import {getCookie} from "../../utils/cookie";
 
 const Header = () => {
   const modal = useSelector((state: RootState) => state.modal.loginModal);
+  const user = useSelector((state: RootState) => state.user);
 
   const dispatch = useDispatch();
 
@@ -29,7 +30,7 @@ const Header = () => {
             <SvgIcon component={SearchIcon} />
           </InputContainer>
           {getCookie("accessToken") ? (
-            <ProfileContainer>로그인</ProfileContainer>
+            <ProfileContainer>{user.username} 회원님</ProfileContainer>
           ) : (
             <LoginBtn onClick={handleClickLoginBtn}>로그인 / 회원가입</LoginBtn>
           )}
@@ -115,4 +116,6 @@ const LoginBtn = styled.button`
 
 const ProfileContainer = styled.div`
   display: flex;
+  color: white;
+  font-size: 1.8rem;
 `;
