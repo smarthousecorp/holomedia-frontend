@@ -4,6 +4,10 @@ import Input from "../Input";
 import Button from "../Button";
 import React, {useState} from "react";
 import axios from "axios";
+import {setCookie} from "../../../utils/cookie";
+import {useNavigate} from "react-router-dom";
+import {useDispatch} from "react-redux";
+import {off} from "../../../store/slices/modal";
 
 interface Login {
   user_id: string;
@@ -11,33 +15,65 @@ interface Login {
 }
 
 const Login = () => {
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
+
   const [inputVal, setInputVal] = useState<Login>({
     user_id: "",
     password: "",
   });
 
-  const handleChangeId = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setInputVal({...inputVal, user_id: e.target.value});
-  };
+  const [errorMsg, setErrorMsg] = useState<Login>({user_id: "", password: ""});
 
-  const handleChangePwd = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setInputVal({...inputVal, password: e.target.value});
+  // 입력 값이 변경될 때 실행되는 함수
+  const onChangeValues = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const {name, value} = e.target;
+    setInputVal({...inputVal, [name]: value});
   };
 
   const onClickLoginBtn = () => {
-    const fetchData = async () => {
-      try {
-        const response = await axios.post(
-          `${import.meta.env.VITE_SERVER_DOMAIN}/login`,
-          inputVal
-        );
-        console.log(response);
-      } catch (error) {
-        console.error("Error fetching data:", error.response);
-      }
-    };
+    axios
+      .post(`${import.meta.env.VITE_SERVER_DOMAIN}/login`, inputVal)
+      .then((res) => {
+        const current = new Date();
+        current.setMinutes(current.getMinutes() + 1440);
 
-    fetchData();
+        setCookie("accessToken", res.data.accessToken, {
+          path: "/",
+          expires: current,
+        });
+        localStorage.setItem("accessToken", res.data.accessToken);
+
+        // current.setMinutes(current.getMinutes() + 1440);
+        // setCookie("refreshToken", res.data.refreshToken, {
+        //   path: "/",
+        //   expires: current,
+        // });
+        dispatch(off());
+        navigate("/");
+      })
+      .catch((error) => {
+        // 404 : 회원이 존재하지 않음 , 400 : 비밀번호가 일치하지 않음
+        if (error.response.data.status === 404) {
+          setErrorMsg({...error, user_id: "존재하지 않는 계정입니다."});
+        }
+
+        if (error.response.data.status === 400) {
+          const errorMessage = error.response.data.message;
+
+          if (errorMessage === "비밀번호가 틀립니다.") {
+            setErrorMsg({
+              ...error,
+              password: "비밀번호가 일치하지 않습니다.",
+            });
+          } else {
+            setErrorMsg({
+              ...error,
+              password: "아이디와 비밀번호를 입력하세요",
+            });
+          }
+        }
+      });
   };
 
   return (
@@ -47,15 +83,17 @@ const Login = () => {
         <Title>로그인</Title>
         <Input
           type="id"
-          name="id"
+          name="user_id"
           placeholder="아이디"
-          onChange={handleChangeId}
+          onChange={onChangeValues}
+          error={errorMsg.user_id}
         />
         <Input
           type="password"
           name="password"
           placeholder="비밀번호"
-          onChange={handleChangePwd}
+          onChange={onChangeValues}
+          error={errorMsg.password}
         />
         <Button
           width="80%"

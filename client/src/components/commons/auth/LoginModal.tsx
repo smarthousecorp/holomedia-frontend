@@ -21,7 +21,10 @@ const LoginModal = () => {
 
   // 모달 사라지게 하는 전역상태 변경 함수
   const dispatch = useDispatch();
-  const handleClickBG = () => {
+  // const handleClickBG = () => {
+  //   dispatch(off());
+  // };
+  const handleClickCloseBtn = () => {
     dispatch(off());
   };
 
@@ -31,9 +34,9 @@ const LoginModal = () => {
   };
 
   return (
-    <Background onClick={handleClickBG}>
+    <Background>
       <ModalContainer onClick={handleClickModal}>
-        <SvgIcon component={ClearIcon} />
+        <SvgIcon component={ClearIcon} onClick={handleClickCloseBtn} />
         <Nav>
           <a onClick={handleClickLogin} className={isClickedLogin ? "on" : ""}>
             로그인
@@ -80,10 +83,16 @@ const ModalContainer = styled.div`
   position: relative; // 자식 요소의 절대 위치를 기준으로 설정
 
   > svg {
+    cursor: pointer;
     font-size: 3.2rem;
     position: absolute;
     right: 2rem;
     top: 2rem;
+    transition: all 500ms;
+
+    &:hover {
+      transform: scale(1.07);
+    }
   }
 `;
 
