@@ -5,7 +5,7 @@ import modal from "./slices/modal";
 import user from "./slices/user";
 import sidebar from "./slices/sidebar";
 import {thunk} from "redux-thunk";
-import logger from "redux-logger";
+// import logger from "redux-logger";
 import header from "./slices/header";
 
 const reducers = combineReducers({
@@ -25,8 +25,7 @@ const persistedReducer = persistReducer(persistConfig, reducers);
 
 const store = configureStore({
   reducer: persistedReducer,
-  middleware: (getDefaultMiddleware) =>
-    getDefaultMiddleware().concat(thunk, logger),
+  middleware: (getDefaultMiddleware) => getDefaultMiddleware().concat(thunk),
 });
 
 export type RootState = ReturnType<typeof store.getState>;
