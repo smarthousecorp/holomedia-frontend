@@ -1,9 +1,19 @@
 import {Outlet} from "react-router";
 import {styled} from "styled-components";
 import Header from "../commons/Header";
+import {useEffect} from "react";
+import {useDispatch} from "react-redux";
+import {view} from "../../store/slices/header";
 // import Sidebar from "../commons/Sidebar";
 
 const PublicLayout = () => {
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    // 해당 레이아웃이 마운트되면 무조건 햄버거 버튼이 보이게 설정
+    dispatch(view());
+  }, []);
+
   return (
     <Full>
       <Header />
