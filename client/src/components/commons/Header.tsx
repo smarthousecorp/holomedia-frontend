@@ -9,7 +9,7 @@ import {on} from "../../store/slices/modal";
 import LoginModal from "./auth/LoginModal";
 import {getCookie} from "../../utils/cookie";
 import {useNavigate} from "react-router-dom";
-import {useState} from "react";
+import {useEffect, useState} from "react";
 import Sidebar from "./Sidebar";
 
 interface sidebarProps {
@@ -34,6 +34,22 @@ const Header = () => {
   const handleClickHamburger = () => {
     setIsOpenSidebar((prev) => !prev);
   };
+
+  // 메인 레이아웃에서 햄버거 클릭 후, 스크롤 조절 시 사이드바 닫기 불가능
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth > 1310 && !header) {
+        setIsOpenSidebar(false);
+      }
+    };
+
+    window.addEventListener("resize", handleResize);
+
+    // 컴포넌트 언마운트 시 이벤트 리스너 제거
+    return () => {
+      window.removeEventListener("resize", handleResize);
+    };
+  }, [header]);
 
   return (
     <>
