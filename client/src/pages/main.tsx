@@ -3,7 +3,7 @@ import axios from "axios";
 import {useEffect, useState} from "react";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import {SvgIcon} from "@mui/material";
-
+import {useNavigate} from "react-router-dom";
 interface mediaType {
   id: number;
   title: string;
@@ -14,7 +14,13 @@ interface mediaType {
 }
 
 const Main = () => {
+  const navigate = useNavigate();
+
   const [medias, setMedias] = useState<mediaType[]>([]);
+
+  const handleClickList = (id: number) => {
+    navigate(`/video/${id}`);
+  };
 
   useEffect(() => {
     const fetchData = async () => {
@@ -34,11 +40,16 @@ const Main = () => {
   return (
     <MainContainer>
       <MovieContainer>
-        <MovieTitle>인기 순위</MovieTitle>
+        <MovieTitle>NEW</MovieTitle>
         <MovieGrid>
           {medias.map((el) => {
             return (
-              <MovieLi key={el.id}>
+              <MovieLi
+                key={el.id}
+                onClick={() => {
+                  handleClickList(el.id);
+                }}
+              >
                 {/* 비회원은 썸네일 가리기(lock_thumbnail), 회원은 el.thumbnail 보여주기 */}
                 <img src="src/assets/lock_thumbnail.png" alt="썸네일" />
                 <MovieInfo>
