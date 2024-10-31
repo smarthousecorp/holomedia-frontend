@@ -4,19 +4,13 @@ import {useEffect, useState} from "react";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import {SvgIcon} from "@mui/material";
 import {useNavigate} from "react-router-dom";
-interface mediaType {
-  id: number;
-  title: string;
-  url: string;
-  views: number;
-  thumbnail: string;
-  name: string;
-}
+import {media} from "../types/media";
+import {SkeletonImage} from "../components/commons/media/Skeleton";
 
 const Main = () => {
   const navigate = useNavigate();
 
-  const [medias, setMedias] = useState<mediaType[]>([]);
+  const [medias, setMedias] = useState<media[]>([]);
 
   const handleClickList = (id: number) => {
     navigate(`/video/${id}`);
@@ -51,7 +45,13 @@ const Main = () => {
                 }}
               >
                 {/* 비회원은 썸네일 가리기(lock_thumbnail), 회원은 el.thumbnail 보여주기 */}
-                <img src="src/assets/lock_thumbnail.png" alt="썸네일" />
+                <ImgContainer>
+                  <SkeletonImage
+                    src={el.non_thumbnail}
+                    alt="썸네일"
+                    background="#505050"
+                  />
+                </ImgContainer>
                 <MovieInfo>
                   <h6>{el.name}</h6>
                   <div className="views">
@@ -120,6 +120,7 @@ const MovieGrid = styled.div`
 `;
 
 const MovieLi = styled.li`
+  cursor: pointer;
   flex: 0 0 calc(25% - 1rem); // 기본적으로 4열로 설정, 여백을 고려하여 계산
   list-style: none; // 기본 리스트 스타일 제거
   border-radius: 10px;
@@ -180,4 +181,24 @@ const MovieInfo = styled.div`
 const MovieDescription = styled.p`
   margin: 0.5rem 0;
   font-size: 1.8rem;
+`;
+
+const ImgContainer = styled.div`
+  background-color: #505050;
+  border-radius: 10px;
+  width: 100%;
+  height: 0; // 높이를 0으로 설정
+  padding-top: 60%; // 비율을 유지하기 위해 패딩을 사용 (예: 4:3 비율)
+  position: relative; // 자식 요소의 절대 위치를 설정하기 위해 relative로 설정
+  overflow: hidden; // 넘치는 부분을 숨김
+
+  > img {
+    position: absolute; // 절대 위치로 설정
+    top: 0;
+    left: 0;
+    width: 100%; // 가로 100%
+    height: 100%; // 세로 100%
+    object-fit: contain; // 비율 유지하며 잘라내기
+    border-radius: 10px; // 상단 모서리 둥글게
+  }
 `;
