@@ -1,5 +1,6 @@
 const express = require("express");
 const router = express.Router();
+const authenticateToken = require("../module/authJWT");
 
 const medias = {
   data: [
@@ -135,7 +136,7 @@ router.get("/", (req, res) => {
 });
 
 // 글 단일 조회
-router.get("/:id", (req, res) => {
+router.get("/:id", authenticateToken, (req, res) => {
   const media = medias.data.find(
     (media) => media.id === parseInt(req.params.id)
   );
