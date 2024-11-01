@@ -1,15 +1,21 @@
 import styled from "styled-components";
-import axios from "axios";
 import {useEffect, useState} from "react";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import {SvgIcon} from "@mui/material";
 import {useNavigate} from "react-router-dom";
 import {media} from "../types/media";
 import {SkeletonImage} from "../components/commons/media/Skeleton";
+import {api} from "../utils/api";
+import {RootState} from "../store";
+import {useDispatch, useSelector} from "react-redux";
+import {getCookie} from "../utils/cookie";
+import {logout} from "../store/slices/user";
 
 const Main = () => {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
 
+  const user = useSelector((state: RootState) => state.user.isLoggedIn);
   const [medias, setMedias] = useState<media[]>([]);
 
   const handleClickList = (id: number) => {
@@ -19,9 +25,7 @@ const Main = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await axios.get(
-          `${import.meta.env.VITE_SERVER_DOMAIN}/media`
-        );
+        const response = await api.get("/media");
         setMedias(response.data);
       } catch (error) {
         console.error("Error fetching data:", error);
@@ -29,6 +33,13 @@ const Main = () => {
     };
 
     fetchData();
+
+    // 토큰이 만료됐을 때, 새로고침 시 유저 전역상태 업데이트
+    const access = getCookie("accessToken");
+    if (!access) {
+      dispatch(logout());
+      localStorage.removeItem("accessToken");
+    }
   }, []);
 
   return (
@@ -47,7 +58,7 @@ const Main = () => {
                 {/* 비회원은 썸네일 가리기(lock_thumbnail), 회원은 el.thumbnail 보여주기 */}
                 <ImgContainer>
                   <SkeletonImage
-                    src={el.non_thumbnail}
+                    src={user ? el.member_thumbnail : el.non_thumbnail}
                     alt="썸네일"
                     background="#505050"
                   />

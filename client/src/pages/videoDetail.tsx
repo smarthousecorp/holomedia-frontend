@@ -1,4 +1,3 @@
-import axios from "axios";
 import {useEffect, useRef, useState} from "react";
 import {useParams} from "react-router-dom";
 import styled from "styled-components";
@@ -6,10 +5,15 @@ import {media} from "../types/media";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import {SvgIcon} from "@mui/material";
 import MediaList from "../components/commons/media/MediaList";
+import {api} from "../utils/api";
+import {useSelector} from "react-redux";
+import {RootState} from "../store";
 
 const VideoDetail = () => {
   const id = useParams().id;
   const videoRef = useRef(null);
+
+  const user = useSelector((state: RootState) => state.user.isLoggedIn);
 
   // 단일 영상 데이터
   const [media, setMedia] = useState<media>();
@@ -31,15 +35,11 @@ const VideoDetail = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await axios.get(
-          `${import.meta.env.VITE_SERVER_DOMAIN}/media/${id}`
-        );
+        const response = await api.get(`/media/${id}`);
         setMedia(response.data);
 
         // 추천 리스트 데이터 가져오기 (예시로 같은 API에서 가져온다고 가정)
-        const recommendedResponse = await axios.get(
-          `${import.meta.env.VITE_SERVER_DOMAIN}/media/recommend`
-        );
+        const recommendedResponse = await api.get(`/media/recommend`);
         setRecommended(recommendedResponse.data);
       } catch (error) {
         console.error("Error fetching data:", error);
@@ -55,7 +55,7 @@ const VideoDetail = () => {
           <video
             ref={videoRef}
             src="https://firebasestorage.googleapis.com/v0/b/quill-image-store.appspot.com/o/video%2Ftest.mp4?alt=media&token=c6892120-2ad6-4109-ad8e-feeed87bbc07"
-            poster={media?.non_thumbnail}
+            poster={user ? media?.member_thumbnail : media?.non_thumbnail}
             onPlay={handlePlay}
             // onPause={handlePause}
             className={isPlaying ? "playing" : ""}

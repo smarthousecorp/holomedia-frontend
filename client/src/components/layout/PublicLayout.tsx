@@ -4,7 +4,9 @@ import Header from "../commons/Header";
 import {useEffect} from "react";
 import {useDispatch} from "react-redux";
 import {view} from "../../store/slices/header";
-// import Sidebar from "../commons/Sidebar";
+import {Navigate} from "react-router-dom";
+import {logout} from "../../store/slices/user";
+import {getCookie} from "../../utils/cookie";
 
 const PublicLayout = () => {
   const dispatch = useDispatch();
@@ -13,6 +15,17 @@ const PublicLayout = () => {
     // 해당 레이아웃이 마운트되면 무조건 햄버거 버튼이 보이게 설정
     dispatch(view());
   }, []);
+
+  const isLoggedIn = () => {
+    return localStorage.getItem("accessToken") || getCookie("accessToken");
+  };
+
+  if (!isLoggedIn()) {
+    alert("로그인 후 접근 가능합니다.");
+    dispatch(logout());
+    localStorage.removeItem("accessToken");
+    return <Navigate to="/" />;
+  }
 
   return (
     <Full>
@@ -44,6 +57,7 @@ const Inner = styled.div`
 
 const Container = styled.main`
   width: 100%;
+  border: 1px solid white;
   /* padding-left: 25rem; // sidebar가 있으면 그대로, 없어지면 0으로 해야함 (전역상태관리 사용 예정) */
 `;
 

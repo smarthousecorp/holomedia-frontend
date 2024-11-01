@@ -4,9 +4,12 @@ import VisibilityIcon from "@mui/icons-material/Visibility";
 import {SvgIcon} from "@mui/material";
 import {useNavigate} from "react-router-dom";
 import {SkeletonImage} from "./Skeleton";
+import {useSelector} from "react-redux";
+import {RootState} from "../../../store";
 
 const MediaList = ({media}: {media: media}) => {
   const navigate = useNavigate();
+  const user = useSelector((state: RootState) => state.user.isLoggedIn);
 
   const handleClickList = (id: number) => {
     navigate(`/video/${id}`);
@@ -20,9 +23,8 @@ const MediaList = ({media}: {media: media}) => {
       }}
     >
       <ImgContainer>
-        {/* <img src={media.thumbnail} alt="썸네일" /> */}
         <SkeletonImage
-          src={media.non_thumbnail}
+          src={user ? media.member_thumbnail : media.non_thumbnail}
           alt="썸네일"
           background="#505050"
         />

@@ -10,8 +10,8 @@ interface SkeletonImageProps {
   [key: string]: any;
 }
 
-const StyledImage = styled.img<{loading: boolean}>`
-  display: ${({loading}) => (loading ? "none" : "block")} !important;
+const StyledImage = styled.img<{loading: string}>`
+  display: ${({loading}) => loading} !important;
 `;
 
 export function SkeletonImage({
@@ -27,7 +27,7 @@ export function SkeletonImage({
   // 1. API Fetch 가 아직 완료 되지 않아서 src 가 없는 경우
   if (!src) {
     return (
-      <SkeletonContainer background={background} style={imgStyle} {...props}>
+      <SkeletonContainer $background={background} style={imgStyle} {...props}>
         <div className="animationBar" />
       </SkeletonContainer>
     );
@@ -37,7 +37,7 @@ export function SkeletonImage({
     <>
       {/* 2. src 는 있지만 image 로드가 완료 되지 않은 경우 */}
       {isLoading && (
-        <SkeletonContainer background={background} style={imgStyle} {...props}>
+        <SkeletonContainer $background={background} style={imgStyle} {...props}>
           <div className="animationBar" />
         </SkeletonContainer>
       )}
@@ -45,7 +45,7 @@ export function SkeletonImage({
       <StyledImage
         src={src}
         alt={alt}
-        loading={isLoading}
+        loading={isLoading ? "none" : "block"}
         onLoad={(e) => {
           if (onLoad) onLoad(e);
           setIsLoading(false);
@@ -67,8 +67,8 @@ const loadingAnimation = keyframes`
   }
 `;
 
-const SkeletonContainer = styled.div<{background: string}>`
-  background-color: ${({background}) => background};
+const SkeletonContainer = styled.div<{$background: string}>`
+  background-color: ${({$background}) => $background};
   width: 100%;
   height: 100%;
   position: relative;
@@ -81,9 +81,9 @@ const SkeletonContainer = styled.div<{background: string}>`
     height: 100%;
     background: linear-gradient(
       90deg,
-      ${({background}) => background} 0%,
+      ${({$background}) => $background} 0%,
       rgba(255, 255, 255, 0.69) 30%,
-      ${({background}) => background} 60%
+      ${({$background}) => $background} 60%
     );
     animation: ${loadingAnimation} 1.5s infinite linear;
   }
