@@ -7,4 +7,7 @@ export interface media {
   non_thumbnail: string;
   member_thumbnail: string;
   name: string;
+  createdAt: Date;
+  updatedAt: Date;
+  price: number;
 }

@@ -115,7 +115,7 @@ const Logo = styled.div`
   }
 
   > img {
-    width: 25rem;
+    width: 20rem;
   }
 `;
 
@@ -171,6 +171,7 @@ const ProfileContainer = styled.div`
   display: flex;
   color: white;
   font-size: 1.8rem;
+  white-space: nowrap;
 `;
 
 const Background = styled.div`

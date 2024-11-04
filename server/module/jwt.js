@@ -7,9 +7,9 @@ const tokenService = {
   // 웬만하면 로그인한 사용자의 pk를 담는다.
   getToken(user) {
     const payload = {
-      user_id: user.id,
-      username: user.username,
+      user_id: user,
     };
+
     return jwt.sign(payload, secretKey, accessTokenOption);
   },
   getPayload(token) {

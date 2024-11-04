@@ -19,7 +19,7 @@ function App() {
           <Route path="/upload" element={<UploadForm />} />
         </Route>
       </Routes>
-      <ToastContainer style={{fontSize: "1.4rem"}} />
+      <ToastContainer style={{fontSize: "1.4rem"}} limit={1} />
     </>
   );
 }

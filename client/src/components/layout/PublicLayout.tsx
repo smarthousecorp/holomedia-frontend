@@ -7,7 +7,8 @@ import {view} from "../../store/slices/header";
 import {Navigate} from "react-router-dom";
 import {logout} from "../../store/slices/user";
 import {getCookie} from "../../utils/cookie";
-import {showToast} from "../../store/slices/toast";
+import Toast from "../commons/Toast";
+import {ToastType} from "../../types/toast";
 
 const PublicLayout = () => {
   const dispatch = useDispatch();
@@ -15,18 +16,16 @@ const PublicLayout = () => {
   useEffect(() => {
     // 해당 레이아웃이 마운트되면 무조건 햄버거 버튼이 보이게 설정
     dispatch(view());
-  }, []);
+  }, [dispatch]);
 
   const isLoggedIn = () => {
     return localStorage.getItem("accessToken") || getCookie("accessToken");
   };
 
   if (!isLoggedIn()) {
-    dispatch(
-      showToast({message: "로그인 후에 접근 가능합니다.", type: "info"})
-    );
     dispatch(logout());
     localStorage.removeItem("accessToken");
+    Toast(ToastType.error, "로그인 후에 접근 가능합니다.");
     return <Navigate to="/" />;
   }
 

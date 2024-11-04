@@ -2,7 +2,7 @@ const express = require("express");
 const session = require("express-session");
 const router = express.Router();
 
-const db = require("../db/userDB");
+const db = require("../db/holomedia");
 const tokenService = require("../module/jwt");
 
 // 로그인 프로세스
@@ -13,7 +13,7 @@ router.post("/login", function (request, response) {
   if (user_id && password) {
     // id와 pw가 입력되었는지 확인
     db.query(
-      "SELECT * FROM user WHERE user_id = ?",
+      "SELECT * FROM users WHERE user_id = ?",
       [user_id],
       function (error, results, fields) {
         if (error) throw error;
@@ -75,7 +75,7 @@ router.post("/signup", function (request, response) {
     // username 체크 추가
     // user_id 중복 확인
     db.query(
-      "SELECT * FROM user WHERE user_id = ? OR username = ?", // user_id와 username 둘 다 확인
+      "SELECT * FROM users WHERE user_id = ? OR username = ?", // user_id와 username 둘 다 확인
       [user_id, username],
       function (error, results, fields) {
         if (error) throw error;

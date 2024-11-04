@@ -1,66 +1,106 @@
 import {useEffect, useRef, useState} from "react";
-import {useParams} from "react-router-dom";
+import {useNavigate, useParams} from "react-router-dom";
 import styled from "styled-components";
 import {media} from "../types/media";
 import VisibilityIcon from "@mui/icons-material/Visibility";
-import {SvgIcon} from "@mui/material";
+import {
+  Button,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  SvgIcon,
+} from "@mui/material";
 import MediaList from "../components/commons/media/MediaList";
 import {api} from "../utils/api";
 import {useSelector} from "react-redux";
 import {RootState} from "../store";
 
+interface PaymentStatus {
+  message?: string;
+  requirePayment: boolean;
+  price: number;
+}
+
 const VideoDetail = () => {
+  const navigate = useNavigate();
   const id = useParams().id;
   const videoRef = useRef(null);
-
   const user = useSelector((state: RootState) => state.user.isLoggedIn);
 
-  // 단일 영상 데이터
   const [media, setMedia] = useState<media>();
-  // 추천 영상 데이터
   const [recommended, setRecommended] = useState<media[]>([]);
-
-  // 영상 재생 상태
   const [isPlaying, setIsPlaying] = useState<boolean>(false);
+  const [showPaymentDialog, setShowPaymentDialog] = useState<boolean>(false);
+
+  const [paymentInfo, setPaymentInfo] = useState<PaymentStatus | null>(null);
 
   const handlePlay = () => {
     setIsPlaying(true);
   };
 
-  // 추후에 정지, 재생 시 유튜브처럼 아이콘을 띄울지 고민
-  // const handlePause = () => {
-  //   setIsPlaying(false);
-  // };
+  const onClosePaymentDialog = () => {
+    setShowPaymentDialog(false);
+    setTimeout(() => {
+      navigate({pathname: "/"});
+    }, 0); // 상태 업데이트 후에 네비게이트
+  };
+
+  const handlePayment = async () => {
+    try {
+      await api.post(`/media/${id}/payment`, {
+        amount: paymentInfo?.price,
+      });
+      setShowPaymentDialog(false);
+      fetchMediaData(); // 결제 후 미디어 데이터 다시 불러오기
+    } catch (error) {
+      console.error("Payment failed:", error);
+      alert("결제에 실패했습니다. 다시 시도해주세요.");
+    }
+  };
+
+  const fetchMediaData = async () => {
+    try {
+      const response = await api.get(`/media/${id}`);
+
+      if (response.data.requirePayment) {
+        setPaymentInfo(response.data);
+        setShowPaymentDialog(true);
+      } else {
+        setMedia(response.data);
+      }
+
+      const recommendedResponse = await api.get(`/media/recommend`);
+      console.log(recommendedResponse);
+
+      setRecommended(recommendedResponse.data);
+    } catch (error) {
+      const {response} = error as any;
+      if (response?.data?.requirePayment) {
+        setPaymentInfo(response.data);
+        setShowPaymentDialog(true);
+      }
+    }
+  };
 
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const response = await api.get(`/media/${id}`);
-        setMedia(response.data);
-
-        // 추천 리스트 데이터 가져오기 (예시로 같은 API에서 가져온다고 가정)
-        const recommendedResponse = await api.get(`/media/recommend`);
-        setRecommended(recommendedResponse.data);
-      } catch (error) {
-        console.error("Error fetching data:", error);
-      }
-    };
-
-    fetchData();
+    fetchMediaData();
   }, [id]);
+
   return (
     <VideoDetailContainer>
       <VideoPlayContainer>
         <VideoPlayer>
-          <video
-            ref={videoRef}
-            src="https://firebasestorage.googleapis.com/v0/b/quill-image-store.appspot.com/o/video%2Ftest.mp4?alt=media&token=c6892120-2ad6-4109-ad8e-feeed87bbc07"
-            poster={user ? media?.member_thumbnail : media?.non_thumbnail}
-            onPlay={handlePlay}
-            // onPause={handlePause}
-            className={isPlaying ? "playing" : ""}
-            controls
-          />
+          {!showPaymentDialog && (
+            <video
+              ref={videoRef}
+              src={media?.url}
+              poster={user ? media?.member_thumbnail : media?.non_thumbnail}
+              onPlay={handlePlay}
+              className={isPlaying ? "playing" : ""}
+              controls
+            />
+          )}
         </VideoPlayer>
         <VideoInformation>
           <NameAndView>
@@ -70,29 +110,50 @@ const VideoDetail = () => {
                 component={VisibilityIcon}
                 sx={{stroke: "#ffffff", strokeWidth: 0.3}}
               />
-              <p>{media?.views.toLocaleString()}</p>
+              <p>{media?.views?.toLocaleString()}</p>
             </Views>
           </NameAndView>
           <Title>{media?.title}</Title>
         </VideoInformation>
       </VideoPlayContainer>
       <RcmndLists>
-        {recommended.map((el) => {
-          return <MediaList key={el.id} media={el} />;
-        })}
+        {recommended.map((el) => (
+          <MediaList key={el.id} media={el} />
+        ))}
       </RcmndLists>
+
+      {/* 결제 다이얼로그 */}
+      <CustomDialog open={showPaymentDialog} onClose={onClosePaymentDialog}>
+        <CustomDialogTitle>결제가 필요한 영상입니다</CustomDialogTitle>
+        <CustomDialogContent>
+          <p>이 영상을 시청하기 위해서는 결제가 필요합니다.</p>
+          <p>가격: {paymentInfo?.price?.toLocaleString()}원</p>
+        </CustomDialogContent>
+        <DialogActions>
+          <Button onClick={onClosePaymentDialog}>취소</Button>
+          <Button onClick={handlePayment} variant="contained" color="primary">
+            결제하기
+          </Button>
+        </DialogActions>
+      </CustomDialog>
     </VideoDetailContainer>
   );
 };
 
 export default VideoDetail;
 
+// 기존 스타일 컴포넌트는 동일하게 유지
 const VideoDetailContainer = styled.section`
   width: 100%;
   margin: 0 auto;
   display: flex;
   justify-content: center;
   color: #fff;
+
+  @media screen and (max-width: 768px) {
+    flex-direction: column;
+    align-items: center;
+  }
 `;
 
 const VideoPlayContainer = styled.div`
@@ -112,6 +173,13 @@ const RcmndLists = styled.ul`
   width: 380px;
   padding-top: 2rem;
   padding-right: 2rem;
+
+  @media screen and (max-width: 768px) {
+    width: 100%;
+    padding-left: 4rem;
+    padding-right: 3rem;
+    padding-top: 5rem;
+  }
 `;
 
 const VideoPlayer = styled.div`
@@ -171,5 +239,26 @@ const Views = styled.div`
 
   > p {
     font-size: 1.4rem;
+  }
+`;
+
+// Dialog 커스텀
+
+const CustomDialog = styled(Dialog)`
+  font-family: "Pretendard-Medium";
+
+  border: 1px solid black;
+`;
+
+const CustomDialogTitle = styled(DialogTitle)`
+  font-family: "Pretendard-Bold" !important;
+  font-size: 1.5rem !important;
+`;
+
+const CustomDialogContent = styled(DialogContent)`
+  font-size: 1.35rem;
+
+  & > p {
+    margin-bottom: 0.5rem;
   }
 `;

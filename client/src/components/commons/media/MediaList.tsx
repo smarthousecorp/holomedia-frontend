@@ -7,6 +7,7 @@ import {SkeletonImage} from "./Skeleton";
 import {useSelector} from "react-redux";
 import {RootState} from "../../../store";
 
+// 영상 단일조회 페이지의 추천 리스트 컴포넌트
 const MediaList = ({media}: {media: media}) => {
   const navigate = useNavigate();
   const user = useSelector((state: RootState) => state.user.isLoggedIn);
@@ -29,17 +30,19 @@ const MediaList = ({media}: {media: media}) => {
           background="#505050"
         />
       </ImgContainer>
-      <MovieInfo>
-        <h6>{media.name}</h6>
-        <div className="views">
-          <SvgIcon
-            component={VisibilityIcon}
-            sx={{stroke: "#ffffff", strokeWidth: 0.3}}
-          />
-          <p>{media.views.toLocaleString()}</p>
-        </div>
-      </MovieInfo>
-      <MovieDescription>{media.title}</MovieDescription>
+      <div className="mo">
+        <MovieInfo>
+          <h6>{media.name}</h6>
+          <div className="views">
+            <SvgIcon
+              component={VisibilityIcon}
+              sx={{stroke: "#ffffff", strokeWidth: 0.3}}
+            />
+            <p>{media.views.toLocaleString()}</p>
+          </div>
+        </MovieInfo>
+        <MovieDescription>{media.title}</MovieDescription>
+      </div>
     </MovieLi>
   );
 };
@@ -47,6 +50,7 @@ const MediaList = ({media}: {media: media}) => {
 export default MediaList;
 
 const MovieLi = styled.li`
+  cursor: pointer;
   list-style: none; // 기본 리스트 스타일 제거
   border-radius: 10px;
   font-family: "Pretendard-Light";
@@ -57,6 +61,22 @@ const MovieLi = styled.li`
     height: auto;
     object-fit: cover;
     border-radius: 10px; // 상단 모서리 둥글게
+  }
+
+  .mo {
+    display: block;
+    flex-direction: column-reverse;
+    width: 100%;
+    height: 100%;
+    padding: 0 10px;
+  }
+
+  @media screen and (max-width: 768px) {
+    display: flex;
+
+    .mo {
+      display: flex;
+    }
   }
 `;
 
@@ -113,5 +133,10 @@ const ImgContainer = styled.div`
     height: 100%; // 세로 100%
     object-fit: contain; // 비율 유지하며 잘라내기
     border-radius: 10px; // 상단 모서리 둥글게
+  }
+
+  @media screen and (max-width: 768px) {
+    width: 30%;
+    padding-top: 20%;
   }
 `;
