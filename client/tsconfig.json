@@ -7,6 +7,7 @@
   "compilerOptions": {
     /* absolute paths */
     "baseUrl": "./src",
+    "allowJs": true,
     "paths": {
       "@/*": ["/*"]
     }

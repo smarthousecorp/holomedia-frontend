@@ -2,7 +2,7 @@ const express = require("express");
 const session = require("express-session");
 const router = express.Router();
 
-const db = require("../db/db");
+const db = require("../db/userDB");
 const tokenService = require("../module/jwt");
 
 // 로그인 프로세스
@@ -96,7 +96,7 @@ router.post("/signup", function (request, response) {
           if (results[0].user_id === user_id) {
             response.status(409).send("이미 존재하는 아이디 입니다.");
           } else if (results[0].username === username) {
-            response.status(409).send("이미 존재하는 닉네임입니다.");
+            response.status(409).send("이미 존재하는 닉네임 입니다.");
           }
         } else if (password !== passwordCheck) {
           // 비밀번호가 올바르게 입력되지 않은 경우

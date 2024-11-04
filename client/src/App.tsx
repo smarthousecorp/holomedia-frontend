@@ -4,6 +4,8 @@ import MainLayout from "./components/layout/MainLayout";
 import "./index.css";
 import VideoDetail from "./pages/videoDetail";
 import PublicLayout from "./components/layout/PublicLayout";
+import {ToastContainer} from "react-toastify";
+import UploadForm from "./pages/uploadVideo";
 
 function App() {
   return (
@@ -14,8 +16,10 @@ function App() {
         </Route>
         <Route element={<PublicLayout />}>
           <Route path="/video/:id" element={<VideoDetail />} />
+          <Route path="/upload" element={<UploadForm />} />
         </Route>
       </Routes>
+      <ToastContainer style={{fontSize: "1.4rem"}} />
     </>
   );
 }

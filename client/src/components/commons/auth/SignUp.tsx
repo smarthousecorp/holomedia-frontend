@@ -6,6 +6,11 @@ import React, {useState} from "react";
 import axios, {AxiosError} from "axios";
 import {useSignUpValidation} from "../../../utils/SignUpValid";
 import {checkId, checkPassword, checkUsername} from "../../../utils/validCheck";
+import {useDispatch} from "react-redux";
+import {off} from "../../../store/slices/modal";
+import {showToast} from "../../../store/slices/toast";
+import Toast from "../Toast";
+import {ToastType} from "../../../types/toast";
 
 export interface SignUp {
   [key: string]: any;
@@ -23,6 +28,7 @@ interface ErrorMsg {
 }
 
 const SignUp = () => {
+  const dispatch = useDispatch();
   // 입력값 상태 관리
   const [inputVal, setInputVal] = useState<SignUp>({
     user_id: "",
@@ -112,12 +118,29 @@ const SignUp = () => {
   const onClickSignUpBtn = () => {
     axios
       .post(`${import.meta.env.VITE_SERVER_DOMAIN}/signup`, inputVal)
-      .then((res) => {
-        console.log(res);
+      .then(() => {
+        dispatch(off());
+        Toast(ToastType.success, "회원가입이 완료되었습니다.");
+        dispatch(
+          showToast({
+            message: "회원가입이 완료되었습니다.",
+            type: "success",
+          })
+        );
       })
       .catch((error) => {
+        const msg = {user_id: "", username: ""};
         const axiosError = error as AxiosError;
-        console.error(axiosError.response?.data);
+        if (axiosError.response?.status === 409) {
+          const errorMessage = axiosError.response?.data;
+
+          if (errorMessage === "이미 존재하는 아이디 입니다.") {
+            msg.user_id = "이미 존재하는 아이디 입니다.";
+          } else if (errorMessage === "이미 존재하는 닉네임 입니다.") {
+            msg.username = "이미 존재하는 닉네임 입니다.";
+          }
+          setErrorMsg({...errorMsg, ...msg});
+        }
       });
   };
   return (

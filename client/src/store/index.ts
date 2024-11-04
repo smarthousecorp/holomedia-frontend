@@ -6,12 +6,14 @@ import user from "./slices/user";
 import sidebar from "./slices/sidebar";
 import {thunk} from "redux-thunk";
 import header from "./slices/header";
+import toast from "./slices/toast";
 
 const reducers = combineReducers({
   modal: modal,
   user: user,
   sidebar: sidebar,
   header: header,
+  toast: toast,
 });
 
 const persistConfig = {

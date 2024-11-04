@@ -3,7 +3,6 @@ const jwt = require("jsonwebtoken");
 
 const authenticateToken = (req, res, next) => {
   const token = req.headers["authorization"]; // Bearer 토큰에서 실제 토큰 추출
-  console.log(token);
 
   if (!token) {
     return res.status(401).send({message: "No token provided"});

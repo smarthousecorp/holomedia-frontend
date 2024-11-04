@@ -7,6 +7,7 @@ import {view} from "../../store/slices/header";
 import {Navigate} from "react-router-dom";
 import {logout} from "../../store/slices/user";
 import {getCookie} from "../../utils/cookie";
+import {showToast} from "../../store/slices/toast";
 
 const PublicLayout = () => {
   const dispatch = useDispatch();
@@ -21,7 +22,9 @@ const PublicLayout = () => {
   };
 
   if (!isLoggedIn()) {
-    alert("로그인 후 접근 가능합니다.");
+    dispatch(
+      showToast({message: "로그인 후에 접근 가능합니다.", type: "info"})
+    );
     dispatch(logout());
     localStorage.removeItem("accessToken");
     return <Navigate to="/" />;
@@ -57,7 +60,6 @@ const Inner = styled.div`
 
 const Container = styled.main`
   width: 100%;
-  border: 1px solid white;
   /* padding-left: 25rem; // sidebar가 있으면 그대로, 없어지면 0으로 해야함 (전역상태관리 사용 예정) */
 `;
 
