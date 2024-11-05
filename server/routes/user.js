@@ -84,7 +84,7 @@ router.post("/signup", function (request, response) {
         if (results.length <= 0 && password === passwordCheck) {
           // DB에 같은 이름의 회원아이디와 닉네임이 없고, 비밀번호가 올바르게 입력된 경우
           db.query(
-            "INSERT INTO user (user_id, password, username) VALUES(?,?,?)",
+            "INSERT INTO users (user_id, password, username) VALUES(?,?,?)",
             [user_id, password, username],
             function (error, data) {
               if (error) throw error;
