@@ -16,7 +16,12 @@ app.use(
   })
 );
 
-app.use(cors());
+app.use(
+  cors({
+    origin: "*",
+    credentials: true,
+  })
+);
 app.use(express.json());
 
 // Pug 템플릿 엔진 설정

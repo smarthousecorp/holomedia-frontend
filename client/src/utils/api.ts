@@ -5,7 +5,10 @@ import {logout} from "../store/slices/user";
 
 export const api = axios.create({
   baseURL: import.meta.env.VITE_SERVER_DOMAIN,
-  headers: {"Content-Type": "application/json"},
+  headers: {
+    "Content-Type": "application/json",
+    "Access-Control-Allow-Origin": "*",
+  },
 });
 
 // 요청이 전송되기 전 실행할 로직
