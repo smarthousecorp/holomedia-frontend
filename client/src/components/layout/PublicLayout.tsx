@@ -22,12 +22,15 @@ const PublicLayout = () => {
     return localStorage.getItem("accessToken") || getCookie("accessToken");
   };
 
+  // 로그인 상태 확인
   if (!isLoggedIn()) {
     dispatch(logout());
     localStorage.removeItem("accessToken");
     Toast(ToastType.error, "로그인 후에 접근 가능합니다.");
     return <Navigate to="/" />;
   }
+
+  // 성인인증 상태 확인
 
   return (
     <Full>

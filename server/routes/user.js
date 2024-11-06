@@ -37,11 +37,14 @@ router.post("/login", function (request, response) {
         // 로그인 성공
         request.session.is_logined = true; // 세션 정보 갱신
         request.session.nickname = user_id;
+        console.log(user);
+
         response.status(200).send({
           message: "로그인이 완료되었습니다.",
           accessToken: tokenService.getToken(user_id),
           status: 200,
           username: user.username,
+          is_adult_verified: user.is_adult_verified,
         });
       }
     );
