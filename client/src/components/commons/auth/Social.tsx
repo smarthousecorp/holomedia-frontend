@@ -12,13 +12,13 @@ const Social = ({auth}: SocialProps) => {
       </TitleDiv>
       <IconUl>
         <IconLi>
-          <img src="./src/assets/Naver.svg" alt="네이버 아이콘" />
+          <img src="/src/assets/Naver.svg" alt="네이버 아이콘" />
         </IconLi>
         <IconLi>
-          <img src="./src/assets/Naver.svg" alt="네이버 아이콘" />
+          <img src="/src/assets/Naver.svg" alt="네이버 아이콘" />
         </IconLi>
         <IconLi>
-          <img src="./src/assets/Kakao.png" alt="카카오 아이콘" />
+          <img src="/src/assets/Kakao.png" alt="카카오 아이콘" />
         </IconLi>
       </IconUl>
     </SocialContainer>
