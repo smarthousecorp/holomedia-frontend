@@ -13,11 +13,114 @@ const AdultVerificationModal = ({
 }: AdultVerificationModalProps) => {
   if (!isOpen) return null;
 
-  const handleVerification = () => {
-    // 성인인증 로직 구현
-    // 예: 본인인증 서비스 연동
-    // 성공 시 onComplete 호출
-    onComplete();
+  // 성인인증하기 버튼 실행 함수
+  const handleVerification = async () => {
+    try {
+      // 1. 백엔드 API를 호출하여 인증 정보 받아오기
+      const response = await fetch("/api/nice/auth/request", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+
+      const authData = await response.json();
+
+      if (!authData.success) {
+        throw new Error(authData.message);
+      }
+
+      // 2. 팝업 창 설정
+      const popupWidth = 500;
+      const popupHeight = 700;
+      const left = (window.screen.width - popupWidth) / 2;
+      const top = (window.screen.height - popupHeight) / 2;
+
+      // 3. 팝업 창 열기
+      const popup = window.open(
+        "",
+        "niceAuth",
+        `width=${popupWidth},height=${popupHeight},left=${left},top=${top},scrollbars=yes`
+      );
+
+      // 4. 폼 생성 및 제출
+      const form = document.createElement("form");
+      form.name = "niceAuthForm";
+      form.method = "post";
+      form.action =
+        "https://nice.checkplus.co.kr/CheckPlusSafeModel/checkplus.cb";
+      form.target = "niceAuth";
+
+      // 받아온 인증 데이터를 hidden input으로 추가
+      const appendInput = (name: string, value: string) => {
+        const input = document.createElement("input");
+        input.type = "hidden";
+        input.name = name;
+        input.value = value;
+        form.appendChild(input);
+      };
+
+      // 필요한 파라미터들 추가
+      appendInput("m", "checkplusService"); // 필수 항목
+      appendInput("token_version_id", authData.token_version_id);
+      appendInput("enc_data", authData.enc_data);
+      appendInput("integrity_value", authData.integrity_value);
+
+      document.body.appendChild(form);
+      form.submit();
+      document.body.removeChild(form);
+
+      // 5. 팝업 창 결과 처리
+      const handleMessage = async (event: any) => {
+        // NICE 인증서버의 도메인 체크 (보안)
+        if (event.origin !== "https://nice.checkplus.co.kr") return;
+
+        const {success, data} = event.data;
+
+        if (success) {
+          try {
+            // 백엔드로 인증 결과 전송
+            const verifyResponse = await fetch("/api/nice/auth/verify", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify(data),
+            });
+
+            const verifyResult = await verifyResponse.json();
+
+            if (verifyResult.success) {
+              // 성인인증 성공 처리
+              if (verifyResult.age >= 19) {
+                onComplete(); // 성공 콜백 실행
+              } else {
+                alert(
+                  "성인인증에 실패했습니다. 만 19세 이상만 이용 가능합니다."
+                );
+              }
+            } else {
+              throw new Error(verifyResult.message);
+            }
+          } catch (error) {
+            console.error("인증 확인 중 오류 발생:", error);
+            alert("인증 처리 중 오류가 발생했습니다.");
+          }
+        } else {
+          alert("본인인증에 실패했습니다.");
+        }
+
+        // 이벤트 리스너 제거 및 팝업 창 닫기
+        window.removeEventListener("message", handleMessage);
+        popup?.close();
+      };
+
+      // 팝업 창으로부터의 메시지 수신 대기
+      window.addEventListener("message", handleMessage);
+    } catch (error) {
+      console.error("본인인증 처리 중 오류 발생:", error);
+      alert("본인인증 처리 중 오류가 발생했습니다.");
+    }
   };
 
   return (

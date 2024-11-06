@@ -4,6 +4,7 @@ const cors = require("cors");
 const path = require("path");
 const mediaRouter = require("./routes/media");
 const userRouter = require("./routes/user");
+const niceAuthRouter = require("./routes/niceAuthRoute");
 
 const app = express();
 
@@ -23,11 +24,13 @@ app.use(
   })
 );
 app.use(express.json());
+app.use(express.urlencoded({extended: true}));
 
 // Pug 템플릿 엔진 설정
 app.use(express.static(path.join(__dirname, "public")));
 
 app.use("/", userRouter);
 app.use("/media", mediaRouter);
+app.use("/api/nice/auth", niceAuthRouter);
 
 module.exports = app;

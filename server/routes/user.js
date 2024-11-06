@@ -5,6 +5,8 @@ const router = express.Router();
 const db = require("../db/holomedia");
 const tokenService = require("../module/jwt");
 
+const uuid4 = require("uuid4");
+
 // 로그인 프로세스
 router.post("/login", function (request, response) {
   const user_id = request.body.user_id;
