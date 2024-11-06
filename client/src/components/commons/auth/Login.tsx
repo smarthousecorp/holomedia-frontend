@@ -52,12 +52,11 @@ const Login = () => {
         // });
 
         // 전역상태 user에 로그인 상태 및 이름 저장
-        console.log(res.data);
-
         dispatch(
           login({
             isLoggedIn: true,
             username: res.data.username,
+            is_adult_verified: res.data.is_adult_verified,
           })
         );
 

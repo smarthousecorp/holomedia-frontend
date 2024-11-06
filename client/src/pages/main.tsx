@@ -9,16 +9,38 @@ import {api} from "../utils/api";
 import {RootState} from "../store";
 import {useDispatch, useSelector} from "react-redux";
 import {getCookie} from "../utils/cookie";
-import {logout} from "../store/slices/user";
+import {logout, verifyAdult} from "../store/slices/user";
+import AdultVerificationModal from "../components/commons/media/AdultVerificationModal";
+import Toast from "../components/commons/Toast";
+import {ToastType} from "../types/toast";
 
 const Main = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
   const user = useSelector((state: RootState) => state.user.isLoggedIn);
+  const isAdultVerified = useSelector(
+    (state: RootState) => state.user.is_adult_verified
+  );
+
   const [medias, setMedias] = useState<media[]>([]);
+  const [showModal, setShowModal] = useState<boolean>(false);
+  const [selectedVideoId, setSelectedVideoId] = useState<number | null>(null);
 
   const handleClickList = (id: number) => {
+    if (!user) {
+      Toast(ToastType.error, "로그인 후에 접근 가능합니다.");
+      return;
+    }
+
+    if (!isAdultVerified) {
+      setSelectedVideoId(id);
+      setShowModal(true);
+      return;
+    }
+
+    console.log("접근가능합니다.");
+
     navigate(`/video/${id}`);
   };
 
@@ -79,6 +101,24 @@ const Main = () => {
           })}
         </MovieGrid>
       </MovieContainer>
+      {/* 성인인증 모달 */}
+      {showModal && (
+        <AdultVerificationModal
+          isOpen={showModal}
+          onClose={() => {
+            setShowModal(false);
+            setSelectedVideoId(null);
+          }}
+          onComplete={() => {
+            setShowModal(false);
+            dispatch(verifyAdult());
+            if (selectedVideoId) {
+              navigate(`/video/${selectedVideoId}`);
+              setSelectedVideoId(null);
+            }
+          }}
+        />
+      )}
     </MainContainer>
   );
 };
