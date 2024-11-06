@@ -32,7 +32,7 @@ class NiceAuth {
         },
         data: qs.stringify(dataBody),
       });
-      console.log(response.data.dataBody.access_token);
+      console.log(response.data);
       return response.data.dataBody.access_token;
     } catch (error) {
       console.error("getAccessToken Error:", error);
@@ -106,7 +106,7 @@ class NiceAuth {
           productId: this.productId,
           key: cryptData.key,
           iv: cryptData.iv,
-          crypto_cert_url: "http://localhost:5173/certification", // 인증 완료 후 리턴될 URL
+          crypto_cert_url: reqData.returnUrl, // 인증 완료 후 리턴될 URL
           integrity_value: cryptData.integrityValue,
           token_version_id: crypto.randomBytes(16).toString("hex"),
           enc_data: cryptData.encrypted,
