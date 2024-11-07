@@ -17,7 +17,7 @@ const checkPaymentStatus = async (userId, mediaId) => {
 };
 
 // 랜덤 영상 3개 조회
-router.get("/recommend", (req, res) => {
+router.get("/recommend", authenticateToken, (req, res) => {
   const sql =
     "SELECT id, title, views, non_thumbnail, member_thumbnail, name FROM medias ORDER BY RAND() LIMIT 3";
 
@@ -29,6 +29,69 @@ router.get("/recommend", (req, res) => {
     res.send(results);
   });
 });
+
+// 주간 통계 API
+
+// 특정 크리에이터의 주간 통계 조회 (수정된 버전)
+router.get("/weekly/:name", (req, res) => {
+  const creatorName = req.params.name;
+
+  const sql = `
+    SELECT 
+      m.id,
+      m.name,
+      m.title,
+      m.views as total_views,
+      m.non_thumbnail,
+      m.member_thumbnail,
+      COALESCE(weekly_views.view_count, 0) as weekly_views,
+      DATE_FORMAT(m.created_at, '%Y-%m-%d') as created_date
+    FROM 
+      medias m
+    LEFT JOIN (
+      SELECT 
+        media_id,
+        COUNT(*) as view_count
+      FROM 
+        view_logs
+      WHERE 
+        viewed_at >= DATE_SUB(NOW(), INTERVAL 7 DAY)
+        AND viewed_at <= NOW()
+      GROUP BY 
+        media_id
+    ) weekly_views ON m.id = weekly_views.media_id
+    WHERE 
+      m.name = ?
+    ORDER BY 
+      weekly_views DESC,
+      m.views DESC`;
+
+  db.query(sql, [creatorName], (err, results) => {
+    if (err) {
+      console.error("크리에이터 주간 통계 조회 실패:", err);
+      return res.status(500).send({message: "서버 오류가 발생했습니다."});
+    }
+
+    if (results.length === 0) {
+      return res.status(404).send({
+        message: "해당 크리에이터의 데이터가 없습니다.",
+      });
+    }
+
+    res.send(results);
+  });
+});
+
+// 조회수 로그를 기록하기 위한 함수 추가 (기존 조회수 증가 로직에 추가)
+const logVideoView = (mediaId, userId = null) => {
+  const sql =
+    "INSERT INTO view_logs (media_id, user_id, viewed_at) VALUES (?, ?, NOW())";
+  db.query(sql, [mediaId, userId], (err) => {
+    if (err) {
+      console.error("조회수 로그 기록 실패:", err);
+    }
+  });
+};
 
 // 글 전체 조회
 router.get("/", (req, res) => {
@@ -83,6 +146,10 @@ router.get("/:id", authenticateToken, async (req, res) => {
           console.error("조회수 업데이트 실패:", err);
           return res.status(500).send({message: "서버 오류가 발생했습니다."});
         }
+
+        // 조회 로그 기록
+        logVideoView(mediaId, userId);
+
         res.send({...media, isPaid});
       });
     });
