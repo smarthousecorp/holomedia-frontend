@@ -31,11 +31,10 @@ router.get("/recommend", authenticateToken, (req, res) => {
 });
 
 // 주간 통계 API
-
-// 특정 크리에이터의 주간 통계 조회 (수정된 버전)
 router.get("/weekly/:name", (req, res) => {
   const creatorName = req.params.name;
 
+  // 1. 크리에이터의 모든 영상을 조회하는 쿼리
   const sql = `
     SELECT 
       m.id,
@@ -45,7 +44,12 @@ router.get("/weekly/:name", (req, res) => {
       m.non_thumbnail,
       m.member_thumbnail,
       COALESCE(weekly_views.view_count, 0) as weekly_views,
-      DATE_FORMAT(m.created_at, '%Y-%m-%d') as created_date
+      DATE_FORMAT(m.created_at, '%Y-%m-%d') as created_date,
+      CASE 
+        WHEN m.created_at >= DATE_SUB(NOW(), INTERVAL 7 DAY) THEN 'new'
+        WHEN m.created_at < DATE_SUB(NOW(), INTERVAL 30 DAY) THEN 'old'
+        ELSE 'regular'
+      END as content_age_status
     FROM 
       medias m
     LEFT JOIN (
@@ -63,22 +67,52 @@ router.get("/weekly/:name", (req, res) => {
     WHERE 
       m.name = ?
     ORDER BY 
-      weekly_views DESC,
-      m.views DESC`;
+      CASE 
+        WHEN weekly_views.view_count IS NOT NULL AND weekly_views.view_count > 0 
+        THEN weekly_views.view_count 
+        ELSE m.views 
+      END DESC`; // weekly_views가 없으면 전체 views로 정렬
 
   db.query(sql, [creatorName], (err, results) => {
+    console.log(results);
+
     if (err) {
       console.error("크리에이터 주간 통계 조회 실패:", err);
       return res.status(500).send({message: "서버 오류가 발생했습니다."});
     }
 
+    // 2. 크리에이터가 존재하지 않는 경우
     if (results.length === 0) {
       return res.status(404).send({
+        status: "empty",
         message: "해당 크리에이터의 데이터가 없습니다.",
       });
     }
 
-    res.send(results);
+    // 3. 통계 요약 정보
+    const summary = {
+      total_contents: results.length,
+      total_weekly_views: results.reduce(
+        (sum, item) => sum + item.weekly_views,
+        0
+      ),
+      total_views: results.reduce((sum, item) => sum + item.total_views, 0),
+      contents_with_no_weekly_views: results.filter(
+        (item) => item.weekly_views === 0
+      ).length,
+      new_contents: results.filter((item) => item.content_age_status === "new")
+        .length,
+      has_weekly_data: results.some((item) => item.weekly_views > 0),
+    };
+
+    res.send({
+      status: "success",
+      summary,
+      data: results.map(({content_age_status, ...item}) => ({
+        ...item,
+        view_status: item.weekly_views > 0 ? "active" : "inactive",
+      })),
+    });
   });
 });
 
