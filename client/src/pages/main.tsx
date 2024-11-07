@@ -157,14 +157,6 @@ const MovieGrid = styled.div`
   gap: 1rem; // 요소 간의 간격 설정
   margin-top: 2rem;
 
-  @media (max-width: 1200px) {
-    justify-content: space-between; // 1200px 이하에서 요소 간의 간격 조정
-  }
-
-  @media (max-width: 900px) {
-    justify-content: space-around; // 900px 이하에서 요소 간의 간격 조정
-  }
-
   @media (max-width: 600px) {
     justify-content: center; // 600px 이하에서 요소를 중앙 정렬
   }
