@@ -24,6 +24,11 @@ const Header = () => {
   const modal = useSelector((state: RootState) => state.modal.loginModal);
   const user = useSelector((state: RootState) => state.user);
   const header = useSelector((state: RootState) => state.header.isOpen);
+  const {currentMode, currentUploader} = useSelector(
+    (state: RootState) => state.view
+  );
+
+  console.log(currentMode, currentUploader);
 
   const navigate = useNavigate();
   const dispatch = useDispatch();
@@ -63,6 +68,10 @@ const Header = () => {
       window.removeEventListener("resize", handleResize);
     };
   }, [header]);
+
+  useEffect(() => {
+    setIsOpenSidebar(false);
+  }, [currentMode, currentUploader]);
 
   return (
     <>
