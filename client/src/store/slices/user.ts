@@ -6,17 +6,20 @@ const userSlice = createSlice({
     isLoggedIn: false,
     username: "",
     is_adult_verified: 0,
+    is_admin: 0,
   },
   reducers: {
     login: (state, actions) => {
       state.isLoggedIn = true;
       state.username = actions.payload.username;
       state.is_adult_verified = actions.payload.is_adult_verified;
+      state.is_admin = actions.payload.is_admin;
     },
     logout: (state) => {
       state.isLoggedIn = false;
       state.username = "";
       state.is_adult_verified = 0;
+      state.is_admin = 0;
     },
     verifyAdult: (state) => {
       state.is_adult_verified = 1; // 성인 인증 완료

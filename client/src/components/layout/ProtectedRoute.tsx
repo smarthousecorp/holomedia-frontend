@@ -12,6 +12,7 @@ const ProtectedRoute = ({children}: ProtectedRouteProps) => {
     (state: RootState) => state.user.is_adult_verified
   );
   const isLoggedIn = useSelector((state: RootState) => state.user.isLoggedIn);
+  const isAdmin = useSelector((state: RootState) => state.user.is_admin);
 
   // 로그인 체크
   if (!isLoggedIn) {
@@ -24,7 +25,7 @@ const ProtectedRoute = ({children}: ProtectedRouteProps) => {
   }
 
   // 성인인증 체크
-  if (!isAdultVerified) {
+  if (!isAdmin && !isAdultVerified) {
     return <Navigate to="/" replace />;
   }
 

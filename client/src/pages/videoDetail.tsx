@@ -71,7 +71,6 @@ const VideoDetail = () => {
       }
 
       const recommendedResponse = await api.get(`/media/recommend`);
-      console.log(recommendedResponse);
 
       setRecommended(recommendedResponse.data);
     } catch (error) {

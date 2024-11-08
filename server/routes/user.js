@@ -46,6 +46,7 @@ router.post("/login", function (request, response) {
           status: 200,
           username: user.username,
           is_adult_verified: user.is_adult_verified,
+          is_admin: user.is_admin,
         });
       }
     );

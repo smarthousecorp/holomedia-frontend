@@ -22,6 +22,7 @@ const Main = () => {
   const isAdultVerified = useSelector(
     (state: RootState) => state.user.is_adult_verified
   );
+  const isAdmin = useSelector((state: RootState) => state.user.is_admin);
 
   const [medias, setMedias] = useState<media[]>([]);
   const [showModal, setShowModal] = useState<boolean>(false);
@@ -33,28 +34,47 @@ const Main = () => {
       return;
     }
 
-    if (!isAdultVerified) {
+    if (!isAdmin && !isAdultVerified) {
       setSelectedVideoId(id);
       setShowModal(true);
       return;
     }
 
-    console.log("접근가능합니다.");
-
     navigate(`/video/${id}`);
   };
 
   useEffect(() => {
-    const fetchData = async () => {
+    const fetchNewData = async () => {
       try {
-        const response = await api.get("/media");
-        setMedias(response.data);
+        const response = await api.get(`/media/recent?limit=${4}`);
+        setMedias(response.data.data);
       } catch (error) {
         console.error("Error fetching data:", error);
       }
     };
 
-    fetchData();
+    // const fetchUploaderData = async () => {
+    //   try {
+    //     const response = await api.get(`/media/uploader`);
+    //     console.log(response);
+    //   } catch (error) {
+    //     console.error("Error fetching data:", error);
+    //   }
+    // };
+
+    // const fetchWeeklyData = async () => {
+    //   try {
+    //     const response = await api.get(`/media/weekly/${}`);
+    //     console.log(response);
+
+    //     setMedias(response.data.data);
+    //   } catch (error) {
+    //     console.error("Error fetching data:", error);
+    //   }
+    // };
+
+    fetchNewData();
+    // fetchUploaderData();
 
     // 토큰이 만료됐을 때, 새로고침 시 유저 전역상태 업데이트
     const access = getCookie("accessToken");
@@ -67,7 +87,8 @@ const Main = () => {
   return (
     <MainContainer>
       <MovieContainer>
-        <MovieTitle>NEW</MovieTitle>
+        <MovieTitle>최근에 등록된 동영상</MovieTitle>
+        <hr />
         <MovieGrid>
           {medias.map((el) => {
             return (
@@ -81,6 +102,7 @@ const Main = () => {
                 <ImgContainer>
                   <SkeletonImage
                     src={user ? el.member_thumbnail : el.non_thumbnail}
+                    style={{objectFit: user ? "cover" : "contain"}}
                     alt="썸네일"
                     background="#505050"
                   />
@@ -144,10 +166,16 @@ const MovieContainer = styled.div`
   &::-webkit-scrollbar {
     display: none; /* Chrome, Safari, Opera*/
   }
+
+  > hr {
+    margin: 10px 0;
+    color: #ffffff;
+    height: 1px;
+  }
 `;
 
 const MovieTitle = styled.h2`
-  font-size: 2.4rem;
+  font-size: 2.2rem;
 `;
 
 const MovieGrid = styled.div`
