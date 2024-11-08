@@ -11,6 +11,10 @@ import {getCookie} from "../../utils/cookie";
 import {useNavigate} from "react-router-dom";
 import {useEffect, useState} from "react";
 import Sidebar from "./Sidebar";
+import {logout} from "../../store/slices/user";
+import {userLogout} from "../../utils/logout";
+import Toast from "./Toast";
+import {ToastType} from "../../types/toast";
 
 interface sidebarProps {
   isOpen: boolean;
@@ -26,6 +30,7 @@ const Header = () => {
 
   // 햄버거 클릭 시 열릴 사이드바 상태
   const [isOpenSidebar, setIsOpenSidebar] = useState<boolean>(false);
+  const [isOpenDropdown, setIsOpenDropdown] = useState<boolean>(false);
 
   const handleClickLoginBtn = () => {
     dispatch(on());
@@ -33,6 +38,14 @@ const Header = () => {
 
   const handleClickHamburger = () => {
     setIsOpenSidebar((prev) => !prev);
+  };
+
+  const handleLogout = () => {
+    dispatch(logout());
+    userLogout();
+    setIsOpenDropdown(false);
+    navigate("/", {replace: true});
+    Toast(ToastType.success, "로그아웃이 완료되었습니다.");
   };
 
   // 메인 레이아웃에서 햄버거 클릭 후, 스크롤 조절 시 사이드바 닫기 불가능
@@ -72,7 +85,13 @@ const Header = () => {
             <SvgIcon component={SearchIcon} />
           </InputContainer>
           {getCookie("accessToken") ? (
-            <ProfileContainer>{user.username} 회원님</ProfileContainer>
+            <ProfileContainer
+              onClick={() => {
+                setIsOpenDropdown(!isOpenDropdown);
+              }}
+            >
+              {user.username} 님
+            </ProfileContainer>
           ) : (
             <LoginBtn onClick={handleClickLoginBtn}>로그인 / 회원가입</LoginBtn>
           )}
@@ -83,6 +102,13 @@ const Header = () => {
         <Background>
           <CustomSidebar isOpen={isOpenSidebar} />
         </Background>
+      )}
+      {isOpenDropdown && (
+        <Dropdown>
+          <a>설정</a>
+          {user.is_admin && <a href="/upload">업로드</a>}
+          <a onClick={handleLogout}>로그아웃</a>
+        </Dropdown>
       )}
     </>
   );
@@ -168,6 +194,8 @@ const LoginBtn = styled.button`
 `;
 
 const ProfileContainer = styled.div`
+  position: relative;
+  cursor: pointer;
   display: flex;
   color: white;
   font-size: 1.8rem;
@@ -197,4 +225,29 @@ const CustomSidebar = styled(Sidebar)<sidebarProps>`
     css`
       left: 0; /* 사이드바가 화면에 나타날 때 위치 */
     `}
+`;
+
+const Dropdown = styled.div`
+  position: absolute;
+  z-index: 999;
+  top: 5rem;
+  right: 6rem;
+  margin-top: 1rem;
+  width: 12rem;
+  background-color: white;
+  box-shadow: 0 0 8px rgba(0, 0, 0, 0.1);
+
+  > a {
+    font-size: 1.5rem;
+    padding: 0.75em 1rem;
+    line-height: 1.5;
+    font-weight: 400;
+    cursor: pointer;
+    color: black;
+
+    &:hover {
+      background-color: #f8f9fa;
+      color: #ff627c;
+    }
+  }
 `;

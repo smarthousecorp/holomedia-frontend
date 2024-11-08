@@ -57,6 +57,7 @@ const Login = () => {
             isLoggedIn: true,
             username: res.data.username,
             is_adult_verified: res.data.is_adult_verified,
+            is_admin: res.data.is_admin,
           })
         );
 
