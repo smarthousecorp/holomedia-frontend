@@ -27,12 +27,12 @@ const VideoDetail = () => {
   const id = useParams().id;
   const videoRef = useRef(null);
   const user = useSelector((state: RootState) => state.user.isLoggedIn);
+  const isAdmin = useSelector((state: RootState) => state.user.is_admin);
 
   const [media, setMedia] = useState<media>();
   const [recommended, setRecommended] = useState<media[]>([]);
   const [isPlaying, setIsPlaying] = useState<boolean>(false);
   const [showPaymentDialog, setShowPaymentDialog] = useState<boolean>(false);
-
   const [paymentInfo, setPaymentInfo] = useState<PaymentStatus | null>(null);
 
   const handlePlay = () => {
@@ -63,7 +63,7 @@ const VideoDetail = () => {
     try {
       const response = await api.get(`/media/${id}`);
 
-      if (response.data.requirePayment) {
+      if (!isAdmin && response.data.requirePayment) {
         setPaymentInfo(response.data);
         setShowPaymentDialog(true);
       } else {
@@ -75,7 +75,7 @@ const VideoDetail = () => {
       setRecommended(recommendedResponse.data);
     } catch (error) {
       const {response} = error as any;
-      if (response?.data?.requirePayment) {
+      if (!isAdmin && response?.data?.requirePayment) {
         setPaymentInfo(response.data);
         setShowPaymentDialog(true);
       }
@@ -192,7 +192,7 @@ const VideoPlayer = styled.div`
   overflow: hidden; // 넘치는 부분을 숨김
 
   > video[poster] {
-    object-fit: contain;
+    object-fit: cover;
   }
 
   > video {

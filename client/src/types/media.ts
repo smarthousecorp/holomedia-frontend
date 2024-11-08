@@ -11,3 +11,18 @@ export interface media {
   updatedAt: Date;
   price: number;
 }
+
+export interface weeklyMedia {
+  id: number;
+  title: string;
+  // url: string;
+  total_views: number;
+  weekly_views: number;
+  view_status: string;
+  non_thumbnail: string;
+  member_thumbnail: string;
+  name: string;
+  created_date: string;
+  price: number;
+  // updatedAt: Date;
+}

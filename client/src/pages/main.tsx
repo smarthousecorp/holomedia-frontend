@@ -3,7 +3,7 @@ import {useEffect, useState} from "react";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import {SvgIcon} from "@mui/material";
 import {useNavigate} from "react-router-dom";
-import {media} from "../types/media";
+import {media, weeklyMedia} from "../types/media";
 import {SkeletonImage} from "../components/commons/media/Skeleton";
 import {api} from "../utils/api";
 import {RootState} from "../store";
@@ -24,7 +24,12 @@ const Main = () => {
   );
   const isAdmin = useSelector((state: RootState) => state.user.is_admin);
 
-  const [medias, setMedias] = useState<media[]>([]);
+  const [medias, setMedias] = useState<media[]>([]); // 최신 업로드 영상 저장
+  const [weeklyData, setWeeklyData] = useState<weeklyMedia[]>([]); // 특정 유저의 주간 영상 데이터
+  const [uploaders, setUploaders] = useState<string[]>([]);
+
+  const [selectedUploader, setSelectedUploader] = useState<string>("");
+
   const [showModal, setShowModal] = useState<boolean>(false);
   const [selectedVideoId, setSelectedVideoId] = useState<number | null>(null);
 
@@ -43,6 +48,11 @@ const Main = () => {
     navigate(`/video/${id}`);
   };
 
+  // 업로더 이름 클릭 핸들러
+  const handleUploaderClick = (name: string) => {
+    setSelectedUploader(name);
+  };
+
   useEffect(() => {
     const fetchNewData = async () => {
       try {
@@ -53,28 +63,22 @@ const Main = () => {
       }
     };
 
-    // const fetchUploaderData = async () => {
-    //   try {
-    //     const response = await api.get(`/media/uploader`);
-    //     console.log(response);
-    //   } catch (error) {
-    //     console.error("Error fetching data:", error);
-    //   }
-    // };
-
-    // const fetchWeeklyData = async () => {
-    //   try {
-    //     const response = await api.get(`/media/weekly/${}`);
-    //     console.log(response);
-
-    //     setMedias(response.data.data);
-    //   } catch (error) {
-    //     console.error("Error fetching data:", error);
-    //   }
-    // };
+    const fetchUploaderData = async () => {
+      try {
+        const response = await api.get(`/media/uploaders`);
+        const uploadersData = response.data.data;
+        setUploaders(uploadersData);
+        // uploaders 데이터를 받아온 후 상태 설정
+        if (uploadersData.length > 0) {
+          setSelectedUploader(uploadersData[0]);
+        }
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
+    };
 
     fetchNewData();
-    // fetchUploaderData();
+    fetchUploaderData();
 
     // 토큰이 만료됐을 때, 새로고침 시 유저 전역상태 업데이트
     const access = getCookie("accessToken");
@@ -84,8 +88,25 @@ const Main = () => {
     }
   }, []);
 
+  useEffect(() => {
+    const fetchWeeklyData = async () => {
+      // selectedUploader가 있을 때만 API 호출
+      if (selectedUploader) {
+        try {
+          const response = await api.get(`/media/weekly/${selectedUploader}`);
+          setWeeklyData(response.data.data);
+        } catch (error) {
+          console.error("Error fetching data:", error);
+        }
+      }
+    };
+
+    fetchWeeklyData();
+  }, [selectedUploader]);
+
   return (
     <MainContainer>
+      {/* 최근 등록 영상 */}
       <MovieContainer>
         <MovieTitle>최근에 등록된 동영상</MovieTitle>
         <hr />
@@ -123,6 +144,50 @@ const Main = () => {
           })}
         </MovieGrid>
       </MovieContainer>
+
+      {/* 주간 베스트 */}
+      <MovieContainer>
+        <MovieTitle>주간 베스트</MovieTitle>
+        <hr />
+        <NavUploaderName>
+          {uploaders.map((uploader) => {
+            return (
+              <Uploader
+                key={uploader}
+                $isSelected={selectedUploader === uploader}
+                onClick={() => handleUploaderClick(uploader)}
+              >
+                {uploader}
+              </Uploader>
+            );
+          })}
+        </NavUploaderName>
+        <MovieGrid>
+          {weeklyData.map((el) => (
+            <MovieLi key={el.id} onClick={() => handleClickList(el.id)}>
+              <ImgContainer>
+                <SkeletonImage
+                  src={user ? el.member_thumbnail : el.non_thumbnail}
+                  style={{objectFit: user ? "cover" : "contain"}}
+                  alt="썸네일"
+                  background="#505050"
+                />
+              </ImgContainer>
+              <MovieInfo>
+                <h6>{el.name}</h6>
+                <div className="views">
+                  <SvgIcon
+                    component={VisibilityIcon}
+                    sx={{stroke: "#ffffff", strokeWidth: 0.3}}
+                  />
+                  <p>{el.total_views.toLocaleString()}</p>
+                </div>
+              </MovieInfo>
+              <MovieDescription>{el.title}</MovieDescription>
+            </MovieLi>
+          ))}
+        </MovieGrid>
+      </MovieContainer>
       {/* 성인인증 모달 */}
       {showModal && (
         <AdultVerificationModal
@@ -151,14 +216,14 @@ const MainContainer = styled.section`
   width: 100%;
   height: 100%;
   background: #000000;
-  display: flex;
 `;
 
 const MovieContainer = styled.div`
   width: 100%;
-  height: 100%;
+  /* height: 100%; */
   color: white;
   margin: 0 4rem;
+  margin-bottom: 3rem;
   overflow-y: scroll;
   -ms-overflow-style: none; /* IE and Edge */
   scrollbar-width: none; /* Firefox */
@@ -271,5 +336,25 @@ const ImgContainer = styled.div`
     height: 100%; // 세로 100%
     object-fit: contain; // 비율 유지하며 잘라내기
     border-radius: 10px; // 상단 모서리 둥글게
+  }
+`;
+
+const NavUploaderName = styled.nav`
+  display: flex;
+  gap: 5px;
+`;
+
+const Uploader = styled.div<{$isSelected?: boolean}>`
+  font-size: 1.4rem;
+  padding: 0.5em 0.75rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border-radius: 5px;
+
+  /* 선택된 업로더 스타일 */
+  background-color: ${(props) => (props.$isSelected ? "#333" : "transparent")};
+
+  &:hover {
+    background-color: ${(props) => (props.$isSelected ? "#333" : "#222")};
   }
 `;

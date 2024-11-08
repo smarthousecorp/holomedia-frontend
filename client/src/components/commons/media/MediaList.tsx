@@ -28,6 +28,7 @@ const MediaList = ({media}: {media: media}) => {
           src={user ? media.member_thumbnail : media.non_thumbnail}
           alt="썸네일"
           background="#505050"
+          objectFit="cover"
         />
       </ImgContainer>
       <div className="mo">
@@ -131,7 +132,7 @@ const ImgContainer = styled.div`
     left: 0;
     width: 100%; // 가로 100%
     height: 100%; // 세로 100%
-    object-fit: contain; // 비율 유지하며 잘라내기
+    object-fit: cover; // 비율 유지하며 잘라내기
     border-radius: 10px; // 상단 모서리 둥글게
   }
 
