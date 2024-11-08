@@ -1,6 +1,6 @@
 // src/components/Sidebar.tsx
 import {useEffect, useState} from "react";
-import styled from "styled-components";
+import styled, {css} from "styled-components";
 import {api} from "../../utils/api";
 import {useDispatch, useSelector} from "react-redux";
 import {RootState} from "../../store";
@@ -81,4 +81,32 @@ const SidebarLi = styled.li<{$isSelected: boolean}>`
   font-size: 1.8rem;
   padding: 1.5rem 0;
   cursor: pointer;
+  transition: all 0.2s ease-in-out;
+  position: relative;
+
+  ${({$isSelected}) =>
+    $isSelected &&
+    css`
+      color: #ff627c;
+      background-color: rgba(255, 98, 124, 0.1);
+      font-weight: 500;
+
+      &::before {
+        content: "";
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 4px;
+        height: 100%;
+        background-color: #ff627c;
+      }
+
+      &:hover {
+        background-color: rgba(255, 98, 124, 0.15);
+      }
+    `}
+
+  &:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+  }
 `;

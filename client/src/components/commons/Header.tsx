@@ -223,17 +223,19 @@ const Background = styled.div`
 
 // 해당 스타일이 적용 되지 않는 이슈가 존재함. 추후 해결 예정
 const CustomSidebar = styled(Sidebar)<sidebarProps>`
-  position: fixed;
-  left: -250px; /* 사이드바가 화면 밖에 위치하도록 설정 */
-  transition: left 0.3s ease; /* 부드러운 애니메이션 효과 */
-  box-shadow: 2px 0 5px rgba(0, 0, 0, 0.5); /* 그림자 효과 */
-  z-index: 1000;
+  &&& {
+    position: fixed;
+    transform: translateX(-25rem); /* width만큼 왼쪽으로 이동 */
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 2px 0 5px rgba(0, 0, 0, 0.5);
+    z-index: 1000;
 
-  ${({isOpen}) =>
-    isOpen &&
-    css`
-      left: 0; /* 사이드바가 화면에 나타날 때 위치 */
-    `}
+    ${({isOpen}) =>
+      isOpen &&
+      css`
+        transform: translateX(0);
+      `}
+  }
 `;
 
 const Dropdown = styled.div`
