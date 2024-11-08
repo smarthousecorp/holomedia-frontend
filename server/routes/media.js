@@ -16,6 +16,74 @@ const checkPaymentStatus = async (userId, mediaId) => {
   });
 };
 
+// 업로더 목록 조회 API
+router.get("/uploaders", (req, res) => {
+  const sql = `
+    SELECT DISTINCT name 
+    FROM medias 
+    ORDER BY name`;
+
+  db.query(sql, (err, results) => {
+    if (err) {
+      console.error("업로더 목록 조회 실패:", err);
+      return res.status(500).send({message: "서버 오류가 발생했습니다."});
+    }
+
+    // 이름만 추출하여 배열로 변환
+    const uploaders = results.map((row) => row.name);
+
+    res.send({
+      status: "success",
+      data: uploaders, // ["미주", "수민", "채희", "민지"] 형태로 반환됨
+    });
+  });
+});
+
+// 최근 생성된 영상 조회 (limit 파라미터 지원)
+router.get("/recent", (req, res) => {
+  const limit = parseInt(req.query.limit) || 10; // 기본값 10
+  const maxLimit = 50; // 최대 조회 가능한 개수
+
+  // limit 값 검증
+  if (limit <= 0 || limit > maxLimit) {
+    return res.status(400).send({
+      message: `조회 개수는 1에서 ${maxLimit} 사이여야 합니다.`,
+    });
+  }
+
+  const sql = `
+    SELECT 
+      id, 
+      title, 
+      views, 
+      non_thumbnail, 
+      member_thumbnail, 
+      name,
+      DATE_FORMAT(created_at, '%Y-%m-%d') as created_date
+    FROM medias 
+    ORDER BY created_at DESC 
+    LIMIT ?`;
+
+  db.query(sql, [limit], (err, results) => {
+    if (err) {
+      console.error("최근 영상 조회 실패:", err);
+      return res.status(500).send({message: "서버 오류가 발생했습니다."});
+    }
+
+    if (results.length === 0) {
+      return res.status(404).send({
+        status: "empty",
+        message: "등록된 영상이 없습니다.",
+      });
+    }
+
+    res.send({
+      status: "success",
+      data: results,
+    });
+  });
+});
+
 // 랜덤 영상 3개 조회
 router.get("/recommend", authenticateToken, (req, res) => {
   const sql =
@@ -74,8 +142,6 @@ router.get("/weekly/:name", (req, res) => {
       END DESC`; // weekly_views가 없으면 전체 views로 정렬
 
   db.query(sql, [creatorName], (err, results) => {
-    console.log(results);
-
     if (err) {
       console.error("크리에이터 주간 통계 조회 실패:", err);
       return res.status(500).send({message: "서버 오류가 발생했습니다."});
@@ -223,9 +289,10 @@ router.post("/:id/payment", authenticateToken, async (req, res) => {
   }
 });
 
-// 글 등록 API
-router.post("/", (req, res) => {
+// 글 등록 API 수정 (업로더 정보 추가)
+router.post("/", authenticateToken, (req, res) => {
   const {title, url, non_thumbnail, member_thumbnail, name} = req.body;
+  const uploader_id = req.user.user_id; // JWT 토큰에서 사용자 ID 추출
 
   // 필수 값 체크
   if (!title || !url || !non_thumbnail || !member_thumbnail || !name) {
@@ -233,8 +300,15 @@ router.post("/", (req, res) => {
   }
 
   const sql =
-    "INSERT INTO medias (title, url, non_thumbnail, member_thumbnail, name) VALUES (?, ?, ?, ?, ?)";
-  const values = [title, url, non_thumbnail, member_thumbnail, name];
+    "INSERT INTO medias (title, url, non_thumbnail, member_thumbnail, name, uploader_id) VALUES (?, ?, ?, ?, ?, ?)";
+  const values = [
+    title,
+    url,
+    non_thumbnail,
+    member_thumbnail,
+    name,
+    uploader_id,
+  ];
 
   db.query(sql, values, (err, result) => {
     if (err) {
