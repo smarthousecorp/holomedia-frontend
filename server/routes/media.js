@@ -306,7 +306,7 @@ router.get("/:id", authenticateToken, async (req, res) => {
   }
 });
 
-// 글 등록 API 수정 (업로더 정보 추가)
+// 영상 등록 API 수정 (업로더 정보 추가)
 router.post("/", authenticateToken, (req, res) => {
   const {title, url, non_thumbnail, member_thumbnail, name} = req.body;
   const uploader_id = req.user.user_id; // JWT 토큰에서 사용자 ID 추출

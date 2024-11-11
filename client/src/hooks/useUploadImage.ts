@@ -1,6 +1,6 @@
-import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
-import { fstorage } from "../firebase";
-import { v4 as uuidv4 } from "uuid";
+import {getDownloadURL, ref, uploadBytes} from "firebase/storage";
+import {fstorage} from "../firebase";
+import {v4 as uuidv4} from "uuid";
 
 export default function useUploadImage() {
   const uploadImage = async (file: File) => {
