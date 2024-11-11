@@ -10,8 +10,6 @@ const authenticateToken = (req, res, next) => {
     (path) => req.path === path || req.path.startsWith(`${path}/`)
   );
 
-  console.log(isPublicPath);
-
   // 공개 경로인 경우 인증 절차 건너뛰기
   if (isPublicPath) {
     return next();
