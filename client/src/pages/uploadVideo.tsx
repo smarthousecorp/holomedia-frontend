@@ -1,11 +1,13 @@
 import React, {useState, ChangeEvent} from "react";
 import styled from "styled-components";
 import useUploadImage from "../hooks/useUploadImage";
+import useUploadVideo from "../hooks/useUploadVideo"; // 새로 만들어야 할 훅
 import {api} from "../utils/api";
 
 interface UploadFormData {
   title: string;
   url: string;
+  video_file: File | null; // 추가된 비디오 파일
   non_thumbnail: File | null;
   member_thumbnail: File | null;
   name: string;
@@ -15,6 +17,7 @@ export default function UploadForm() {
   const [formData, setFormData] = useState<UploadFormData>({
     title: "",
     url: "",
+    video_file: null, // 초기값 추가
     non_thumbnail: null,
     member_thumbnail: null,
     name: "",
@@ -23,10 +26,12 @@ export default function UploadForm() {
   const [previews, setPreviews] = useState({
     non_thumbnail: "",
     member_thumbnail: "",
+    video_file: "", // 비디오 미리보기 URL
   });
 
   // 이미지 업로드 커스텀훅
   const uploadImage = useUploadImage();
+  const uploadVideo = useUploadVideo(); // 비디오 업로드용 커스텀훅
 
   const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
     const {name, value} = e.target;
@@ -44,11 +49,22 @@ export default function UploadForm() {
         [name]: files[0],
       }));
 
-      const previewUrl = URL.createObjectURL(files[0]);
-      setPreviews((prev) => ({
-        ...prev,
-        [name]: previewUrl,
-      }));
+      // 비디오 파일인 경우 미리보기 생성
+      if (name === "video_file" && files[0].type.startsWith("video/")) {
+        const previewUrl = URL.createObjectURL(files[0]);
+        setPreviews((prev) => ({
+          ...prev,
+          [name]: previewUrl,
+        }));
+      }
+      // 이미지 파일인 경우 기존 로직 유지
+      else if (files[0].type.startsWith("image/")) {
+        const previewUrl = URL.createObjectURL(files[0]);
+        setPreviews((prev) => ({
+          ...prev,
+          [name]: previewUrl,
+        }));
+      }
     }
   };
 
@@ -60,31 +76,51 @@ export default function UploadForm() {
 
       // 기본 필드들 추가
       Object.entries(formData).forEach(([key, value]) => {
-        if (key !== "non_thumbnail" && key !== "member_thumbnail") {
+        console.log(key, value);
+
+        if (
+          !["non_thumbnail", "member_thumbnail", "video_file", "url"].includes(
+            key
+          )
+        ) {
           formDataToSend.append(key, value);
         }
       });
 
-      // 이미지 업로드 및 URL 추가
+      // 비디오 파일 업로드
+      if (formData.video_file) {
+        const videoUrl = await uploadVideo(formData.video_file);
+        formDataToSend.append("url", videoUrl); // 기존 url 필드에 업로드된 비디오 URL 저장
+      }
+
+      // 이미지 업로드
       if (formData.non_thumbnail) {
         const nonDownloadUrl = await uploadImage(formData.non_thumbnail);
-        formDataToSend.append("non_thumbnail", nonDownloadUrl); // URL 키 이름 변경
+        formDataToSend.append("non_thumbnail", nonDownloadUrl);
       }
 
       if (formData.member_thumbnail) {
         const memberDownloadUrl = await uploadImage(formData.member_thumbnail);
-        formDataToSend.append("member_thumbnail", memberDownloadUrl); // URL 키 이름 변경
-      }
-
-      // FormData 내용 확인을 위한 로깅
-      for (const pair of formDataToSend.entries()) {
-        console.log(`${pair[0]}: ${pair[1]}`);
+        formDataToSend.append("member_thumbnail", memberDownloadUrl);
       }
 
       const response = await api.post("/media", formDataToSend);
 
       if (response.status === 200) {
         alert("업로드가 완료되었습니다!");
+        setFormData({
+          title: "",
+          url: "",
+          video_file: null,
+          non_thumbnail: null,
+          member_thumbnail: null,
+          name: "",
+        });
+        setPreviews({
+          non_thumbnail: "",
+          member_thumbnail: "",
+          video_file: "",
+        });
       } else {
         alert("업로드 중 오류가 발생했습니다.");
       }
@@ -112,17 +148,34 @@ export default function UploadForm() {
         </FormGroup>
 
         <FormGroup>
-          <Label>영상 URL</Label>
-          <Input
-            type="url"
-            name="url"
-            value={formData.url}
-            onChange={handleInputChange}
-            placeholder="영상 URL을 입력하세요"
-            required
-          />
+          <Label>영상 파일</Label>
+          <FileUploadContainer>
+            <FileUploadLabel>
+              {previews.video_file ? (
+                <video
+                  src={previews.video_file}
+                  controls
+                  style={{width: "100%", height: "100%", objectFit: "contain"}}
+                />
+              ) : (
+                <>
+                  <UploadIcon>📹</UploadIcon>
+                  <UploadText>클릭하여 영상 업로드</UploadText>
+                </>
+              )}
+              <input
+                type="file"
+                name="video_file"
+                onChange={handleFileChange}
+                style={{display: "none"}}
+                accept="video/*"
+                required
+              />
+            </FileUploadLabel>
+          </FileUploadContainer>
         </FormGroup>
 
+        {/* 기존 썸네일 업로드 필드들... */}
         <FormGroup>
           <Label>비회원용 썸네일</Label>
           <FileUploadContainer>
@@ -188,6 +241,8 @@ export default function UploadForm() {
     </Container>
   );
 }
+
+// 스타일 컴포넌트들은 기존과 동일...
 
 const Container = styled.div`
   max-width: 80rem;

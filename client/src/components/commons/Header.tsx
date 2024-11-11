@@ -28,8 +28,6 @@ const Header = () => {
     (state: RootState) => state.view
   );
 
-  console.log(currentMode, currentUploader);
-
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
