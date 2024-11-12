@@ -57,7 +57,7 @@ const TitleDiv = styled.div`
   bottom: 7rem;
   font-family: "Pretendard-Bold";
   font-size: 1.4rem;
-  width: 12rem;
+  width: 13rem;
   text-align: center;
   background-color: white;
 `;

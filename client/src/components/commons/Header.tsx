@@ -112,7 +112,10 @@ const Header = () => {
       {modal && <LoginModal />}
       {isOpenSidebar && (
         <Background>
-          <CustomSidebar isOpen={isOpenSidebar} />
+          <CustomSidebar
+            isOpen={isOpenSidebar}
+            onClose={() => setIsOpenSidebar(false)}
+          />
         </Background>
       )}
       {isOpenDropdown && (

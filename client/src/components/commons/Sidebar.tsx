@@ -7,13 +7,18 @@ import {setViewMode, ViewMode} from "../../store/slices/view";
 import LanguageSwitcher from "./LanguageSwitcher";
 import {useTranslation} from "react-i18next";
 
-const Sidebar = () => {
-  const {t} = useTranslation();
+interface SidebarProps {
+  isOpen: boolean;
+  onClose: () => void; // 사이드바를 닫는 함수 추가
+}
+
+const Sidebar = ({onClose}: SidebarProps) => {
+  const {t, i18n} = useTranslation();
   const dispatch = useDispatch();
   const {currentMode, currentUploader} = useSelector(
     (state: RootState) => state.view
   );
-  const [uploaders, setUploaders] = useState<string[]>([]);
+  const [uploaders, setUploaders] = useState([]);
 
   useEffect(() => {
     const fetchUploaderData = async () => {
@@ -28,6 +33,19 @@ const Sidebar = () => {
 
     fetchUploaderData();
   }, []);
+
+  // 언어 변경 감지 및 사이드바 닫기
+  useEffect(() => {
+    const handleLanguageChange = () => {
+      onClose(); // 언어 변경 시 사이드바 닫기
+    };
+
+    i18n.on("languageChanged", handleLanguageChange);
+
+    return () => {
+      i18n.off("languageChanged", handleLanguageChange);
+    };
+  }, [i18n, onClose]);
 
   const handleModeChange = (mode: ViewMode, uploader?: string) => {
     dispatch(setViewMode({mode, uploader}));
@@ -52,9 +70,7 @@ const Sidebar = () => {
           {uploaders.map((uploader) => (
             <SidebarLi
               key={uploader}
-              $isSelected={
-                currentMode === "weekly" && currentUploader === uploader
-              }
+              $isSelected={currentUploader === uploader}
               onClick={() => handleModeChange("weekly", uploader)}
             >
               {uploader}
