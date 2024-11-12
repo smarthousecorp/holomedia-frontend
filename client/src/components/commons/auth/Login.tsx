@@ -9,6 +9,7 @@ import {useNavigate} from "react-router-dom";
 import {useDispatch} from "react-redux";
 import {off} from "../../../store/slices/modal";
 import {login} from "../../../store/slices/user";
+import {useTranslation} from "react-i18next";
 
 interface Login {
   user_id: string;
@@ -16,6 +17,8 @@ interface Login {
 }
 
 const Login = () => {
+  const {t} = useTranslation();
+
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
@@ -68,7 +71,10 @@ const Login = () => {
       .catch((error) => {
         // 404 : 회원이 존재하지 않음 , 400 : 비밀번호가 일치하지 않음
         if (error.response.data.status === 404) {
-          setErrorMsg({...error, user_id: "존재하지 않는 계정입니다."});
+          setErrorMsg({
+            ...error,
+            user_id: t("auth.login.errors.userNotFound"),
+          });
         }
 
         if (error.response.data.status === 400) {
@@ -77,12 +83,12 @@ const Login = () => {
           if (errorMessage === "비밀번호가 틀립니다.") {
             setErrorMsg({
               ...error,
-              password: "비밀번호가 일치하지 않습니다.",
+              password: t("auth.login.errors.wrongPassword"),
             });
           } else {
             setErrorMsg({
               ...error,
-              password: "아이디와 비밀번호를 입력하세요",
+              password: t("auth.login.errors.requiredFields"),
             });
           }
         }
@@ -91,20 +97,20 @@ const Login = () => {
 
   return (
     <LoginContainer>
-      <Social auth={"로그인"} />
+      <Social auth={t("auth.modal.title.login")} />
       <LoginInputContainer>
-        <Title>로그인</Title>
+        <Title>{t("auth.modal.title.login")}</Title>
         <Input
           type="id"
           name="user_id"
-          placeholder="아이디"
+          placeholder={t("auth.login.idPlaceholder")}
           onChange={onChangeValues}
           error={errorMsg.user_id}
         />
         <Input
           type="password"
           name="password"
-          placeholder="비밀번호"
+          placeholder={t("auth.login.passwordPlaceholder")}
           onChange={onChangeValues}
           error={errorMsg.password}
         />
@@ -114,7 +120,7 @@ const Login = () => {
           padding="1.8rem 1.6rem"
           onClick={onClickLoginBtn}
         >
-          로그인
+          {t("auth.login.button")}
         </Button>
       </LoginInputContainer>
     </LoginContainer>

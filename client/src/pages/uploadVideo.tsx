@@ -4,6 +4,8 @@ import useUploadImage from "../hooks/useUploadImage";
 import useUploadVideo from "../hooks/useUploadVideo"; // 새로 만들어야 할 훅
 import {api} from "../utils/api";
 
+import {useTranslation} from "react-i18next";
+
 interface UploadFormData {
   title: string;
   url: string;
@@ -14,6 +16,8 @@ interface UploadFormData {
 }
 
 export default function UploadForm() {
+  const {t} = useTranslation();
+
   const [formData, setFormData] = useState<UploadFormData>({
     title: "",
     url: "",
@@ -107,7 +111,7 @@ export default function UploadForm() {
       const response = await api.post("/media", formDataToSend);
 
       if (response.status === 200) {
-        alert("업로드가 완료되었습니다!");
+        alert(t("upload.messages.uploadSuccess"));
         setFormData({
           title: "",
           url: "",
@@ -122,33 +126,32 @@ export default function UploadForm() {
           video_file: "",
         });
       } else {
-        alert("업로드 중 오류가 발생했습니다.");
+        alert(t("upload.messages.uploadError"));
       }
     } catch (error) {
       console.error("Upload error:", error);
-      alert("업로드 중 오류가 발생했습니다.");
+      alert(t("upload.messages.uploadError"));
     }
   };
 
   return (
     <Container>
-      <Title>새 영상 업로드</Title>
-
+      <Title>{t("upload.pageTitle")}</Title>
       <Form onSubmit={handleSubmit}>
         <FormGroup>
-          <Label>제목</Label>
+          <Label>{t("upload.form.videoTitle.label")}</Label>
           <Input
             type="text"
             name="title"
             value={formData.title}
             onChange={handleInputChange}
-            placeholder="영상 제목을 입력하세요"
+            placeholder={t("upload.form.videoTitle.placeholder")}
             required
           />
         </FormGroup>
 
         <FormGroup>
-          <Label>영상 파일</Label>
+          <Label>{t("upload.form.videoFile.label")}</Label>
           <FileUploadContainer>
             <FileUploadLabel>
               {previews.video_file ? (
@@ -160,7 +163,9 @@ export default function UploadForm() {
               ) : (
                 <>
                   <UploadIcon>📹</UploadIcon>
-                  <UploadText>클릭하여 영상 업로드</UploadText>
+                  <UploadText>
+                    {t("upload.form.videoFile.uploadText")}
+                  </UploadText>
                 </>
               )}
               <input
@@ -175,9 +180,8 @@ export default function UploadForm() {
           </FileUploadContainer>
         </FormGroup>
 
-        {/* 기존 썸네일 업로드 필드들... */}
         <FormGroup>
-          <Label>비회원용 썸네일</Label>
+          <Label>{t("upload.form.nonMemberThumbnail.label")}</Label>
           <FileUploadContainer>
             <FileUploadLabel>
               {previews.non_thumbnail ? (
@@ -185,7 +189,9 @@ export default function UploadForm() {
               ) : (
                 <>
                   <UploadIcon>📤</UploadIcon>
-                  <UploadText>클릭하여 이미지 업로드</UploadText>
+                  <UploadText>
+                    {t("upload.form.nonMemberThumbnail.uploadText")}
+                  </UploadText>
                 </>
               )}
               <input
@@ -201,7 +207,7 @@ export default function UploadForm() {
         </FormGroup>
 
         <FormGroup>
-          <Label>회원용 썸네일</Label>
+          <Label>{t("upload.form.memberThumbnail.label")}</Label>
           <FileUploadContainer>
             <FileUploadLabel>
               {previews.member_thumbnail ? (
@@ -209,7 +215,9 @@ export default function UploadForm() {
               ) : (
                 <>
                   <UploadIcon>📤</UploadIcon>
-                  <UploadText>클릭하여 이미지 업로드</UploadText>
+                  <UploadText>
+                    {t("upload.form.memberThumbnail.uploadText")}
+                  </UploadText>
                 </>
               )}
               <input
@@ -225,24 +233,22 @@ export default function UploadForm() {
         </FormGroup>
 
         <FormGroup>
-          <Label>크리에이터 이름</Label>
+          <Label>{t("upload.form.creatorName.label")}</Label>
           <Input
             type="text"
             name="name"
             value={formData.name}
             onChange={handleInputChange}
-            placeholder="크리에이터 이름을 입력하세요"
+            placeholder={t("upload.form.creatorName.placeholder")}
             required
           />
         </FormGroup>
 
-        <SubmitButton type="submit">업로드</SubmitButton>
+        <SubmitButton type="submit">{t("upload.form.submit")}</SubmitButton>
       </Form>
     </Container>
   );
 }
-
-// 스타일 컴포넌트들은 기존과 동일...
 
 const Container = styled.div`
   max-width: 80rem;

@@ -7,6 +7,8 @@ import PublicLayout from "./components/layout/PublicLayout";
 import {ToastContainer} from "react-toastify";
 import UploadForm from "./pages/uploadVideo";
 import ProtectedRoute from "./components/layout/ProtectedRoute";
+import Settings from "./pages/setting";
+import "./i18n"; // i18n 설정 import
 
 function App() {
   return (
@@ -25,6 +27,7 @@ function App() {
               </ProtectedRoute>
             }
           />
+          <Route path="/settings" element={<Settings />} />
         </Route>
       </Routes>
       <ToastContainer style={{fontSize: "1.4rem"}} limit={1} />

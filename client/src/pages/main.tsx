@@ -14,8 +14,11 @@ import AdultVerificationModal from "../components/commons/media/AdultVerificatio
 import Toast from "../components/commons/Toast";
 import {ToastType} from "../types/toast";
 import {getCookie} from "../utils/cookie";
+import {useTranslation} from "react-i18next";
 
 const Main = () => {
+  const {t} = useTranslation();
+
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
@@ -24,9 +27,13 @@ const Main = () => {
     (state: RootState) => state.user.is_adult_verified
   );
   const isAdmin = useSelector((state: RootState) => state.user.is_admin);
-  const {currentMode, currentUploader, sectionTitle} = useSelector(
+  const {currentMode, currentUploader} = useSelector(
     (state: RootState) => state.view
   );
+  const sectionTitle =
+    currentMode === "weekly"
+      ? t("sectionTitles.weekly", {uploader: currentUploader})
+      : t(`sectionTitles.${currentMode}`);
 
   const [medias, setMedias] = useState<media[] | weeklyMedia[]>([]);
   const [showModal, setShowModal] = useState<boolean>(false);
@@ -40,7 +47,7 @@ const Main = () => {
           response = await api.get(`/media/recent?limit=12`);
           break;
         case "best":
-          response = await api.get("/media/recent");
+          response = await api.get("/media/best?limit=12");
           break;
         case "weekly":
           if (!currentUploader) return;

@@ -1,12 +1,14 @@
-// src/components/Sidebar.tsx
 import {useEffect, useState} from "react";
 import styled, {css} from "styled-components";
 import {api} from "../../utils/api";
 import {useDispatch, useSelector} from "react-redux";
 import {RootState} from "../../store";
 import {setViewMode, ViewMode} from "../../store/slices/view";
+import LanguageSwitcher from "./LanguageSwitcher";
+import {useTranslation} from "react-i18next";
 
 const Sidebar = () => {
+  const {t} = useTranslation();
   const dispatch = useDispatch();
   const {currentMode, currentUploader} = useSelector(
     (state: RootState) => state.view
@@ -33,34 +35,40 @@ const Sidebar = () => {
 
   return (
     <SidebarContainer>
-      <ul>
-        <SidebarLi
-          $isSelected={currentMode === "new" && !currentUploader}
-          onClick={() => handleModeChange("new")}
-        >
-          NEW
-        </SidebarLi>
-        <SidebarLi
-          $isSelected={currentMode === "best" && !currentUploader}
-          onClick={() => handleModeChange("best")}
-        >
-          실시간 베스트
-        </SidebarLi>
-        {uploaders.map((uploader) => (
+      <ContentWrapper>
+        <NavList>
           <SidebarLi
-            key={uploader}
-            $isSelected={
-              currentMode === "weekly" && currentUploader === uploader
-            }
-            onClick={() => handleModeChange("weekly", uploader)}
+            $isSelected={currentMode === "new" && !currentUploader}
+            onClick={() => handleModeChange("new")}
           >
-            {uploader}
+            {t("sidebar.new")}
           </SidebarLi>
-        ))}
-      </ul>
+          <SidebarLi
+            $isSelected={currentMode === "best" && !currentUploader}
+            onClick={() => handleModeChange("best")}
+          >
+            {t("sidebar.realTimeBest")}
+          </SidebarLi>
+          {uploaders.map((uploader) => (
+            <SidebarLi
+              key={uploader}
+              $isSelected={
+                currentMode === "weekly" && currentUploader === uploader
+              }
+              onClick={() => handleModeChange("weekly", uploader)}
+            >
+              {uploader}
+            </SidebarLi>
+          ))}
+        </NavList>
+      </ContentWrapper>
+      <LanguageSwitcherWrapper>
+        <LanguageSwitcher />
+      </LanguageSwitcherWrapper>
     </SidebarContainer>
   );
 };
+
 export default Sidebar;
 
 const SidebarContainer = styled.nav`
@@ -70,14 +78,32 @@ const SidebarContainer = styled.nav`
   left: 0;
   z-index: 999;
   width: 25rem;
-  height: 100%;
-  /* border-right: 1px solid rgb(226, 226, 226); */
   background-color: #000000;
   color: white;
-  text-align: center;
+  display: flex;
+  flex-direction: column;
+  height: calc(100vh - 8rem); // 상단 8rem을 제외한 높이
+`;
+
+const ContentWrapper = styled.div`
+  flex: 1;
+  overflow-y: auto;
+`;
+
+const NavList = styled.ul`
+  position: relative;
+  margin: 0;
+  padding: 0;
+`;
+
+const LanguageSwitcherWrapper = styled.div`
+  border-top: 1px solid white;
+  padding: 1.5rem;
+  background-color: #000000;
 `;
 
 const SidebarLi = styled.li<{$isSelected: boolean}>`
+  text-align: center;
   font-size: 1.8rem;
   padding: 1.5rem 0;
   cursor: pointer;

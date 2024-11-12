@@ -15,12 +15,15 @@ import {logout} from "../../store/slices/user";
 import {userLogout} from "../../utils/logout";
 import Toast from "./Toast";
 import {ToastType} from "../../types/toast";
+import {useTranslation} from "react-i18next";
 
 interface sidebarProps {
   isOpen: boolean;
 }
 
 const Header = () => {
+  const {t} = useTranslation();
+
   const modal = useSelector((state: RootState) => state.modal.loginModal);
   const user = useSelector((state: RootState) => state.user);
   const header = useSelector((state: RootState) => state.header.isOpen);
@@ -48,7 +51,7 @@ const Header = () => {
     userLogout();
     setIsOpenDropdown(false);
     navigate("/", {replace: true});
-    Toast(ToastType.success, "로그아웃이 완료되었습니다.");
+    Toast(ToastType.success, t("header.toast.logoutSuccess"));
   };
 
   // 메인 레이아웃에서 햄버거 클릭 후, 스크롤 조절 시 사이드바 닫기 불가능
@@ -88,7 +91,7 @@ const Header = () => {
         </Logo>
         <Right>
           <InputContainer>
-            <Input placeholder="검색어를 입력해주세요" />
+            <Input placeholder={t("header.search.placeholder")} />
             <SvgIcon component={SearchIcon} />
           </InputContainer>
           {getCookie("accessToken") ? (
@@ -97,10 +100,12 @@ const Header = () => {
                 setIsOpenDropdown(!isOpenDropdown);
               }}
             >
-              {user.username} 님
+              {t("header.auth.profile", {username: user.username})}
             </ProfileContainer>
           ) : (
-            <LoginBtn onClick={handleClickLoginBtn}>로그인 / 회원가입</LoginBtn>
+            <LoginBtn onClick={handleClickLoginBtn}>
+              {t("header.auth.loginSignup")}
+            </LoginBtn>
           )}
         </Right>
       </Container>
@@ -112,9 +117,9 @@ const Header = () => {
       )}
       {isOpenDropdown && (
         <Dropdown>
-          <a>설정</a>
-          {user.is_admin && <a href="/upload">업로드</a>}
-          <a onClick={handleLogout}>로그아웃</a>
+          <a>{t("header.auth.settings")}</a>
+          {user.is_admin && <a href="/upload">{t("header.auth.upload")}</a>}
+          <a onClick={handleLogout}>{t("header.auth.logout")}</a>
         </Dropdown>
       )}
     </>

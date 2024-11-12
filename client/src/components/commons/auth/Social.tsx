@@ -1,24 +1,38 @@
 import styled from "styled-components";
+import {useTranslation} from "react-i18next";
 
 interface SocialProps {
-  auth: string;
+  auth: "login" | "signup";
 }
 
 const Social = ({auth}: SocialProps) => {
+  const {t} = useTranslation();
+
   return (
     <SocialContainer>
       <TitleDiv>
-        {auth === "로그인" ? "SNS 간편 로그인" : "SNS 간편 회원가입"}
+        {auth === "login"
+          ? t("auth.social.loginTitle", "SNS 간편 로그인")
+          : t("auth.social.signupTitle", "SNS 간편 회원가입")}
       </TitleDiv>
       <IconUl>
         <IconLi>
-          <img src="/Naver.svg" alt="네이버 아이콘" />
+          <img
+            src="/Naver.svg"
+            alt={t("auth.social.naverAlt", "네이버 아이콘")}
+          />
         </IconLi>
         <IconLi>
-          <img src="/Naver.svg" alt="구글 아이콘" />
+          <img
+            src="/Google.svg"
+            alt={t("auth.social.googleAlt", "구글 아이콘")}
+          />
         </IconLi>
         <IconLi>
-          <img src="/Kakao.png" alt="카카오 아이콘" />
+          <img
+            src="/Kakao.png"
+            alt={t("auth.social.kakaoAlt", "카카오 아이콘")}
+          />
         </IconLi>
       </IconUl>
     </SocialContainer>
