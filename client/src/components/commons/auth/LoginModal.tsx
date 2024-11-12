@@ -6,8 +6,11 @@ import {SvgIcon} from "@mui/material";
 import React, {useState} from "react";
 import Login from "./Login";
 import SignUp from "./SignUp";
+import {useTranslation} from "react-i18next";
 
 const LoginModal = () => {
+  const {t} = useTranslation();
+
   // 상단 nav 클릭 상태
   const [isClickedLogin, setIsClickedLogin] = useState<boolean>(true);
 
@@ -36,16 +39,20 @@ const LoginModal = () => {
   return (
     <Background>
       <ModalContainer onClick={handleClickModal}>
-        <SvgIcon component={ClearIcon} onClick={handleClickCloseBtn} />
+        <SvgIcon
+          component={ClearIcon}
+          onClick={handleClickCloseBtn}
+          aria-label={t("auth.modal.close")}
+        />
         <Nav>
           <a onClick={handleClickLogin} className={isClickedLogin ? "on" : ""}>
-            로그인
+            {t("auth.modal.title.login")}
           </a>
           <a
             onClick={handleClickSignup}
             className={!isClickedLogin ? "on" : ""}
           >
-            회원가입
+            {t("auth.modal.title.signup")}
           </a>
         </Nav>
         {isClickedLogin ? <Login /> : <SignUp />}

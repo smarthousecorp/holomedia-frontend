@@ -83,6 +83,51 @@ router.get("/recent", (req, res) => {
   });
 });
 
+// 실시간 베스트 영상 조회 (limit 파라미터 지원) 추후에는 일간, 주간, 월간 베스트로 변경 예정
+router.get("/best", (req, res) => {
+  const limit = parseInt(req.query.limit) || 12; // 기본값 10
+  const maxLimit = 50; // 최대 조회 가능한 개수
+
+  // limit 값 검증
+  if (limit <= 0 || limit > maxLimit) {
+    return res.status(400).send({
+      message: `조회 개수는 1에서 ${maxLimit} 사이여야 합니다.`,
+    });
+  }
+
+  const sql = `
+    SELECT 
+      id, 
+      title, 
+      views, 
+      non_thumbnail, 
+      member_thumbnail,
+      name,
+      DATE_FORMAT(created_at, '%Y-%m-%d') as created_date
+    FROM medias 
+    ORDER BY views DESC, created_at DESC 
+    LIMIT ?`;
+
+  db.query(sql, [limit], (err, results) => {
+    if (err) {
+      console.error("실시간 베스트 영상 조회 실패:", err);
+      return res.status(500).send({message: "서버 오류가 발생했습니다."});
+    }
+
+    if (results.length === 0) {
+      return res.status(404).send({
+        status: "empty",
+        message: "등록된 영상이 없습니다.",
+      });
+    }
+
+    res.send({
+      status: "success",
+      data: results,
+    });
+  });
+});
+
 // 주간 통계 API
 router.get("/weekly/:name", authenticateToken, (req, res) => {
   const creatorName = req.params.name;

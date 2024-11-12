@@ -4,6 +4,7 @@ import Input from "../Input";
 import Button from "../Button";
 import React, {useState} from "react";
 import axios, {AxiosError} from "axios";
+import {useTranslation} from "react-i18next";
 import {useSignUpValidation} from "../../../utils/SignUpValid";
 import {checkId, checkPassword, checkUsername} from "../../../utils/validCheck";
 import {useDispatch} from "react-redux";
@@ -28,8 +29,9 @@ interface ErrorMsg {
 }
 
 const SignUp = () => {
+  const {t} = useTranslation();
   const dispatch = useDispatch();
-  // 입력값 상태 관리
+
   const [inputVal, setInputVal] = useState<SignUp>({
     user_id: "",
     password: "",
@@ -37,7 +39,6 @@ const SignUp = () => {
     username: "",
   });
 
-  // 입력값 유효성 검사 에러 메세지
   const [errorMsg, setErrorMsg] = useState<ErrorMsg>({
     user_id: "",
     password: "",
@@ -45,13 +46,8 @@ const SignUp = () => {
     username: "",
   });
 
-  // custom valid 함수 사용
   const validationResults = useSignUpValidation(inputVal);
 
-  // // 비밀번호 입력 창의 type=password or text
-  // const [isVisible, setIsVisible] = useState<boolean>(false);
-
-  // 입력 값이 변경될 때 실행되는 함수
   const onChangeValues = (e: React.ChangeEvent<HTMLInputElement>) => {
     const {name, value} = e.target;
     setInputVal({...inputVal, [name]: value});
@@ -61,7 +57,10 @@ const SignUp = () => {
         if (inputVal.password === value) {
           setErrorMsg({...errorMsg, [name]: ""});
         } else {
-          setErrorMsg({...errorMsg, [name]: "비밀번호가 일치하지 않습니다."});
+          setErrorMsg({
+            ...errorMsg,
+            [name]: t("auth.signup.errors.passwordMismatch"),
+          });
         }
     }
   };
@@ -71,28 +70,26 @@ const SignUp = () => {
     const {user_id} = inputVal;
 
     if (!checkId(user_id)) {
-      msg.user_id = "6~15자의 영문 소문자 및 숫자가 포험되어야 합니다.";
+      msg.user_id = t("auth.signup.errors.idFormat");
     }
 
     setErrorMsg({...errorMsg, ...msg});
   };
 
-  // 입력창 blur 이벤트 시
   const onBlurPwdInputs = () => {
     const msg = {password: "", passwordCheck: ""};
     const {password, passwordCheck} = inputVal;
 
     if (!checkPassword(password)) {
-      msg.password =
-        "8~15자, 영문 대소문자+숫자+특수문자 조합으로 구성되어야 합니다.";
+      msg.password = t("auth.signup.errors.passwordFormat");
       if (passwordCheck !== "" && password !== passwordCheck) {
-        msg.passwordCheck = "비밀번호가 일치하지 않습니다.";
+        msg.passwordCheck = t("auth.signup.errors.passwordMismatch");
         setErrorMsg({...errorMsg, ...msg});
       } else {
         setErrorMsg({...errorMsg, ...msg});
       }
     } else if (passwordCheck !== "" && password !== passwordCheck) {
-      msg.passwordCheck = "비밀번호가 일치하지 않습니다.";
+      msg.passwordCheck = t("auth.signup.errors.passwordMismatch");
       setErrorMsg({...errorMsg, ...msg});
     } else {
       setErrorMsg({...errorMsg, ...msg});
@@ -104,26 +101,21 @@ const SignUp = () => {
     const {username} = inputVal;
 
     if (!checkUsername(username)) {
-      msg.username = "2~12자의 한글, 영문, 숫자로 구성되어야 합니다.";
+      msg.username = t("auth.signup.errors.usernameFormat");
     }
 
     setErrorMsg({...errorMsg, ...msg});
   };
-
-  // // 비밀번호 표시/감추기 버튼 클릭 시 실행되는 함수
-  // const onClickVisibleBtn = () => {
-  //   setIsVisible(!isVisible);
-  // };
 
   const onClickSignUpBtn = () => {
     axios
       .post(`${import.meta.env.VITE_SERVER_DOMAIN}/signup`, inputVal)
       .then(() => {
         dispatch(off());
-        Toast(ToastType.success, "회원가입이 완료되었습니다.");
+        Toast(ToastType.success, t("auth.signup.success"));
         dispatch(
           showToast({
-            message: "회원가입이 완료되었습니다.",
+            message: t("auth.signup.success"),
             type: "success",
           })
         );
@@ -135,24 +127,25 @@ const SignUp = () => {
           const errorMessage = axiosError.response?.data;
 
           if (errorMessage === "이미 존재하는 아이디 입니다.") {
-            msg.user_id = "이미 존재하는 아이디 입니다.";
+            msg.user_id = t("auth.signup.errors.duplicateId");
           } else if (errorMessage === "이미 존재하는 닉네임 입니다.") {
-            msg.username = "이미 존재하는 닉네임 입니다.";
+            msg.username = t("auth.signup.errors.duplicateUsername");
           }
           setErrorMsg({...errorMsg, ...msg});
         }
       });
   };
+
   return (
     <SignUpContainer>
-      <Social auth={"회원가입"} />
+      <Social auth={"signup"} />
       <SignUpInputContainer>
-        <Title>회원가입</Title>
+        <Title>{t("auth.modal.title.signup")}</Title>
         <Input
           type="id"
           name="user_id"
-          label="아이디"
-          placeholder="6~15자의 영문, 소문자, 숫자"
+          label={t("auth.signup.id")}
+          placeholder={t("auth.signup.idPlaceholder")}
           onChange={onChangeValues}
           onBlur={onBlurIdInput}
           error={errorMsg.user_id}
@@ -160,8 +153,8 @@ const SignUp = () => {
         <Input
           type="password"
           name="password"
-          label="비밀번호"
-          placeholder="8~15자의 영문 대소문자, 숫자, 특수문자 (!@#$%^&*)"
+          label={t("auth.signup.password")}
+          placeholder={t("auth.signup.passwordPlaceholder")}
           onChange={onChangeValues}
           onBlur={onBlurPwdInputs}
           error={errorMsg.password}
@@ -169,8 +162,8 @@ const SignUp = () => {
         <Input
           type="password"
           name="passwordCheck"
-          label="비밀번호 확인"
-          placeholder="비밀번호 확인"
+          label={t("auth.signup.passwordCheck")}
+          placeholder={t("auth.signup.passwordCheckPlaceholder")}
           onChange={onChangeValues}
           onBlur={onBlurPwdInputs}
           error={errorMsg.passwordCheck}
@@ -178,8 +171,8 @@ const SignUp = () => {
         <Input
           type="text"
           name="username"
-          label="닉네임"
-          placeholder="2~12자 한글, 영문, 숫자"
+          label={t("auth.signup.username")}
+          placeholder={t("auth.signup.usernamePlaceholder")}
           onChange={onChangeValues}
           onBlur={onBlurNameInput}
           error={errorMsg.username}
@@ -196,7 +189,7 @@ const SignUp = () => {
             !validationResults.usernameValid
           }
         >
-          회원가입
+          {t("auth.signup.button")}
         </Button>
       </SignUpInputContainer>
     </SignUpContainer>

@@ -1,18 +1,17 @@
 // src/store/slices/view.ts
 import {createSlice, PayloadAction} from "@reduxjs/toolkit";
+// import i18n from "../../i18n.js"; // i18n 설정 파일 import
 
 export type ViewMode = "new" | "best" | "weekly";
 
 interface ViewState {
   currentMode: ViewMode;
   currentUploader: string;
-  sectionTitle: string;
 }
 
 const initialState: ViewState = {
   currentMode: "new",
   currentUploader: "",
-  sectionTitle: "최근에 등록된 동영상",
 };
 
 const viewSlice = createSlice({
@@ -25,19 +24,6 @@ const viewSlice = createSlice({
     ) => {
       state.currentMode = action.payload.mode;
       state.currentUploader = action.payload.uploader || "";
-
-      // Update section title based on mode
-      switch (action.payload.mode) {
-        case "new":
-          state.sectionTitle = "최근에 등록된 동영상";
-          break;
-        case "best":
-          state.sectionTitle = "실시간 베스트";
-          break;
-        case "weekly":
-          state.sectionTitle = `${action.payload.uploader}의 동영상`;
-          break;
-      }
     },
   },
 });
