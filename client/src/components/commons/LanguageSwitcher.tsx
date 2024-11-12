@@ -1,7 +1,17 @@
-// src/components/LanguageSwitcher.jsx
 import {useTranslation} from "react-i18next";
 
-const lngs = {
+// 언어 데이터의 구조를 정의
+interface LanguageInfo {
+  nativeName: string;
+}
+
+// 지원되는 언어 코드를 정의
+type LanguageCode = "ko" | "en" | "jp" | "zh";
+
+// 전체 언어 데이터 객체의 타입을 정의
+type Languages = Record<LanguageCode, LanguageInfo>;
+
+const lngs: Languages = {
   ko: {nativeName: "한국어"},
   en: {nativeName: "English"},
   jp: {nativeName: "日本語"},
@@ -13,7 +23,7 @@ const LanguageSwitcher = () => {
 
   return (
     <div className="language-switcher">
-      {Object.keys(lngs).map((lng) => (
+      {(Object.keys(lngs) as LanguageCode[]).map((lng) => (
         <button
           key={lng}
           style={{

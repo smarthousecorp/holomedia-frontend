@@ -1,6 +1,6 @@
 // src/store/slices/view.ts
 import {createSlice, PayloadAction} from "@reduxjs/toolkit";
-import i18n from "../../i18n.js"; // i18n 설정 파일 import
+// import i18n from "../../i18n.js"; // i18n 설정 파일 import
 
 export type ViewMode = "new" | "best" | "weekly";
 

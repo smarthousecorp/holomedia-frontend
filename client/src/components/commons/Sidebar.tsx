@@ -8,8 +8,8 @@ import LanguageSwitcher from "./LanguageSwitcher";
 import {useTranslation} from "react-i18next";
 
 interface SidebarProps {
-  isOpen: boolean;
-  onClose: () => void; // 사이드바를 닫는 함수 추가
+  isOpen?: boolean;
+  onClose?: () => void; // 사이드바를 닫는 함수 추가
 }
 
 const Sidebar = ({onClose}: SidebarProps) => {
@@ -37,7 +37,7 @@ const Sidebar = ({onClose}: SidebarProps) => {
   // 언어 변경 감지 및 사이드바 닫기
   useEffect(() => {
     const handleLanguageChange = () => {
-      onClose(); // 언어 변경 시 사이드바 닫기
+      onClose?.(); // 언어 변경 시 사이드바 닫기
     };
 
     i18n.on("languageChanged", handleLanguageChange);

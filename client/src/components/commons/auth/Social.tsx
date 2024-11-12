@@ -2,7 +2,7 @@ import styled from "styled-components";
 import {useTranslation} from "react-i18next";
 
 interface SocialProps {
-  auth: "login" | "signup";
+  auth: string;
 }
 
 const Social = ({auth}: SocialProps) => {

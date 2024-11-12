@@ -97,7 +97,7 @@ const Login = () => {
 
   return (
     <LoginContainer>
-      <Social auth={t("auth.modal.title.login")} />
+      <Social auth={"login"} />
       <LoginInputContainer>
         <Title>{t("auth.modal.title.login")}</Title>
         <Input
