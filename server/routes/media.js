@@ -58,6 +58,7 @@ router.get("/recent", (req, res) => {
       non_thumbnail, 
       member_thumbnail, 
       name,
+      price,
       DATE_FORMAT(created_at, '%Y-%m-%d') as created_date
     FROM medias 
     ORDER BY created_at DESC 
@@ -103,6 +104,7 @@ router.get("/best", (req, res) => {
       non_thumbnail, 
       member_thumbnail,
       name,
+      price,
       DATE_FORMAT(created_at, '%Y-%m-%d') as created_date
     FROM medias 
     ORDER BY views DESC, created_at DESC 
@@ -275,7 +277,6 @@ const logVideoView = (mediaId, userId) => {
 router.get("/", (req, res) => {
   const sql =
     "SELECT id, title, views, non_thumbnail, member_thumbnail, name FROM medias ORDER BY id";
-  const sqlUpdateViews = "UPDATE medias SET views = views + 1 WHERE id = ?";
 
   db.query(sql, (err, results) => {
     if (err) {

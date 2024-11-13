@@ -1,12 +1,12 @@
 import {Outlet} from "react-router";
 import {styled} from "styled-components";
 import Header from "../commons/Header";
-import Sidebar from "../commons/Sidebar";
 import {useDispatch, useSelector} from "react-redux";
 import {RootState} from "../../store";
 import {useEffect} from "react";
 import {close, open, setSidebarState} from "../../store/slices/sidebar";
 import {hide, setHeaderState, view} from "../../store/slices/header";
+import DefaultSidebar from "../commons/sidebar/DefaultSidebar";
 
 const MainLayout = () => {
   const sidebar = useSelector((state: RootState) => state.sidebar.isOpen);
@@ -42,7 +42,7 @@ const MainLayout = () => {
     <Full>
       <Header />
       <Inner>
-        {sidebar && <Sidebar />}
+        {sidebar && <DefaultSidebar />}
         <Container open={sidebar}>
           <Outlet />
         </Container>
