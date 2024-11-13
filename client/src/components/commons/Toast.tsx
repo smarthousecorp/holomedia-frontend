@@ -14,6 +14,8 @@ const toastOptions: ToastOptions = {
 };
 
 const Toast = (type: ToastType, message: string) => {
+  toast.clearWaitingQueue();
+
   switch (type) {
     case "success":
       toast.success(message, {
