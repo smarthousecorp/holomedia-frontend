@@ -16,6 +16,9 @@ import {ToastType} from "../types/toast";
 import {getCookie} from "../utils/cookie";
 import {useTranslation} from "react-i18next";
 import {getTimeAgo} from "../utils/getTimeAgo";
+import {Settings} from "lucide-react";
+
+type LoadingState = "loading" | "error" | "success";
 
 const Main = () => {
   const {t} = useTranslation();
@@ -36,6 +39,8 @@ const Main = () => {
       ? t("sectionTitles.weekly", {uploader: currentUploader})
       : t(`sectionTitles.${currentMode}`);
 
+  const [loadingState, setLoadingState] = useState<LoadingState>("loading");
+
   const [medias, setMedias] = useState<media[] | weeklyMedia[]>([]);
 
   const [showModal, setShowModal] = useState<boolean>(false);
@@ -43,6 +48,7 @@ const Main = () => {
 
   const fetchData = async () => {
     try {
+      setLoadingState("loading");
       let response;
       switch (currentMode) {
         case "new":
@@ -57,8 +63,10 @@ const Main = () => {
           break;
       }
       setMedias(response.data.data);
+      setLoadingState("success");
     } catch (error) {
       console.error("Error fetching data:", error);
+      setLoadingState("error");
       Toast(ToastType.error, "데이터를 불러오는데 실패했습니다.");
     }
   };
@@ -97,6 +105,18 @@ const Main = () => {
     }
     return item.total_views;
   };
+
+  console.log(loadingState);
+
+  if (loadingState === "error") {
+    return (
+      <MaintenanceContainer>
+        <Settings size={48} className="spin" />
+        <MaintenanceText>점검중입니다.</MaintenanceText>
+        <RetryButton onClick={fetchData}>다시 시도</RetryButton>
+      </MaintenanceContainer>
+    );
+  }
 
   return (
     <MainContainer>
@@ -161,6 +181,52 @@ const Main = () => {
   );
 };
 export default Main;
+
+const MaintenanceContainer = styled.div`
+  width: 100%;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: #000000;
+  color: white;
+  gap: 2rem;
+
+  .spin {
+    animation: spin 2s linear infinite;
+  }
+
+  @keyframes spin {
+    from {
+      transform: rotate(0deg);
+    }
+    to {
+      transform: rotate(360deg);
+    }
+  }
+`;
+
+const MaintenanceText = styled.h2`
+  font-size: 2.4rem;
+  color: #ff627c;
+`;
+
+const RetryButton = styled.button`
+  padding: 1rem 2rem;
+  font-size: 1.6rem;
+  background-color: transparent;
+  border: 1px solid #ff627c;
+  color: #ff627c;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  &:hover {
+    background-color: #ff627c;
+    color: white;
+  }
+`;
 
 const MainContainer = styled.section`
   width: 100%;
