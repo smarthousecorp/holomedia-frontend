@@ -10,12 +10,12 @@ import LoginModal from "./auth/LoginModal";
 import {getCookie} from "../../utils/cookie";
 import {useNavigate} from "react-router-dom";
 import {useEffect, useState} from "react";
-import Sidebar from "./Sidebar";
 import {logout} from "../../store/slices/user";
 import {userLogout} from "../../utils/logout";
 import Toast from "./Toast";
 import {ToastType} from "../../types/toast";
 import {useTranslation} from "react-i18next";
+import HamburgerSidebar from "./sidebar/HamburgerSidebar";
 
 interface sidebarProps {
   isOpen: boolean;
@@ -110,14 +110,28 @@ const Header = () => {
         </Right>
       </Container>
       {modal && <LoginModal />}
-      {isOpenSidebar && (
-        <Background>
-          <CustomSidebar
-            isOpen={isOpenSidebar}
-            onClose={() => setIsOpenSidebar(false)}
-          />
-        </Background>
-      )}
+      <Background
+        isOpen={isOpenSidebar}
+        onClick={() => setIsOpenSidebar(false)}
+      >
+        <HamburgerSidebar
+          isOpen={isOpenSidebar}
+          onClose={() => setIsOpenSidebar(false)}
+        >
+          <Logo>
+            {header && (
+              <SvgIcon component={MenuIcon} onClick={handleClickHamburger} />
+            )}
+            <img
+              src={logo}
+              alt="로고"
+              onClick={() => {
+                navigate("/");
+              }}
+            />
+          </Logo>
+        </HamburgerSidebar>
+      </Background>
       {isOpenDropdown && (
         <Dropdown>
           <a>{t("header.auth.settings")}</a>
@@ -217,31 +231,24 @@ const ProfileContainer = styled.div`
   white-space: nowrap;
 `;
 
-const Background = styled.div`
+const Background = styled.div<sidebarProps>`
   width: 100vw;
   height: 100vh;
   background-color: rgba(0, 0, 0, 0.4);
-  z-index: 888;
+  z-index: 999;
   position: fixed;
   top: 0;
   left: 0;
-`;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
 
-// 해당 스타일이 적용 되지 않는 이슈가 존재함. 추후 해결 예정
-const CustomSidebar = styled(Sidebar)<sidebarProps>`
-  &&& {
-    position: fixed;
-    transform: translateX(-25rem); /* width만큼 왼쪽으로 이동 */
-    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    box-shadow: 2px 0 5px rgba(0, 0, 0, 0.5);
-    z-index: 1000;
-
-    ${({isOpen}) =>
-      isOpen &&
-      css`
-        transform: translateX(0);
-      `}
-  }
+  ${({isOpen}) =>
+    isOpen &&
+    css`
+      opacity: 1;
+      pointer-events: auto;
+    `}
 `;
 
 const Dropdown = styled.div`

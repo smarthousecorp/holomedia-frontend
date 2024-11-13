@@ -15,6 +15,7 @@ import Toast from "../components/commons/Toast";
 import {ToastType} from "../types/toast";
 import {getCookie} from "../utils/cookie";
 import {useTranslation} from "react-i18next";
+import {getTimeAgo} from "../utils/getTimeAgo";
 
 const Main = () => {
   const {t} = useTranslation();
@@ -36,6 +37,7 @@ const Main = () => {
       : t(`sectionTitles.${currentMode}`);
 
   const [medias, setMedias] = useState<media[] | weeklyMedia[]>([]);
+
   const [showModal, setShowModal] = useState<boolean>(false);
   const [selectedVideoId, setSelectedVideoId] = useState<number | null>(null);
 
@@ -105,6 +107,11 @@ const Main = () => {
           {medias.map((el) => (
             <MovieLi key={el.id} onClick={() => handleClickList(el.id)}>
               <ImgContainer>
+                {el.price > 0 && (
+                  <div className="price-badge">
+                    {el.price.toLocaleString()}원
+                  </div>
+                )}
                 <SkeletonImage
                   src={user ? el.member_thumbnail : el.non_thumbnail}
                   style={{objectFit: user ? "cover" : "contain"}}
@@ -122,7 +129,12 @@ const Main = () => {
                   <p>{getViews(el).toLocaleString()}</p>
                 </div>
               </MovieInfo>
-              <MovieDescription>{el.title}</MovieDescription>
+              <MovieDescription>
+                {el.title}
+                <span className="timeAgo">
+                  · {getTimeAgo(new Date(el.created_date))}
+                </span>
+              </MovieDescription>
             </MovieLi>
           ))}
         </MovieGrid>
@@ -253,8 +265,15 @@ const MovieInfo = styled.div`
 `;
 
 const MovieDescription = styled.p`
+  display: flex;
+  align-items: center;
+  gap: 5px;
   margin: 0.5rem 0;
   font-size: 1.8rem;
+
+  .timeAgo {
+    font-size: 1.3rem;
+  }
 `;
 
 const ImgContainer = styled.div`
@@ -274,6 +293,20 @@ const ImgContainer = styled.div`
     height: 100%; // 세로 100%
     object-fit: contain; // 비율 유지하며 잘라내기
     border-radius: 10px; // 상단 모서리 둥글게
+  }
+
+  // 가격 배지 스타일
+  .price-badge {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background-color: rgba(0, 0, 0, 0.7);
+    color: #ff627c;
+    padding: 5px 10px;
+    border-radius: 5px;
+    font-size: 1.4rem;
+    z-index: 1;
+    backdrop-filter: blur(4px);
   }
 `;
 
