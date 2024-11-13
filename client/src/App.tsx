@@ -9,6 +9,7 @@ import UploadForm from "./pages/uploadVideo";
 import ProtectedRoute from "./components/layout/ProtectedRoute";
 import Settings from "./pages/setting";
 import "./i18n"; // i18n 설정 import
+import ErrorPage from "./pages/Error";
 
 function App() {
   return (
@@ -16,9 +17,9 @@ function App() {
       <Routes>
         <Route element={<MainLayout />}>
           <Route path="/" element={<Main />} />
-          <Route path="/upload" element={<UploadForm />} />
         </Route>
         <Route element={<PublicLayout />}>
+          <Route path="/upload" element={<UploadForm />} />
           <Route
             path="/video/:id"
             element={
@@ -28,6 +29,7 @@ function App() {
             }
           />
           <Route path="/settings" element={<Settings />} />
+          <Route path="/error" element={<ErrorPage />} />
         </Route>
       </Routes>
       <ToastContainer style={{fontSize: "1.4rem"}} limit={1} />

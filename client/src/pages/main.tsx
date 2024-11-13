@@ -17,6 +17,7 @@ import {getCookie} from "../utils/cookie";
 import {useTranslation} from "react-i18next";
 import {getTimeAgo} from "../utils/getTimeAgo";
 import {Settings} from "lucide-react";
+import Loading from "../components/commons/Loading";
 
 type LoadingState = "loading" | "error" | "success";
 
@@ -68,6 +69,7 @@ const Main = () => {
       console.error("Error fetching data:", error);
       setLoadingState("error");
       Toast(ToastType.error, "데이터를 불러오는데 실패했습니다.");
+      navigate("/error");
     }
   };
 
@@ -106,13 +108,15 @@ const Main = () => {
     return item.total_views;
   };
 
-  console.log(loadingState);
+  if (loadingState === "loading") {
+    return <Loading />;
+  }
 
   if (loadingState === "error") {
     return (
       <MaintenanceContainer>
         <Settings size={48} className="spin" />
-        <MaintenanceText>점검중입니다.</MaintenanceText>
+        <MaintenanceText>데이터 로딩에 실패했습니다.</MaintenanceText>
         <RetryButton onClick={fetchData}>다시 시도</RetryButton>
       </MaintenanceContainer>
     );
