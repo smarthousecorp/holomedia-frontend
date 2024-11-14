@@ -29,8 +29,9 @@ function App() {
             }
           />
           <Route path="/settings" element={<Settings />} />
-          <Route path="/error" element={<ErrorPage />} />
+          <Route path="/error" element={<ErrorPage error="500" />} />
         </Route>
+        <Route path="/*" element={<ErrorPage error="404" />} />
       </Routes>
       <ToastContainer style={{fontSize: "1.4rem"}} limit={1} />
     </>

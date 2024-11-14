@@ -134,8 +134,12 @@ const Header = () => {
       </Background>
       {isOpenDropdown && (
         <Dropdown>
-          <a>{t("header.auth.settings")}</a>
-          {user.is_admin && <a href="/upload">{t("header.auth.upload")}</a>}
+          <a onClick={() => navigate("/settings")}>
+            {t("header.auth.settings")}
+          </a>
+          {user.is_admin && (
+            <a onClick={() => navigate("/upload")}>{t("header.auth.upload")}</a>
+          )}
           <a onClick={handleLogout}>{t("header.auth.logout")}</a>
         </Dropdown>
       )}

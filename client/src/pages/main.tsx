@@ -69,7 +69,7 @@ const Main = () => {
       console.error("Error fetching data:", error);
       setLoadingState("error");
       Toast(ToastType.error, "데이터를 불러오는데 실패했습니다.");
-      navigate("/error");
+      navigate("/error", {state: 500});
     }
   };
 
@@ -126,7 +126,7 @@ const Main = () => {
     <MainContainer>
       <MovieContainer>
         <MovieTitle>{sectionTitle}</MovieTitle>
-        <hr />
+        {/* <hr /> */}
         <MovieGrid>
           {medias.map((el) => (
             <MovieLi key={el.id} onClick={() => handleClickList(el.id)}>
