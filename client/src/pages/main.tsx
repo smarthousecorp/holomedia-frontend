@@ -257,6 +257,10 @@ const MovieContainer = styled.div`
     color: #ffffff;
     height: 1px;
   }
+
+  @media (max-width: 600px) {
+    margin: 0 2rem;
+  }
 `;
 
 const MovieTitle = styled.h2`
@@ -291,9 +295,9 @@ const MovieLi = styled.li`
     flex: 0 0 calc(50% - 1rem); // 900px 이하에서 2열
   }
 
-  /* @media (max-width: 600px) {
+  @media (max-width: 600px) {
     flex: 0 0 100%; // 600px 이하에서 1열
-  } */
+  }
 
   > img {
     width: 100%; // 가로 100%
