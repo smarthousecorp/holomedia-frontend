@@ -2,6 +2,7 @@ import styled, {css} from "styled-components";
 import logo from "../../assets/holomedia-logo.png";
 import SearchIcon from "@mui/icons-material/Search";
 import MenuIcon from "@mui/icons-material/Menu";
+import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import {SvgIcon} from "@mui/material";
 import {useDispatch, useSelector} from "react-redux";
 import {RootState} from "../../store";
@@ -37,6 +38,8 @@ const Header = () => {
   // 햄버거 클릭 시 열릴 사이드바 상태
   const [isOpenSidebar, setIsOpenSidebar] = useState<boolean>(false);
   const [isOpenDropdown, setIsOpenDropdown] = useState<boolean>(false);
+  // 모바일에서 검색 아이콘 클릭 시 상태
+  const [isSearchExpanded, setIsSearchExpanded] = useState<boolean>(false);
 
   const handleClickLoginBtn = () => {
     dispatch(on());
@@ -54,16 +57,22 @@ const Header = () => {
     Toast(ToastType.success, t("header.toast.logoutSuccess"));
   };
 
+  const toggleSearch = () => {
+    setIsSearchExpanded((prev) => !prev);
+  };
+
   // 메인 레이아웃에서 햄버거 클릭 후, 스크롤 조절 시 사이드바 닫기 불가능
   useEffect(() => {
     const handleResize = () => {
       if (window.innerWidth > 1310 && !header) {
         setIsOpenSidebar(false);
       }
+      if (window.innerWidth > 600) {
+        setIsSearchExpanded(false);
+      }
     };
 
     window.addEventListener("resize", handleResize);
-
     // 컴포넌트 언마운트 시 이벤트 리스너 제거
     return () => {
       window.removeEventListener("resize", handleResize);
@@ -77,37 +86,54 @@ const Header = () => {
   return (
     <>
       <Container>
-        <Logo>
-          {header && (
-            <SvgIcon component={MenuIcon} onClick={handleClickHamburger} />
-          )}
-          <img
-            src={logo}
-            alt="로고"
-            onClick={() => {
-              navigate("/");
-            }}
-          />
-        </Logo>
-        <Right>
-          <InputContainer>
-            <Input placeholder={t("header.search.placeholder")} />
+        {!isSearchExpanded ? (
+          <>
+            <Logo>
+              {header && (
+                <SvgIcon component={MenuIcon} onClick={handleClickHamburger} />
+              )}
+              <img
+                src={logo}
+                alt="로고"
+                onClick={() => {
+                  navigate("/");
+                }}
+              />
+            </Logo>
+            <Right>
+              <SearchContainer>
+                <DesktopSearch>
+                  <InputContainer>
+                    <Input placeholder={t("header.search.placeholder")} />
+                    <SvgIcon component={SearchIcon} />
+                  </InputContainer>
+                </DesktopSearch>
+                <MobileSearchIcon onClick={toggleSearch}>
+                  <SvgIcon component={SearchIcon} />
+                </MobileSearchIcon>
+              </SearchContainer>
+              {getCookie("accessToken") ? (
+                <ProfileContainer
+                  onClick={() => {
+                    setIsOpenDropdown(!isOpenDropdown);
+                  }}
+                >
+                  {t("header.auth.profile", {username: user.username})}
+                </ProfileContainer>
+              ) : (
+                <LoginBtn onClick={handleClickLoginBtn}>
+                  {t("header.auth.loginSignup")}
+                </LoginBtn>
+              )}
+            </Right>
+          </>
+        ) : (
+          <ExpandedSearchContainer>
+            <SvgIcon component={ArrowBackIcon} onClick={toggleSearch} />
+            <Input placeholder={t("header.search.placeholder")} autoFocus />
             <SvgIcon component={SearchIcon} />
-          </InputContainer>
-          {getCookie("accessToken") ? (
-            <ProfileContainer
-              onClick={() => {
-                setIsOpenDropdown(!isOpenDropdown);
-              }}
-            >
-              {t("header.auth.profile", {username: user.username})}
-            </ProfileContainer>
-          ) : (
-            <LoginBtn onClick={handleClickLoginBtn}>
-              {t("header.auth.loginSignup")}
-            </LoginBtn>
-          )}
-        </Right>
+          </ExpandedSearchContainer>
+        )}
       </Container>
       {modal && <LoginModal />}
       <Background
@@ -153,7 +179,6 @@ const Container = styled.header`
   width: 100%;
   height: 8rem;
   background: #000000;
-  /* border-bottom: 0.1rem solid #e2e2e2; */
   position: fixed;
   top: 0;
   z-index: 999;
@@ -163,6 +188,7 @@ const Container = styled.header`
 `;
 
 const Logo = styled.div`
+  height: 8rem;
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -176,6 +202,17 @@ const Logo = styled.div`
   > img {
     width: 20rem;
   }
+
+  @media (max-width: 600px) {
+    margin-left: 2.7rem;
+    & > img {
+      width: 16rem;
+    }
+
+    & > svg {
+      font-size: 2.1rem;
+    }
+  }
 `;
 
 const Right = styled.div`
@@ -185,10 +222,65 @@ const Right = styled.div`
   justify-content: space-between;
   align-items: center;
   margin-right: 6rem;
+
+  @media (max-width: 600px) {
+    width: auto;
+    gap: 1.5rem;
+    margin-right: 2rem;
+  }
+`;
+
+const SearchContainer = styled.div`
+  width: 80%;
+  display: flex;
+  align-items: center;
+`;
+
+const DesktopSearch = styled.div`
+  width: 100%;
+
+  @media (max-width: 600px) {
+    display: none;
+  }
+`;
+
+const MobileSearchIcon = styled.div`
+  display: none;
+  cursor: pointer;
+
+  @media (max-width: 600px) {
+    display: flex;
+    align-items: center;
+
+    > svg {
+      font-size: 2.4rem;
+      color: white;
+    }
+  }
+`;
+
+const ExpandedSearchContainer = styled.div`
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  padding: 0 2rem;
+  background: #000000;
+
+  > svg {
+    font-size: 2.4rem;
+    color: white;
+    cursor: pointer;
+  }
+
+  input {
+    flex: 1;
+  }
 `;
 
 const InputContainer = styled.div`
-  width: 80%;
+  width: 100%;
   position: relative;
   border-radius: 10px;
   background: #323232;
@@ -211,7 +303,7 @@ const Input = styled.input`
   color: #ffffff;
 
   &::placeholder {
-    color: #9c9c9c; /* placeholder 색상 */
+    color: #9c9c9c;
   }
 `;
 
@@ -224,6 +316,14 @@ const LoginBtn = styled.button`
   color: #ffffff;
   padding: 0 1rem;
   white-space: nowrap;
+  font-size: 1.3rem;
+
+  @media (max-width: 600px) {
+    width: auto;
+    padding: 0 1.5rem;
+    font-size: 1.05rem;
+    height: 4rem;
+  }
 `;
 
 const ProfileContainer = styled.div`
@@ -277,5 +377,9 @@ const Dropdown = styled.div`
       background-color: #f8f9fa;
       color: #ff627c;
     }
+  }
+
+  @media (max-width: 600px) {
+    right: 2rem;
   }
 `;
