@@ -6,6 +6,8 @@ const detectCountry = (req, res, next) => {
     req.headers["x-forwarded-for"]?.split(",")[0] ||
     req.socket.remoteAddress ||
     "";
+  console.log(ip);
+
   // 개발 환경에서 테스트를 위한 더미 IP
   const testIP = process.env.NODE_ENV === "development" ? "8.8.8.8" : ip;
 

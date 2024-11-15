@@ -141,6 +141,7 @@ router.get("/user-country", detectCountry, (req, res) => {
     const geoInfo = req.geoInfo;
     const countryCode = geoInfo?.country || "";
     const language = countryToLanguage[countryCode] || DEFAULT_LANGUAGE;
+    console.log(getInfo, countryCode, language);
 
     res.json({
       success: true,
