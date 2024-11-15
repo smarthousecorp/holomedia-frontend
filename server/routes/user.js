@@ -137,15 +137,17 @@ const countryToLanguage = {
 const DEFAULT_LANGUAGE = "ko";
 
 router.get("/user-country", detectCountry, (req, res) => {
+  console.log(req.geoInfo);
+
   try {
     const geoInfo = req.geoInfo;
     const countryCode = geoInfo?.country || "";
     const language = countryToLanguage[countryCode] || DEFAULT_LANGUAGE;
-    console.log(getInfo, countryCode, language);
 
     res.json({
       success: true,
       data: {
+        ip: req.ip,
         countryCode,
         language,
         region: geoInfo?.region || "",

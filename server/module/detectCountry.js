@@ -1,27 +1,42 @@
 const geoip = require("geoip-lite");
+const requestIp = require("request-ip");
 
 const detectCountry = (req, res, next) => {
-  // 클라이언트 IP 주소 가져오기
-  const ip =
-    req.headers["x-forwarded-for"]?.split(",")[0] ||
-    req.socket.remoteAddress ||
-    "";
-  console.log(ip);
-
-  // 개발 환경에서 테스트를 위한 더미 IP
-  const testIP = process.env.NODE_ENV === "development" ? "8.8.8.8" : ip;
-
   try {
-    const geo = geoip.lookup(testIP);
+    // 클라이언트 IP 주소 가져오기
+    let ip = requestIp.getClientIp(req);
+
+    console.log("Original IP:", ip);
+    console.log("Headers:", req.headers);
+
+    // localhost 체크
+    if (ip === "::1" || ip === "localhost" || ip === "127.0.0.1") {
+      ip = "8.8.8.8"; // 개발환경용 테스트 IP
+    }
+
+    // IPv6 to IPv4 변환
+    if (ip && ip.includes("::ffff:")) {
+      ip = ip.split("::ffff:")[1];
+    }
+
+    console.log("Processed IP:", ip);
+
+    // GeoIP 조회
+    const geo = geoip.lookup(ip);
+    console.log("GeoIP result:", geo);
+
     if (geo) {
       req.geoInfo = {
         country: geo.country,
         region: geo.region,
         timezone: geo.timezone,
       };
+      console.log("GeoInfo set:", req.geoInfo);
+    } else {
+      console.log("No geo data found for IP:", ip);
     }
   } catch (error) {
-    console.error("Error detecting country:", error);
+    console.error("Error in detectCountry:", error);
   }
   next();
 };
