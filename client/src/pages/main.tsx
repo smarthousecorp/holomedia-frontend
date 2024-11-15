@@ -131,11 +131,11 @@ const Main = () => {
           {medias.map((el) => (
             <MovieLi key={el.id} onClick={() => handleClickList(el.id)}>
               <ImgContainer>
-                {el.price > 0 && (
+                {/* {el.price > 0 && (
                   <div className="price-badge">
                     {el.price.toLocaleString()}원
                   </div>
-                )}
+                )} */}
                 <SkeletonImage
                   src={user ? el.member_thumbnail : el.non_thumbnail}
                   style={{objectFit: user ? "cover" : "contain"}}

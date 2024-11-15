@@ -4,6 +4,7 @@ const router = express.Router();
 
 const db = require("../db/holomedia");
 const tokenService = require("../module/jwt");
+const {detectCountry} = require("../module/detectCountry");
 
 const uuid4 = require("uuid4");
 
@@ -118,6 +119,43 @@ router.post("/signup", function (request, response) {
   } else {
     // 입력되지 않은 정보가 있는 경우
     response.status(400).send("입력되지 않은 정보가 있습니다.");
+  }
+});
+
+// 국가 코드와 언어 매핑
+const countryToLanguage = {
+  KR: "ko",
+  JP: "jp",
+  CN: "zh",
+  TW: "zh",
+  US: "en",
+  GB: "en",
+  // 추가 국가 매핑
+};
+
+// 기본 언어 설정
+const DEFAULT_LANGUAGE = "ko";
+
+router.get("/user-country", detectCountry, (req, res) => {
+  try {
+    const geoInfo = req.geoInfo;
+    const countryCode = geoInfo?.country || "";
+    const language = countryToLanguage[countryCode] || DEFAULT_LANGUAGE;
+
+    res.json({
+      success: true,
+      data: {
+        countryCode,
+        language,
+        region: geoInfo?.region || "",
+        timezone: geoInfo?.timezone || "",
+      },
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      error: "Failed to detect country",
+    });
   }
 });
 

@@ -9,9 +9,30 @@ import UploadForm from "./pages/uploadVideo";
 import ProtectedRoute from "./components/layout/ProtectedRoute";
 import Settings from "./pages/setting";
 import "./i18n"; // i18n 설정 import
+import {useCountryDetection} from "./hooks/useCountryDetection";
+import Loading from "./components/commons/Loading";
 import ErrorPage from "./pages/Error";
 
+interface ErrorMessageProps {
+  message?: string;
+}
+
+const ErrorMessage: React.FC<ErrorMessageProps> = ({
+  message = "Error detecting country",
+}) => <div>{message}</div>;
+
 function App() {
+  const {countryInfo, error, loading} = useCountryDetection();
+  console.log(countryInfo);
+
+  if (loading) {
+    return <Loading />;
+  }
+
+  if (error) {
+    return <ErrorMessage />;
+  }
+
   return (
     <>
       <Routes>
