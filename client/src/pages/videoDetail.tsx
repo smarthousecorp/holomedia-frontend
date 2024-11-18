@@ -27,6 +27,8 @@ const VideoDetail = () => {
   const id = useParams().id;
   const videoRef = useRef(null);
   const user = useSelector((state: RootState) => state.user.isLoggedIn);
+  console.log(user);
+
   const isAdmin = useSelector((state: RootState) => state.user.is_admin);
 
   const [media, setMedia] = useState<media>();
@@ -94,7 +96,7 @@ const VideoDetail = () => {
             <video
               ref={videoRef}
               src={media?.url}
-              poster={user ? media?.member_thumbnail : media?.non_thumbnail}
+              poster={media?.thumbnail}
               onPlay={handlePlay}
               className={isPlaying ? "playing" : ""}
               controls

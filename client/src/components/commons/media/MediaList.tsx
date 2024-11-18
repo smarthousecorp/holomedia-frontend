@@ -11,6 +11,7 @@ import {RootState} from "../../../store";
 const MediaList = ({media}: {media: media}) => {
   const navigate = useNavigate();
   const user = useSelector((state: RootState) => state.user.isLoggedIn);
+  console.log(user);
 
   const handleClickList = (id: number) => {
     navigate(`/video/${id}`);
@@ -25,7 +26,7 @@ const MediaList = ({media}: {media: media}) => {
     >
       <ImgContainer>
         <SkeletonImage
-          src={user ? media.member_thumbnail : media.non_thumbnail}
+          src={media.thumbnail}
           alt="썸네일"
           background="#505050"
           objectFit="cover"
