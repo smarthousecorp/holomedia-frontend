@@ -92,12 +92,8 @@ i18n.use(initReactI18next).init({
               label: "Video File",
               uploadText: "Click to upload video",
             },
-            nonMemberThumbnail: {
-              label: "Non-member Thumbnail",
-              uploadText: "Click to upload image",
-            },
-            memberThumbnail: {
-              label: "Member Thumbnail",
+            thumbnail: {
+              label: "Thumbnail",
               uploadText: "Click to upload image",
             },
             creatorName: {
@@ -200,12 +196,8 @@ i18n.use(initReactI18next).init({
               label: "영상 파일",
               uploadText: "클릭하여 영상 업로드",
             },
-            nonMemberThumbnail: {
-              label: "비회원용 썸네일",
-              uploadText: "클릭하여 이미지 업로드",
-            },
-            memberThumbnail: {
-              label: "회원용 썸네일",
+            Thumbnail: {
+              label: "썸네일",
               uploadText: "클릭하여 이미지 업로드",
             },
             creatorName: {
@@ -309,12 +301,8 @@ i18n.use(initReactI18next).init({
               label: "動画ファイル",
               uploadText: "クリックして動画をアップロード",
             },
-            nonMemberThumbnail: {
-              label: "非会員用サムネイル",
-              uploadText: "クリックして画像をアップロード",
-            },
-            memberThumbnail: {
-              label: "会員用サムネイル",
+            Thumbnail: {
+              label: "サムネイル",
               uploadText: "クリックして画像をアップロード",
             },
             creatorName: {
@@ -417,8 +405,8 @@ i18n.use(initReactI18next).init({
               label: "视频文件",
               uploadText: "点击上传视频",
             },
-            nonMemberThumbnail: {
-              label: "非会员缩略图",
+            Thumbnail: {
+              label: "缩略图",
               uploadText: "点击上传图片",
             },
             memberThumbnail: {

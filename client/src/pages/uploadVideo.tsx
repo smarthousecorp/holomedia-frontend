@@ -1,17 +1,16 @@
-import React, {useState, ChangeEvent} from "react";
+import React, {useState, ChangeEvent, useCallback, useEffect} from "react";
 import styled from "styled-components";
 import useUploadImage from "../hooks/useUploadImage";
-import useUploadVideo from "../hooks/useUploadVideo"; // 새로 만들어야 할 훅
+import useUploadVideo from "../hooks/useUploadVideo";
 import {api} from "../utils/api";
-
+import VideoThumbnailSelector from "../components/commons/media/VideoThumbnailSelector";
 import {useTranslation} from "react-i18next";
 
 interface UploadFormData {
   title: string;
   url: string;
-  video_file: File | null; // 추가된 비디오 파일
-  non_thumbnail: File | null;
-  member_thumbnail: File | null;
+  video_file: File | null;
+  thumbnail: string | null;
   name: string;
 }
 
@@ -21,21 +20,17 @@ export default function UploadForm() {
   const [formData, setFormData] = useState<UploadFormData>({
     title: "",
     url: "",
-    video_file: null, // 초기값 추가
-    non_thumbnail: null,
-    member_thumbnail: null,
+    video_file: null,
+    thumbnail: null,
     name: "",
   });
 
-  const [previews, setPreviews] = useState({
-    non_thumbnail: "",
-    member_thumbnail: "",
-    video_file: "", // 비디오 미리보기 URL
-  });
+  const [selectedThumbnail, setSelectedThumbnail] = useState<string>("");
+  const [videoPreview, setVideoPreview] = useState<string>("");
 
   // 이미지 업로드 커스텀훅
   const uploadImage = useUploadImage();
-  const uploadVideo = useUploadVideo(); // 비디오 업로드용 커스텀훅
+  const uploadVideo = useUploadVideo();
 
   const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
     const {name, value} = e.target;
@@ -45,32 +40,36 @@ export default function UploadForm() {
     }));
   };
 
-  const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
-    const {name, files} = e.target;
-    if (files && files[0]) {
-      setFormData((prev) => ({
-        ...prev,
-        [name]: files[0],
-      }));
+  // 비디오 파일 변경 핸들러를 useCallback으로 최적화
+  const handleFileChange = useCallback(
+    (e: ChangeEvent<HTMLInputElement>) => {
+      const {name, files} = e.target;
+      if (files && files[0]) {
+        setFormData((prev) => ({
+          ...prev,
+          [name]: files[0],
+        }));
 
-      // 비디오 파일인 경우 미리보기 생성
-      if (name === "video_file" && files[0].type.startsWith("video/")) {
-        const previewUrl = URL.createObjectURL(files[0]);
-        setPreviews((prev) => ({
-          ...prev,
-          [name]: previewUrl,
-        }));
+        if (name === "video_file" && files[0].type.startsWith("video/")) {
+          // 이전 비디오 프리뷰 URL 정리
+          if (videoPreview) {
+            URL.revokeObjectURL(videoPreview);
+          }
+          const previewUrl = URL.createObjectURL(files[0]);
+          setVideoPreview(previewUrl);
+        }
       }
-      // 이미지 파일인 경우 기존 로직 유지
-      else if (files[0].type.startsWith("image/")) {
-        const previewUrl = URL.createObjectURL(files[0]);
-        setPreviews((prev) => ({
-          ...prev,
-          [name]: previewUrl,
-        }));
-      }
-    }
-  };
+    },
+    [videoPreview]
+  );
+
+  const handleThumbnailSelect = useCallback((thumbnailUrl: string) => {
+    setSelectedThumbnail(thumbnailUrl);
+    setFormData((prev) => ({
+      ...prev,
+      thumbnail: thumbnailUrl,
+    }));
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -80,13 +79,7 @@ export default function UploadForm() {
 
       // 기본 필드들 추가
       Object.entries(formData).forEach(([key, value]) => {
-        console.log(key, value);
-
-        if (
-          !["non_thumbnail", "member_thumbnail", "video_file", "url"].includes(
-            key
-          )
-        ) {
+        if (!["video_file", "url", "thumbnail"].includes(key)) {
           formDataToSend.append(key, value);
         }
       });
@@ -94,18 +87,20 @@ export default function UploadForm() {
       // 비디오 파일 업로드
       if (formData.video_file) {
         const videoUrl = await uploadVideo(formData.video_file);
-        formDataToSend.append("url", videoUrl); // 기존 url 필드에 업로드된 비디오 URL 저장
+        formDataToSend.append("url", videoUrl);
       }
 
-      // 이미지 업로드
-      if (formData.non_thumbnail) {
-        const nonDownloadUrl = await uploadImage(formData.non_thumbnail);
-        formDataToSend.append("non_thumbnail", nonDownloadUrl);
-      }
+      // 선택된 썸네일 업로드
+      if (selectedThumbnail) {
+        // Base64 데이터 URL을 File 객체로 변환
+        const response = await fetch(selectedThumbnail);
+        const blob = await response.blob();
+        const thumbnailFile = new File([blob], "thumbnail.jpg", {
+          type: "image/jpeg",
+        });
 
-      if (formData.member_thumbnail) {
-        const memberDownloadUrl = await uploadImage(formData.member_thumbnail);
-        formDataToSend.append("member_thumbnail", memberDownloadUrl);
+        const thumbnailUrl = await uploadImage(thumbnailFile);
+        formDataToSend.append("thumbnail", thumbnailUrl);
       }
 
       const response = await api.post("/media", formDataToSend);
@@ -116,15 +111,11 @@ export default function UploadForm() {
           title: "",
           url: "",
           video_file: null,
-          non_thumbnail: null,
-          member_thumbnail: null,
+          thumbnail: null,
           name: "",
         });
-        setPreviews({
-          non_thumbnail: "",
-          member_thumbnail: "",
-          video_file: "",
-        });
+        setVideoPreview("");
+        setSelectedThumbnail("");
       } else {
         alert(t("upload.messages.uploadError"));
       }
@@ -133,6 +124,15 @@ export default function UploadForm() {
       alert(t("upload.messages.uploadError"));
     }
   };
+
+  // 컴포넌트 언마운트 시 정리
+  useEffect(() => {
+    return () => {
+      if (videoPreview) {
+        URL.revokeObjectURL(videoPreview);
+      }
+    };
+  }, []);
 
   return (
     <Container>
@@ -154,9 +154,9 @@ export default function UploadForm() {
           <Label>{t("upload.form.videoFile.label")}</Label>
           <FileUploadContainer>
             <FileUploadLabel>
-              {previews.video_file ? (
+              {videoPreview ? (
                 <video
-                  src={previews.video_file}
+                  src={videoPreview}
                   controls
                   style={{width: "100%", height: "100%", objectFit: "contain"}}
                 />
@@ -180,57 +180,16 @@ export default function UploadForm() {
           </FileUploadContainer>
         </FormGroup>
 
-        <FormGroup>
-          <Label>{t("upload.form.nonMemberThumbnail.label")}</Label>
-          <FileUploadContainer>
-            <FileUploadLabel>
-              {previews.non_thumbnail ? (
-                <PreviewImage src={previews.non_thumbnail} alt="Preview" />
-              ) : (
-                <>
-                  <UploadIcon>📤</UploadIcon>
-                  <UploadText>
-                    {t("upload.form.nonMemberThumbnail.uploadText")}
-                  </UploadText>
-                </>
-              )}
-              <input
-                type="file"
-                name="non_thumbnail"
-                onChange={handleFileChange}
-                style={{display: "none"}}
-                accept="image/*"
-                required
-              />
-            </FileUploadLabel>
-          </FileUploadContainer>
-        </FormGroup>
-
-        <FormGroup>
-          <Label>{t("upload.form.memberThumbnail.label")}</Label>
-          <FileUploadContainer>
-            <FileUploadLabel>
-              {previews.member_thumbnail ? (
-                <PreviewImage src={previews.member_thumbnail} alt="Preview" />
-              ) : (
-                <>
-                  <UploadIcon>📤</UploadIcon>
-                  <UploadText>
-                    {t("upload.form.memberThumbnail.uploadText")}
-                  </UploadText>
-                </>
-              )}
-              <input
-                type="file"
-                name="member_thumbnail"
-                onChange={handleFileChange}
-                style={{display: "none"}}
-                accept="image/*"
-                required
-              />
-            </FileUploadLabel>
-          </FileUploadContainer>
-        </FormGroup>
+        {formData.video_file && (
+          <FormGroup>
+            <Label>{t("upload.form.thumbnail.label")}</Label>
+            <VideoThumbnailSelector
+              videoFile={formData.video_file}
+              onThumbnailSelect={handleThumbnailSelect}
+              thumbnailCount={6}
+            />
+          </FormGroup>
+        )}
 
         <FormGroup>
           <Label>{t("upload.form.creatorName.label")}</Label>
@@ -357,13 +316,6 @@ const UploadText = styled.p`
   margin-bottom: 0.5rem;
   font-size: 1.4rem;
   color: #999;
-`;
-
-const PreviewImage = styled.img`
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  border-radius: 0.8rem;
 `;
 
 const SubmitButton = styled.button`

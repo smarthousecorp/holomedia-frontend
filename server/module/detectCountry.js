@@ -11,7 +11,7 @@ const detectCountry = (req, res, next) => {
 
     // localhost 체크
     if (ip === "::1" || ip === "localhost" || ip === "127.0.0.1") {
-      ip = "8.8.8.8"; // 개발환경용 테스트 IP
+      ip = "1.34.1.1"; // 개발환경용 테스트 IP
     }
 
     // IPv6 to IPv4 변환

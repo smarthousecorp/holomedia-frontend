@@ -137,7 +137,7 @@ const Main = () => {
                   </div>
                 )} */}
                 <SkeletonImage
-                  src={user ? el.member_thumbnail : el.non_thumbnail}
+                  src={el.thumbnail}
                   style={{objectFit: user ? "cover" : "contain"}}
                   alt="썸네일"
                   background="#505050"

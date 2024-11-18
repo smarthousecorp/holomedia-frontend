@@ -55,8 +55,7 @@ router.get("/recent", (req, res) => {
       id, 
       title, 
       views, 
-      non_thumbnail, 
-      member_thumbnail, 
+      thumbnail,
       name,
       price,
       DATE_FORMAT(created_at, '%Y-%m-%d') as created_date
@@ -101,8 +100,7 @@ router.get("/best", (req, res) => {
       id, 
       title, 
       views, 
-      non_thumbnail, 
-      member_thumbnail,
+      thumbnail,
       name,
       price,
       DATE_FORMAT(created_at, '%Y-%m-%d') as created_date
@@ -141,8 +139,7 @@ router.get("/weekly/:name", authenticateToken, (req, res) => {
       m.name,
       m.title,
       m.views as total_views,
-      m.non_thumbnail,
-      m.member_thumbnail,
+      thumbnail,
       m.price,         /* Price 필드 추가 */
       COALESCE(weekly_views.view_count, 0) as weekly_views,
       DATE_FORMAT(m.created_at, '%Y-%m-%d') as created_date,
@@ -218,7 +215,7 @@ router.get("/weekly/:name", authenticateToken, (req, res) => {
 // 랜덤 영상 3개 조회
 router.get("/recommend", authenticateToken, (req, res) => {
   const sql =
-    "SELECT id, title, views, non_thumbnail, member_thumbnail, name FROM medias ORDER BY RAND() LIMIT 3";
+    "SELECT id, title, views, thumbnail, name FROM medias ORDER BY RAND() LIMIT 3";
 
   db.query(sql, (err, results) => {
     if (err) {
@@ -276,7 +273,7 @@ const logVideoView = (mediaId, userId) => {
 // 글 전체 조회
 router.get("/", (req, res) => {
   const sql =
-    "SELECT id, title, views, non_thumbnail, member_thumbnail, name FROM medias ORDER BY id";
+    "SELECT id, title, views, thumbnail, name FROM medias ORDER BY id";
 
   db.query(sql, (err, results) => {
     if (err) {
@@ -354,24 +351,18 @@ router.get("/:id", authenticateToken, async (req, res) => {
 
 // 영상 등록 API 수정 (업로더 정보 추가)
 router.post("/", authenticateToken, (req, res) => {
-  const {title, url, non_thumbnail, member_thumbnail, name} = req.body;
-  const uploader_id = req.user.user_id; // JWT 토큰에서 사용자 ID 추출
+  const {title, url, thumbnail, name} = req.body;
+  const uploader_id = req.user.id; // JWT 토큰에서 사용자 ID 추출
+  console.log(req.user);
 
   // 필수 값 체크
-  if (!title || !url || !non_thumbnail || !member_thumbnail || !name) {
+  if (!title || !url || !thumbnail || !name) {
     return res.status(400).send({message: "값을 모두 입력해주세요."});
   }
 
   const sql =
-    "INSERT INTO medias (title, url, non_thumbnail, member_thumbnail, name, uploader_id) VALUES (?, ?, ?, ?, ?, ?)";
-  const values = [
-    title,
-    url,
-    non_thumbnail,
-    member_thumbnail,
-    name,
-    uploader_id,
-  ];
+    "INSERT INTO medias (title, url, thumbnail, name, uploader_id) VALUES (?, ?, ?, ?, ?)";
+  const values = [title, url, thumbnail, name, uploader_id];
 
   db.query(sql, values, (err, result) => {
     if (err) {
