@@ -69,12 +69,12 @@ router.get("/recent", (req, res) => {
       return res.status(500).send({message: "서버 오류가 발생했습니다."});
     }
 
-    if (results.length === 0) {
-      return res.status(404).send({
-        status: "empty",
-        message: "등록된 영상이 없습니다.",
-      });
-    }
+    // if (results.length === 0) {
+    //   return res.status(204).send({
+    //     status: "empty",
+    //     message: "등록된 영상이 없습니다.",
+    //   });
+    // }
 
     res.send({
       status: "success",

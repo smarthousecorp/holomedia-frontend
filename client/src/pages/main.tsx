@@ -18,6 +18,7 @@ import {useTranslation} from "react-i18next";
 import {getTimeAgo} from "../utils/getTimeAgo";
 import {Settings} from "lucide-react";
 import Loading from "../components/commons/Loading";
+import EmptyState from "../components/commons/EmptyState";
 
 type LoadingState = "loading" | "error" | "success";
 
@@ -63,7 +64,10 @@ const Main = () => {
           response = await api.get(`/media/weekly/${currentUploader}`);
           break;
       }
-      setMedias(response.data.data);
+
+      console.log(response?.data);
+
+      setMedias(response?.data.data);
       setLoadingState("success");
     } catch (error) {
       console.error("Error fetching data:", error);
@@ -127,41 +131,45 @@ const Main = () => {
       <MovieContainer>
         <MovieTitle>{sectionTitle}</MovieTitle>
         {/* <hr /> */}
-        <MovieGrid>
-          {medias.map((el) => (
-            <MovieLi key={el.id} onClick={() => handleClickList(el.id)}>
-              <ImgContainer>
-                {/* {el.price > 0 && (
+        {medias.length === 0 ? (
+          <EmptyState message={`${sectionTitle}에 등록된 영상이 없습니다`} />
+        ) : (
+          <MovieGrid>
+            {medias.map((el) => (
+              <MovieLi key={el.id} onClick={() => handleClickList(el.id)}>
+                <ImgContainer>
+                  {/* {el.price > 0 && (
                   <div className="price-badge">
                     {el.price.toLocaleString()}원
                   </div>
                 )} */}
-                <SkeletonImage
-                  src={el.thumbnail}
-                  style={{objectFit: user ? "cover" : "contain"}}
-                  alt="썸네일"
-                  background="#505050"
-                />
-              </ImgContainer>
-              <MovieInfo>
-                <h6>{el.name}</h6>
-                <div className="views">
-                  <SvgIcon
-                    component={VisibilityIcon}
-                    sx={{stroke: "#ffffff", strokeWidth: 0.3}}
+                  <SkeletonImage
+                    src={el.thumbnail}
+                    style={{objectFit: user ? "cover" : "contain"}}
+                    alt="썸네일"
+                    background="#505050"
                   />
-                  <p>{getViews(el).toLocaleString()}</p>
-                </div>
-              </MovieInfo>
-              <MovieDescription>
-                {el.title}
-                <span className="timeAgo">
-                  · {getTimeAgo(new Date(el.created_date))}
-                </span>
-              </MovieDescription>
-            </MovieLi>
-          ))}
-        </MovieGrid>
+                </ImgContainer>
+                <MovieInfo>
+                  <h6>{el.name}</h6>
+                  <div className="views">
+                    <SvgIcon
+                      component={VisibilityIcon}
+                      sx={{stroke: "#ffffff", strokeWidth: 0.3}}
+                    />
+                    <p>{getViews(el).toLocaleString()}</p>
+                  </div>
+                </MovieInfo>
+                <MovieDescription>
+                  {el.title}
+                  <span className="timeAgo">
+                    · {getTimeAgo(new Date(el.created_date))}
+                  </span>
+                </MovieDescription>
+              </MovieLi>
+            ))}
+          </MovieGrid>
+        )}
       </MovieContainer>
 
       {showModal && (
