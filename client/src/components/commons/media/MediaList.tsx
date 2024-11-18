@@ -4,14 +4,10 @@ import VisibilityIcon from "@mui/icons-material/Visibility";
 import {SvgIcon} from "@mui/material";
 import {useNavigate} from "react-router-dom";
 import {SkeletonImage} from "./Skeleton";
-import {useSelector} from "react-redux";
-import {RootState} from "../../../store";
 
 // 영상 단일조회 페이지의 추천 리스트 컴포넌트
 const MediaList = ({media}: {media: media}) => {
   const navigate = useNavigate();
-  const user = useSelector((state: RootState) => state.user.isLoggedIn);
-  console.log(user);
 
   const handleClickList = (id: number) => {
     navigate(`/video/${id}`);

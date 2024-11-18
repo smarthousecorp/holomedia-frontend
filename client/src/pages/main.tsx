@@ -16,7 +16,7 @@ import {ToastType} from "../types/toast";
 import {getCookie} from "../utils/cookie";
 import {useTranslation} from "react-i18next";
 import {getTimeAgo} from "../utils/getTimeAgo";
-import {Settings} from "lucide-react";
+import {Settings, Lock} from "lucide-react";
 import Loading from "../components/commons/Loading";
 import EmptyState from "../components/commons/EmptyState";
 
@@ -33,6 +33,9 @@ const Main = () => {
     (state: RootState) => state.user.is_adult_verified
   );
   const isAdmin = useSelector((state: RootState) => state.user.is_admin);
+
+  const shouldBlur = !isAdmin && (!user || !isAdultVerified);
+
   const {currentMode, currentUploader} = useSelector(
     (state: RootState) => state.view
   );
@@ -64,8 +67,6 @@ const Main = () => {
           response = await api.get(`/media/weekly/${currentUploader}`);
           break;
       }
-
-      console.log(response?.data);
 
       setMedias(response?.data.data);
       setLoadingState("success");
@@ -137,7 +138,7 @@ const Main = () => {
           <MovieGrid>
             {medias.map((el) => (
               <MovieLi key={el.id} onClick={() => handleClickList(el.id)}>
-                <ImgContainer>
+                <ImgContainer $shouldBlur={shouldBlur}>
                   {/* {el.price > 0 && (
                   <div className="price-badge">
                     {el.price.toLocaleString()}원
@@ -149,8 +150,19 @@ const Main = () => {
                     alt="썸네일"
                     background="#505050"
                   />
+                  {shouldBlur && (
+                    <BlurOverlay>
+                      <Lock size={24} />
+                      <p>
+                        {!user
+                          ? "로그인이 필요합니다"
+                          : "성인인증이 필요합니다"}
+                      </p>
+                    </BlurOverlay>
+                  )}
                 </ImgContainer>
                 <MovieInfo>
+                  {/* <h6>{shouldBlur ? "등급 제한 컨텐츠" : el.name}</h6> */}
                   <h6>{el.name}</h6>
                   <div className="views">
                     <SvgIcon
@@ -161,6 +173,7 @@ const Main = () => {
                   </div>
                 </MovieInfo>
                 <MovieDescription>
+                  {/* {shouldBlur ? "..." : el.title} */}
                   {el.title}
                   <span className="timeAgo">
                     · {getTimeAgo(new Date(el.created_date))}
@@ -358,26 +371,27 @@ const MovieDescription = styled.p`
   }
 `;
 
-const ImgContainer = styled.div`
+const ImgContainer = styled.div<{$shouldBlur: boolean}>`
   background-color: #505050;
   border-radius: 10px;
   width: 100%;
-  height: 0; // 높이를 0으로 설정
-  padding-top: 60%; // 비율을 유지하기 위해 패딩을 사용 (예: 4:3 비율)
-  position: relative; // 자식 요소의 절대 위치를 설정하기 위해 relative로 설정
-  overflow: hidden; // 넘치는 부분을 숨김
+  height: 0;
+  padding-top: 60%;
+  position: relative;
+  overflow: hidden;
 
   > img {
-    position: absolute; // 절대 위치로 설정
+    position: absolute;
     top: 0;
     left: 0;
-    width: 100%; // 가로 100%
-    height: 100%; // 세로 100%
-    object-fit: contain; // 비율 유지하며 잘라내기
-    border-radius: 10px; // 상단 모서리 둥글게
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    border-radius: 10px;
+    filter: ${(props) => (props.$shouldBlur ? "blur(10px)" : "none")};
+    transition: filter 0.3s ease;
   }
 
-  // 가격 배지 스타일
   .price-badge {
     position: absolute;
     top: 10px;
@@ -389,6 +403,26 @@ const ImgContainer = styled.div`
     font-size: 1.4rem;
     z-index: 1;
     backdrop-filter: blur(4px);
+  }
+`;
+
+const BlurOverlay = styled.div`
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background-color: rgba(0, 0, 0, 0.5);
+  color: white;
+  gap: 1rem;
+
+  p {
+    font-size: 1.4rem;
+    text-align: center;
   }
 `;
 

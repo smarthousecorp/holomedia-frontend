@@ -26,8 +26,6 @@ const VideoDetail = () => {
   const navigate = useNavigate();
   const id = useParams().id;
   const videoRef = useRef(null);
-  const user = useSelector((state: RootState) => state.user.isLoggedIn);
-  console.log(user);
 
   const isAdmin = useSelector((state: RootState) => state.user.is_admin);
 
