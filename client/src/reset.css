@@ -136,6 +136,7 @@ table {
 
 input,
 button {
+  font-family: "Pretendard-Medium";
   outline: none;
   border: none;
 }
@@ -159,5 +160,5 @@ body {
   font-size: 10px;
   font-family: "Pretendard-Medium";
   font-weight: 400;
-  background-color: #000000;
+  background-color: #ededed;
 }

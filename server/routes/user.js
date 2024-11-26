@@ -1,5 +1,6 @@
 const express = require("express");
 const session = require("express-session");
+const authenticateToken = require("../module/authJWT");
 const router = express.Router();
 
 const db = require("../db/holomedia");
@@ -51,9 +52,13 @@ router.post("/login", function (request, response) {
             is_admin: user.is_admin,
           }),
           status: 200,
+          user_id: user.user_id,
           username: user.username,
+          profile_image: user.profile_image,
           is_adult_verified: user.is_adult_verified,
           is_admin: user.is_admin,
+          is_uploader: user.is_uploader,
+          bloom: user.bloom,
         });
       }
     );
@@ -132,6 +137,351 @@ const countryToLanguage = {
   GB: "en",
   // 추가 국가 매핑
 };
+
+// 단일 사용자 정보 조회 API
+router.get("/user/:id", (req, res) => {
+  const userId = req.params.id;
+  const sql = `
+    SELECT 
+      id,
+      username, 
+      created_at, 
+      updated_at, 
+      is_adult_verified, 
+      is_admin,
+      is_uploader,
+      profile_image,
+      adult_verified_at
+      bloom
+    FROM users 
+    WHERE id = ?
+  `;
+
+  db.query(sql, [userId], (err, results) => {
+    if (err) {
+      console.error("사용자 정보 조회 실패:", err);
+      return res.status(500).send({message: "서버 오류가 발생했습니다."});
+    }
+
+    // 결과가 없는 경우
+    if (results.length === 0) {
+      return res.status(404).send({
+        status: "error",
+        message: "해당 사용자를 찾을 수 없습니다.",
+      });
+    }
+
+    // 첫 번째 결과 반환 (id는 기본키이므로 항상 하나의 결과만 존재)
+    res.send({
+      status: "success",
+      data: results[0],
+    });
+  });
+});
+
+router.get("/uploaders", (req, res) => {
+  const page = parseInt(req.query.page) || 1;
+  const limit = parseInt(req.query.limit) || 10;
+  const offset = (page - 1) * limit;
+
+  // 업로더 정보를 가져오는 메인 쿼리
+  const uploaderQuery = `
+    SELECT 
+      u.id,
+      u.user_id,
+      u.username,
+      u.created_at,
+      u.profile_image,
+      u.bloom,
+      COUNT(DISTINCT m.id) as media_count,
+      COALESCE(SUM(m.views), 0) as total_views,
+      COALESCE(MAX(m.created_at), u.created_at) as last_upload
+    FROM users u
+    LEFT JOIN medias m ON u.id = m.uploader_id
+    WHERE u.is_uploader = 1
+    GROUP BY 
+      u.id,
+      u.user_id,
+      u.username, 
+      u.created_at, 
+      u.profile_image,
+      u.bloom
+    ORDER BY last_upload DESC
+    LIMIT ? OFFSET ?
+  `;
+
+  // 전체 업로더 수 쿼리
+  const countQuery = `
+    SELECT COUNT(DISTINCT id) as total 
+    FROM users 
+    WHERE is_uploader = 1
+  `;
+
+  db.query(uploaderQuery, [limit, offset], (err, uploaders) => {
+    if (err) {
+      console.error("업로더 목록 조회 실패:", err);
+      return res.status(500).send({
+        status: "error",
+        message: "서버 오류가 발생했습니다.",
+      });
+    }
+
+    db.query(countQuery, (err, countResult) => {
+      if (err) {
+        console.error("업로더 수 조회 실패:", err);
+        return res.status(500).send({
+          status: "error",
+          message: "서버 오류가 발생했습니다.",
+        });
+      }
+
+      const totalCount = countResult[0].total;
+      const totalPages = Math.ceil(totalCount / limit);
+
+      res.send({
+        status: "success",
+        data: uploaders.map((uploader) => ({
+          ...uploader,
+          media_count: parseInt(uploader.media_count) || 0,
+          total_views: parseInt(uploader.total_views) || 0,
+          last_upload: uploader.last_upload,
+        })),
+        pagination: {
+          current_page: page,
+          total_pages: totalPages,
+          total_count: totalCount,
+          per_page: limit,
+        },
+      });
+    });
+  });
+});
+
+router.get("/recommended-uploaders", authenticateToken, (req, res) => {
+  const userId = req.user.id; // 현재 로그인한 사용자 ID
+
+  const limit = parseInt(req.query.limit) || 3; // 기본값으로 3명의 업로더 추천
+
+  // 팔로우하지 않은 업로더를 랜덤으로 조회하는 쿼리
+  const recommendQuery = `
+    SELECT 
+      u.id,
+      u.user_id,
+      u.username,
+      u.profile_image,
+      u.bloom,
+      COUNT(DISTINCT m.id) as media_count,
+      COALESCE(SUM(m.views), 0) as total_views,
+      COALESCE(MAX(m.created_at), u.created_at) as last_upload
+    FROM users u
+    LEFT JOIN medias m ON u.id = m.uploader_id
+    WHERE u.is_uploader = 1
+    AND u.id != ?  /* 자기 자신 제외 */
+    AND u.id NOT IN (  /* 이미 팔로우한 업로더 제외 */
+      SELECT following_id 
+      FROM follows 
+      WHERE follower_id = ?
+    )
+    GROUP BY 
+      u.id,
+      u.user_id,
+      u.username,
+      u.profile_image,
+      u.bloom
+    ORDER BY RAND()  /* 랜덤 정렬 */
+    LIMIT ?
+  `;
+
+  db.query(recommendQuery, [userId, userId, limit], (err, uploaders) => {
+    if (err) {
+      console.error("추천 업로더 조회 실패:", err);
+      return res.status(500).send({
+        status: "error",
+        message: "서버 오류가 발생했습니다.",
+      });
+    }
+
+    res.send({
+      status: "success",
+      data: uploaders.map((uploader) => ({
+        ...uploader,
+        media_count: parseInt(uploader.media_count) || 0,
+        total_views: parseInt(uploader.total_views) || 0,
+        last_upload: uploader.last_upload,
+      })),
+    });
+  });
+});
+
+// 팔로우 관련 API
+
+// 팔로우하기
+router.post("/follow/:uploaderId", authenticateToken, async (req, res) => {
+  const followerId = req.user.id; // 현재 로그인한 사용자 ID (인증 미들웨어에서 설정됨을 가정)
+  const uploaderId = parseInt(req.params.uploaderId);
+
+  // 자기 자신을 팔로우하는 것을 방지
+  if (followerId === uploaderId) {
+    return res.status(400).send({
+      status: "error",
+      message: "자기 자신을 팔로우할 수 없습니다.",
+    });
+  }
+
+  // 업로더인지 확인
+  const uploaderCheckQuery = "SELECT is_uploader FROM users WHERE id = ?";
+
+  db.query(uploaderCheckQuery, [uploaderId], (err, results) => {
+    if (err) {
+      console.error("업로더 확인 실패:", err);
+      return res.status(500).send({
+        status: "error",
+        message: "서버 오류가 발생했습니다.",
+      });
+    }
+
+    if (results.length === 0 || !results[0].is_uploader) {
+      return res.status(400).send({
+        status: "error",
+        message: "유효한 업로더가 아닙니다.",
+      });
+    }
+
+    // 팔로우 관계 생성
+    const followQuery =
+      "INSERT INTO follows (follower_id, following_id) VALUES (?, ?)";
+
+    db.query(followQuery, [followerId, uploaderId], (err) => {
+      if (err) {
+        // 중복 팔로우 시도 시
+        if (err.code === "ER_DUP_ENTRY") {
+          return res.status(400).send({
+            status: "error",
+            message: "이미 팔로우하고 있는 업로더입니다.",
+          });
+        }
+        console.error("팔로우 생성 실패:", err);
+        return res.status(500).send({
+          status: "error",
+          message: "서버 오류가 발생했습니다.",
+        });
+      }
+
+      res.send({
+        status: "success",
+        message: "성공적으로 팔로우했습니다.",
+      });
+    });
+  });
+});
+
+// 언팔로우하기
+router.delete("/follow/:uploaderId", authenticateToken, (req, res) => {
+  const followerId = req.user.id; // 현재 로그인한 사용자 ID
+  const uploaderId = parseInt(req.params.uploaderId);
+
+  const unfollowQuery =
+    "DELETE FROM follows WHERE follower_id = ? AND following_id = ?";
+
+  db.query(unfollowQuery, [followerId, uploaderId], (err, result) => {
+    if (err) {
+      console.error("언팔로우 실패:", err);
+      return res.status(500).send({
+        status: "error",
+        message: "서버 오류가 발생했습니다.",
+      });
+    }
+
+    if (result.affectedRows === 0) {
+      return res.status(404).send({
+        status: "error",
+        message: "팔로우 관계가 존재하지 않습니다.",
+      });
+    }
+
+    res.send({
+      status: "success",
+      message: "성공적으로 언팔로우했습니다.",
+    });
+  });
+});
+
+// 팔로잉 목록 조회
+router.get("/following", authenticateToken, (req, res) => {
+  const userId = req.user.id;
+  const page = parseInt(req.query.page) || 1;
+  const limit = parseInt(req.query.limit) || 10;
+  const offset = (page - 1) * limit;
+
+  const followingQuery = `
+    SELECT 
+      u.id,
+      u.user_id,
+      u.username,
+      u.profile_image,
+      u.bloom,
+      f.created_at as followed_at,
+      COUNT(DISTINCT m.id) as media_count,
+      COALESCE(SUM(m.views), 0) as total_views
+    FROM follows f
+    JOIN users u ON f.following_id = u.id
+    LEFT JOIN medias m ON u.id = m.uploader_id
+    WHERE f.follower_id = ?
+    GROUP BY 
+      u.id,
+      u.user_id,
+      u.username,
+      u.profile_image,
+      u.bloom,
+      f.created_at
+    ORDER BY f.created_at DESC
+    LIMIT ? OFFSET ?
+  `;
+
+  const countQuery = `
+    SELECT COUNT(*) as total
+    FROM follows
+    WHERE follower_id = ?
+  `;
+
+  db.query(followingQuery, [userId, limit, offset], (err, following) => {
+    if (err) {
+      console.error("팔로잉 목록 조회 실패:", err);
+      return res.status(500).send({
+        status: "error",
+        message: "서버 오류가 발생했습니다.",
+      });
+    }
+
+    db.query(countQuery, [userId], (err, countResult) => {
+      if (err) {
+        console.error("팔로잉 수 조회 실패:", err);
+        return res.status(500).send({
+          status: "error",
+          message: "서버 오류가 발생했습니다.",
+        });
+      }
+
+      const totalCount = countResult[0].total;
+      const totalPages = Math.ceil(totalCount / limit);
+
+      res.send({
+        status: "success",
+        data: following.map((user) => ({
+          ...user,
+          media_count: parseInt(user.media_count) || 0,
+          total_views: parseInt(user.total_views) || 0,
+        })),
+        pagination: {
+          current_page: page,
+          total_pages: totalPages,
+          total_count: totalCount,
+          per_page: limit,
+        },
+      });
+    });
+  });
+});
 
 // 기본 언어 설정
 const DEFAULT_LANGUAGE = "ko";

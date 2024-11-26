@@ -18,8 +18,8 @@ const LoadingContainer = styled.div`
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  background: #000000;
-  color: white;
+  background: #ffffff;
+  color: #000000;
   gap: 2rem;
 
   .spin {

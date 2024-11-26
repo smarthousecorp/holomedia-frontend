@@ -11,7 +11,7 @@ const ErrorPage = ({error}: Props) => {
   const navigate = useNavigate();
 
   const handleRetry = () => {
-    navigate("/");
+    navigate("/main");
     // 또는 이전 페이지로: navigate(-1);
   };
 

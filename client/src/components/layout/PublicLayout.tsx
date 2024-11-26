@@ -1,21 +1,14 @@
 import {Outlet} from "react-router";
 import {styled} from "styled-components";
 import Header from "../commons/Header";
-import {useEffect} from "react";
-import {useDispatch} from "react-redux";
-import {view} from "../../store/slices/header";
+import DefaultSidebar from "../commons/sidebar/DefaultSidebar";
 
 const PublicLayout = () => {
-  const dispatch = useDispatch();
-
-  useEffect(() => {
-    dispatch(view());
-  }, [dispatch]);
-
   return (
     <Full>
       <Header />
       <Inner>
+        <DefaultSidebarStyled />
         <Container>
           <Outlet />
         </Container>
@@ -37,12 +30,21 @@ const Full = styled.div`
 const Inner = styled.div`
   width: 100%;
   height: 100vh;
-  background-color: #000000;
-  padding-top: 8rem;
+  background-color: #ffffff;
   display: flex;
+
+  @media (max-width: 900px) {
+    padding-top: 8rem;
+  }
 `;
 
 const Container = styled.main`
   width: 100%;
-  /* padding-left: 25rem; // sidebar가 있으면 그대로, 없어지면 0으로 해야함 (전역상태관리 사용 예정) */
+  background-color: #ffffff;
+`;
+
+const DefaultSidebarStyled = styled(DefaultSidebar)`
+  @media (max-width: 768px) {
+    display: none;
+  }
 `;

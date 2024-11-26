@@ -7,7 +7,6 @@ import sidebar from "./slices/sidebar";
 import {thunk} from "redux-thunk";
 import header from "./slices/header";
 import toast from "./slices/toast";
-import view from "./slices/view";
 
 const reducers = combineReducers({
   modal: modal,
@@ -15,7 +14,6 @@ const reducers = combineReducers({
   sidebar: sidebar,
   header: header,
   toast: toast,
-  view: view,
 });
 
 const persistConfig = {

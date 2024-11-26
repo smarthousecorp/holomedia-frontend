@@ -12,6 +12,7 @@ import "./i18n"; // i18n 설정 import
 import {useCountryDetection} from "./hooks/useCountryDetection";
 import Loading from "./components/commons/Loading";
 import ErrorPage from "./pages/Error";
+import Login from "./pages/Login";
 
 interface ErrorMessageProps {
   message?: string;
@@ -23,9 +24,8 @@ const ErrorMessage: React.FC<ErrorMessageProps> = ({
 
 function App() {
   const {countryInfo, error, loading} = useCountryDetection();
-  console.log(countryInfo);
 
-  if (loading) {
+  if (countryInfo && loading) {
     return <Loading />;
   }
 
@@ -37,10 +37,10 @@ function App() {
     <>
       <Routes>
         <Route element={<MainLayout />}>
-          <Route path="/" element={<Main />} />
+          <Route path="/" element={<Login />} />
         </Route>
         <Route element={<PublicLayout />}>
-          <Route path="/upload" element={<UploadForm />} />
+          <Route path="/main" element={<Main />} />
           <Route
             path="/video/:id"
             element={
@@ -49,6 +49,7 @@ function App() {
               </ProtectedRoute>
             }
           />
+          <Route path="/upload" element={<UploadForm />} />
           <Route path="/settings" element={<Settings />} />
           <Route path="/error" element={<ErrorPage error="500" />} />
         </Route>

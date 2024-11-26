@@ -2,12 +2,15 @@
 export interface media {
   id: number;
   title: string;
-  url: string;
+  // url: string;
   views: number;
   thumbnail: string;
   name: string;
   created_date: Date;
   price: number;
+  uploader_id: number;
+  description: string;
+  like_count: number;
 }
 
 export interface weeklyMedia {
@@ -21,5 +24,7 @@ export interface weeklyMedia {
   name: string;
   created_date: string;
   price: number;
+  uploader_id: number;
+  description: string;
   // updatedAt: Date;
 }

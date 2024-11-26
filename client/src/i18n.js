@@ -73,8 +73,10 @@ i18n.use(initReactI18next).init({
           },
         },
         sidebar: {
-          new: "NEW",
-          realTimeBest: "Real-time Best",
+          home: "HOME",
+          alarm: "ALARM",
+          setting: "SETTING",
+          membership: "MEMBERSHIP",
         },
         sectionTitles: {
           new: "Recently Uploaded Videos",
@@ -177,8 +179,10 @@ i18n.use(initReactI18next).init({
           },
         },
         sidebar: {
-          new: "NEW",
-          realTimeBest: "실시간 베스트",
+          home: "홈",
+          alarm: "알림",
+          setting: "설정",
+          membership: "멤버십",
         },
         sectionTitles: {
           new: "최근에 등록된 동영상",

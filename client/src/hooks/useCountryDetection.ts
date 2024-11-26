@@ -15,7 +15,6 @@ export const useCountryDetection = () => {
       setLoading(true);
       try {
         const response = await api.get("/user-country");
-        console.log(response);
 
         const {success, data}: CountryResponse = await response.data;
 

@@ -1,9 +1,11 @@
 import styled from "styled-components";
-import logo from "../../assets/bloom-logo.png";
+import logo from "../../assets/logo_test.png";
 import {useNavigate} from "react-router-dom";
+import {getCookie} from "../../utils/cookie";
 
 const Header = () => {
   const navigate = useNavigate();
+  const isLogin = getCookie("accessToken");
 
   return (
     <>
@@ -12,9 +14,7 @@ const Header = () => {
           <img
             src={logo}
             alt="로고"
-            onClick={() => {
-              navigate("/");
-            }}
+            onClick={() => navigate(isLogin ? "/main" : "/")}
           />
         </Logo>
       </Container>
@@ -26,7 +26,7 @@ export default Header;
 
 const Container = styled.header`
   width: 100%;
-  height: 8rem;
+  height: 7rem;
   background: #ffffff;
   position: fixed;
   top: 0;
@@ -35,7 +35,7 @@ const Container = styled.header`
   justify-content: space-between;
   align-items: center;
 
-  @media (max-width: 768px) {
+  @media (max-width: 900px) {
     display: flex;
   }
 `;
@@ -53,14 +53,11 @@ const Logo = styled.div`
   }
 
   > img {
-    width: 10rem;
+    width: 14rem;
   }
 
   @media (max-width: 600px) {
     margin-left: 2.7rem;
-    & > img {
-      width: 8rem;
-    }
 
     & > svg {
       font-size: 2.1rem;

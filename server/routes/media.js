@@ -58,6 +58,9 @@ router.get("/recent", (req, res) => {
       thumbnail,
       name,
       price,
+      uploader_id,
+      description,
+      like_count,
       DATE_FORMAT(created_at, '%Y-%m-%d') as created_date
     FROM medias 
     ORDER BY created_at DESC 
@@ -103,6 +106,9 @@ router.get("/best", (req, res) => {
       thumbnail,
       name,
       price,
+      uploader_id,
+      description,
+      like_count,
       DATE_FORMAT(created_at, '%Y-%m-%d') as created_date
     FROM medias 
     ORDER BY views DESC, created_at DESC 
@@ -141,6 +147,7 @@ router.get("/weekly/:name", authenticateToken, (req, res) => {
       m.views as total_views,
       thumbnail,
       m.price,         /* Price 필드 추가 */
+      m.uploader_id,
       COALESCE(weekly_views.view_count, 0) as weekly_views,
       DATE_FORMAT(m.created_at, '%Y-%m-%d') as created_date,
       CASE 

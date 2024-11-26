@@ -1,11 +1,11 @@
 // src/pages/Main.tsx
 import {useEffect, useState} from "react";
 import styled from "styled-components";
-import VisibilityIcon from "@mui/icons-material/Visibility";
+// import VisibilityIcon from "@mui/icons-material/Visibility";
 import {SvgIcon} from "@mui/material";
 import {useNavigate} from "react-router-dom";
-import {media, weeklyMedia} from "../types/media";
-import {SkeletonImage} from "../components/commons/media/Skeleton";
+import {media} from "../types/media";
+// import {SkeletonImage} from "../components/commons/media/Skeleton";
 import {api} from "../utils/api";
 import {RootState} from "../store";
 import {useSelector, useDispatch} from "react-redux";
@@ -14,17 +14,21 @@ import AdultVerificationModal from "../components/commons/media/AdultVerificatio
 import Toast from "../components/commons/Toast";
 import {ToastType} from "../types/toast";
 import {getCookie} from "../utils/cookie";
-import {useTranslation} from "react-i18next";
-import {getTimeAgo} from "../utils/getTimeAgo";
-import {Settings, Lock} from "lucide-react";
-import Loading from "../components/commons/Loading";
-import EmptyState from "../components/commons/EmptyState";
+import {Settings} from "lucide-react";
+// import Loading from "../components/commons/Loading";
+// import EmptyState from "../components/commons/EmptyState";
+// import searchIcon from "../assets/search.png";
+import SearchOutlinedIcon from "@mui/icons-material/SearchOutlined";
+import {Uploader} from "../types/user";
+import UploaderList from "../components/main/UploaderList";
+import ScoreProgress from "../components/main/ScoreProgress";
+import MovieList from "../components/main/MovieList";
+import {RecommendedUploaders} from "../components/main/RecommendList";
+// import SideBannder from "../assets/side-banner.png";
 
 type LoadingState = "loading" | "error" | "success";
 
 const Main = () => {
-  const {t} = useTranslation();
-
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
@@ -36,39 +40,30 @@ const Main = () => {
 
   const shouldBlur = !isAdmin && (!user || !isAdultVerified);
 
-  const {currentMode, currentUploader} = useSelector(
-    (state: RootState) => state.view
-  );
-  const sectionTitle =
-    currentMode === "weekly"
-      ? t("sectionTitles.weekly", {uploader: currentUploader})
-      : t(`sectionTitles.${currentMode}`);
-
   const [loadingState, setLoadingState] = useState<LoadingState>("loading");
 
-  const [medias, setMedias] = useState<media[] | weeklyMedia[]>([]);
+  // api 응답 저장 상태
+  const [medias, setMedias] = useState<media[]>([]);
+  const [uploaders, setUploaders] = useState<Uploader[]>([]);
 
   const [showModal, setShowModal] = useState<boolean>(false);
   const [selectedVideoId, setSelectedVideoId] = useState<number | null>(null);
 
+  const handleUploaderClick = (uploader: Uploader): void => {
+    navigate(`/user/${uploader.id}`);
+  };
+
+  const handleMediaClick = (media: media): void => {
+    navigate(`/main/${media.id}`);
+  };
+
   const fetchData = async () => {
     try {
       setLoadingState("loading");
-      let response;
-      switch (currentMode) {
-        case "new":
-          response = await api.get(`/media/recent?limit=12`);
-          break;
-        case "best":
-          response = await api.get("/media/best?limit=12");
-          break;
-        case "weekly":
-          if (!currentUploader) return;
-          response = await api.get(`/media/weekly/${currentUploader}`);
-          break;
-      }
-
-      setMedias(response?.data.data);
+      const mediaResponse = await api.get(`/media/recent?limit=12`);
+      const uploaderResponse = await api.get(`/uploaders?page=1&limit=10`);
+      setMedias(mediaResponse.data.data);
+      setUploaders(uploaderResponse.data.data);
       setLoadingState("success");
     } catch (error) {
       console.error("Error fetching data:", error);
@@ -80,9 +75,7 @@ const Main = () => {
 
   useEffect(() => {
     fetchData();
-  }, [currentMode, currentUploader]);
 
-  useEffect(() => {
     const access = getCookie("accessToken");
     if (!access) {
       dispatch(logout());
@@ -90,32 +83,24 @@ const Main = () => {
     }
   }, []);
 
-  const handleClickList = (id: number) => {
-    if (!user) {
-      Toast(ToastType.error, "로그인 후에 접근 가능합니다.");
-      return;
-    }
+  // const handleClickList = (id: number) => {
+  //   if (!user) {
+  //     Toast(ToastType.error, "로그인 후에 접근 가능합니다.");
+  //     return;
+  //   }
 
-    if (!isAdmin && !isAdultVerified) {
-      setSelectedVideoId(id);
-      setShowModal(true);
-      return;
-    }
+  //   if (!isAdmin && !isAdultVerified) {
+  //     setSelectedVideoId(id);
+  //     setShowModal(true);
+  //     return;
+  //   }
 
-    navigate(`/video/${id}`);
-  };
+  //   navigate(`/video/${id}`);
+  // };
 
-  // views를 표시하는 부분을 타입 가드를 사용하여 처리
-  const getViews = (item: media | weeklyMedia): number => {
-    if ("views" in item) {
-      return item.views;
-    }
-    return item.total_views;
-  };
-
-  if (loadingState === "loading") {
-    return <Loading />;
-  }
+  // if (loadingState === "loading") {
+  //   return <Loading />;
+  // }
 
   if (loadingState === "error") {
     return (
@@ -130,60 +115,42 @@ const Main = () => {
   return (
     <MainContainer>
       <MovieContainer>
-        <MovieTitle>{sectionTitle}</MovieTitle>
+        <MovieTopSection>
+          <MovieTitle>홈</MovieTitle>
+          <InputWrapper>
+            <SearchContainer placeholder="아이돌 찾기" />
+            <SvgIcon
+              className="searchIcon"
+              component={SearchOutlinedIcon}
+              // sx={{stroke: "#6d46cc", strokeWidth: 1}}
+            />
+          </InputWrapper>
+        </MovieTopSection>
         {/* <hr /> */}
         {medias.length === 0 ? (
-          <EmptyState message={`${sectionTitle}에 등록된 영상이 없습니다`} />
+          // <EmptyState message={`홈에 등록된 영상이 없습니다`} />
+          <></>
         ) : (
-          <MovieGrid>
-            {medias.map((el) => (
-              <MovieLi key={el.id} onClick={() => handleClickList(el.id)}>
-                <ImgContainer $shouldBlur={shouldBlur}>
-                  {/* {el.price > 0 && (
-                  <div className="price-badge">
-                    {el.price.toLocaleString()}원
-                  </div>
-                )} */}
-                  <SkeletonImage
-                    src={el.thumbnail}
-                    style={{objectFit: user ? "cover" : "contain"}}
-                    alt="썸네일"
-                    background="#505050"
-                  />
-                  {shouldBlur && (
-                    <BlurOverlay>
-                      <Lock size={24} />
-                      <p>
-                        {!user
-                          ? "로그인이 필요합니다"
-                          : "성인인증이 필요합니다"}
-                      </p>
-                    </BlurOverlay>
-                  )}
-                </ImgContainer>
-                <MovieInfo>
-                  {/* <h6>{shouldBlur ? "등급 제한 컨텐츠" : el.name}</h6> */}
-                  <h6>{el.name}</h6>
-                  <div className="views">
-                    <SvgIcon
-                      component={VisibilityIcon}
-                      sx={{stroke: "#ffffff", strokeWidth: 0.3}}
-                    />
-                    <p>{getViews(el).toLocaleString()}</p>
-                  </div>
-                </MovieInfo>
-                <MovieDescription>
-                  {/* {shouldBlur ? "..." : el.title} */}
-                  {el.title}
-                  <span className="timeAgo">
-                    · {getTimeAgo(new Date(el.created_date))}
-                  </span>
-                </MovieDescription>
-              </MovieLi>
-            ))}
-          </MovieGrid>
+          <MovieMainContainer>
+            <UploaderList
+              uploaders={uploaders}
+              onUploaderClick={handleUploaderClick}
+            />
+            <ScoreProgress currentScore={10} />
+            <MovieList
+              medias={medias}
+              uploaders={uploaders}
+              onUploaderClick={handleUploaderClick}
+              onMediaClick={handleMediaClick}
+              shouldBlur={shouldBlur}
+            />
+          </MovieMainContainer>
         )}
       </MovieContainer>
+      <SideContainer>
+        <RecommendedUploaders />
+        {/* <img src={SideBannder} alt="광고 배너" /> */}
+      </SideContainer>
 
       {showModal && (
         <AdultVerificationModal
@@ -214,7 +181,7 @@ const MaintenanceContainer = styled.div`
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  background: #000000;
+  background: #ededed;
   color: white;
   gap: 2rem;
 
@@ -256,15 +223,18 @@ const RetryButton = styled.button`
 const MainContainer = styled.section`
   width: 100%;
   height: 100%;
-  background: #000000;
+  background: #ededed;
+  color: #000000;
+  padding-top: 2rem;
+  display: flex;
 `;
 
 const MovieContainer = styled.div`
+  max-width: 750px;
   /* width: 100%; */
   /* height: 100%; */
-  color: white;
+  color: #000000;
   margin: 0 4rem;
-  margin-bottom: 3rem;
   overflow-y: scroll;
   -ms-overflow-style: none; /* IE and Edge */
   scrollbar-width: none; /* Firefox */
@@ -273,14 +243,18 @@ const MovieContainer = styled.div`
     display: none; /* Chrome, Safari, Opera*/
   }
 
-  > hr {
-    margin: 10px 0;
-    color: #ffffff;
-    height: 1px;
-  }
-
   @media (max-width: 600px) {
     margin: 0 2rem;
+  }
+`;
+
+const MovieTopSection = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  @media (max-width: 900px) {
+    display: none;
   }
 `;
 
@@ -288,160 +262,45 @@ const MovieTitle = styled.h2`
   font-size: 2.2rem;
 `;
 
-const MovieGrid = styled.div`
-  display: flex;
-  flex-wrap: wrap; // 요소들이 줄 바꿈을 할 수 있도록 설정
-  justify-content: flex-start;
-  gap: 1rem; // 요소 간의 간격 설정
-  margin-top: 2rem;
-
-  @media (max-width: 600px) {
-    justify-content: center; // 600px 이하에서 요소를 중앙 정렬
-  }
-`;
-
-const MovieLi = styled.li`
-  cursor: pointer;
-  flex: 0 0 calc(25% - 1rem); // 기본적으로 4열로 설정, 여백을 고려하여 계산
-  list-style: none; // 기본 리스트 스타일 제거
-  border-radius: 10px;
-  font-family: "Pretendard-Light";
-  margin-bottom: 1.5rem;
-
-  @media (max-width: 1200px) {
-    flex: 0 0 calc(33.33% - 1rem); // 1200px 이하에서 3열
-  }
-
-  @media (max-width: 900px) {
-    flex: 0 0 calc(50% - 1rem); // 900px 이하에서 2열
-  }
-
-  @media (max-width: 600px) {
-    flex: 0 0 100%; // 600px 이하에서 1열
-  }
-
-  > img {
-    width: 100%; // 가로 100%
-    height: auto;
-    object-fit: cover;
-    border-radius: 10px; // 상단 모서리 둥글게
-  }
-`;
-
-const MovieInfo = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin: 1rem 0;
-
-  > h6 {
-    font-family: "Pretendard-Light";
-    font-size: 1.4rem;
-
-    @media (max-width: 600px) {
-      font-size: 1.2rem; // 600px 이하에서 폰트 크기 조정
-    }
-  }
-
-  .views {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    font-size: 1.2rem;
-
-    > svg {
-      width: 1.6rem;
-    }
-
-    @media (max-width: 600px) {
-      font-size: 1rem; // 600px 이하에서 폰트 크기 조정
-    }
-  }
-`;
-
-const MovieDescription = styled.p`
-  display: flex;
-  align-items: center;
-  gap: 5px;
-  margin: 0.5rem 0;
-  font-size: 1.8rem;
-
-  .timeAgo {
-    font-size: 1.3rem;
-  }
-`;
-
-const ImgContainer = styled.div<{$shouldBlur: boolean}>`
-  background-color: #505050;
-  border-radius: 10px;
-  width: 100%;
-  height: 0;
-  padding-top: 60%;
+const InputWrapper = styled.div`
   position: relative;
-  overflow: hidden;
+  display: flex;
+  align-items: center;
 
-  > img {
+  .searchIcon {
     position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    object-fit: contain;
-    border-radius: 10px;
-    filter: ${(props) => (props.$shouldBlur ? "blur(10px)" : "none")};
-    transition: filter 0.3s ease;
-  }
-
-  .price-badge {
-    position: absolute;
-    top: 10px;
-    right: 10px;
-    background-color: rgba(0, 0, 0, 0.7);
-    color: #ff627c;
-    padding: 5px 10px;
-    border-radius: 5px;
-    font-size: 1.4rem;
-    z-index: 1;
-    backdrop-filter: blur(4px);
+    right: 1rem;
+    font-size: 2.6rem;
+    color: #eb3553;
+    cursor: pointer;
+    /* pointer-events: none; // 입력에 방해되지 않도록 */
   }
 `;
 
-const BlurOverlay = styled.div`
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
+const SearchContainer = styled.input`
+  box-shadow: 0 4px 4px 0 rgba(0, 0, 0, 0.05);
+  border-radius: 6px;
+  padding: 1.2rem 1.5rem;
+  padding-right: 2.5rem; // 아이콘을 위한 여백
+  width: 22rem;
+  font-size: 1.2rem;
+
+  &::placeholder {
+    color: #c7c7c7; // 원하는 색상으로 변경
+  }
+`;
+
+const MovieMainContainer = styled.div`
+  margin-top: 2rem;
   display: flex;
   flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  background-color: rgba(0, 0, 0, 0.5);
-  color: white;
-  gap: 1rem;
-
-  p {
-    font-size: 1.4rem;
-    text-align: center;
-  }
+  gap: 2rem;
 `;
 
-// const NavUploaderName = styled.nav`
-//   display: flex;
-//   gap: 5px;
-// `;
+const SideContainer = styled.div`
+  margin-right: 4rem;
 
-// const Uploader = styled.div<{$isSelected?: boolean}>`
-//   font-size: 1.4rem;
-//   padding: 0.5em 0.75rem;
-//   cursor: pointer;
-//   transition: all 0.2s ease;
-//   border-radius: 5px;
-
-//   /* 선택된 업로더 스타일 */
-//   background-color: ${(props) => (props.$isSelected ? "#333" : "transparent")};
-
-//   &:hover {
-//     background-color: ${(props) => (props.$isSelected ? "#333" : "#222")};
-//   }
-// `;
+  @media (max-width: 1150px) {
+    display: none;
+  }
+`;
