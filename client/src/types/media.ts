@@ -2,7 +2,7 @@
 export interface media {
   id: number;
   title: string;
-  // url: string;
+  url: string;
   views: number;
   thumbnail: string;
   name: string;

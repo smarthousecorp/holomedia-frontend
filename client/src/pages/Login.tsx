@@ -1,12 +1,13 @@
 import React, {useState} from "react";
 import styled from "styled-components";
-import logo from "../assets/bloom-logo.png";
+import logo from "../assets/holomedia-logo.png";
 import {useNavigate} from "react-router-dom";
 import {useDispatch} from "react-redux";
 import {useTranslation} from "react-i18next";
 import axios from "axios";
 import {setCookie} from "../utils/cookie";
 import {login} from "../store/slices/user";
+// import mockImg from "../assets/main.png";
 
 interface LoginCredentials {
   user_id: string;
@@ -113,6 +114,7 @@ const Login: React.FC = () => {
 
   return (
     <Container>
+      {/* <img src={mockImg} alt="목업 이미지" /> */}
       <LoginBox>
         <Logo>
           <img src={logo} alt="로고" />
@@ -183,6 +185,7 @@ const Container = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
+  gap: 3rem;
   height: 100vh;
   background-color: #f0f0f0;
 `;
@@ -201,7 +204,7 @@ const Logo = styled.div`
   font-weight: bold;
   margin-bottom: 1.5rem;
   > img {
-    width: 10rem;
+    width: 20rem;
   }
 `;
 const Title = styled.h3`
