@@ -44,7 +44,7 @@ const ErrorPage = ({error}: Props) => {
 
 const ErrorContainer = styled.div`
   width: 100%;
-  height: calc(100vh - 8rem);
+  height: 100vh;
   display: flex;
   flex-direction: column;
   align-items: center;

@@ -222,26 +222,22 @@ const RetryButton = styled.button`
 
 const MainContainer = styled.section`
   width: 100%;
-  height: 100%;
+  height: 100vh; // 뷰포트 전체 높이로 변경
   background: #ededed;
   color: #000000;
   padding-top: 2rem;
   display: flex;
+  overflow-y: auto; // 전체 컨테이너에 스크롤 추가
+
+  @media (max-width: 900px) {
+    overflow-y: visible;
+  }
 `;
 
 const MovieContainer = styled.div`
   max-width: 750px;
-  /* width: 100%; */
-  /* height: 100%; */
   color: #000000;
   margin: 0 4rem;
-  overflow-y: scroll;
-  -ms-overflow-style: none; /* IE and Edge */
-  scrollbar-width: none; /* Firefox */
-
-  &::-webkit-scrollbar {
-    display: none; /* Chrome, Safari, Opera*/
-  }
 
   @media (max-width: 600px) {
     margin: 0 2rem;
@@ -292,13 +288,22 @@ const SearchContainer = styled.input`
 
 const MovieMainContainer = styled.div`
   margin-top: 2rem;
+  padding-bottom: 5rem;
   display: flex;
   flex-direction: column;
   gap: 2rem;
+
+  @media (max-width: 900px) {
+    padding-bottom: 7rem;
+  }
 `;
 
 const SideContainer = styled.div`
   margin-right: 4rem;
+  position: sticky; // sticky 포지셔닝 추가
+  top: 0.1rem; // 상단에서 2rem 떨어진 위치에 고정
+  height: fit-content; // 내용물 높이에 맞게 조정
+  align-self: flex-start; // 플렉스 컨테이너의 상단에 정렬
 
   @media (max-width: 1150px) {
     display: none;
