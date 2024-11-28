@@ -142,7 +142,7 @@ const UploaderLists = styled.ul<{$isDragging: boolean}>`
   justify-content: space-around;
   grid-auto-flow: column;
   grid-auto-columns: 8.5rem;
-  padding: 0;
+  padding: 0 0 1rem 0;
   border-radius: 0 0 17px 17px;
   background-color: #ffffff;
   overflow-x: auto;
