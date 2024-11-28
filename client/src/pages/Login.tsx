@@ -169,7 +169,13 @@ const Login: React.FC = () => {
           </AutoLoginWrapper>
           <LoginButton type="submit">로그인</LoginButton>
           <About>
-            <a href="#">회원가입</a>
+            <a
+              onClick={() => {
+                navigate("/signup");
+              }}
+            >
+              회원가입
+            </a>
             <div className="idpw">
               <a href="#">계정 찾기 |</a>
               <a href="#">비밀번호 찾기</a>

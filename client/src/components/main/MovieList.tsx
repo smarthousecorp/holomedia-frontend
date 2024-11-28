@@ -155,7 +155,7 @@ const UploaderId = styled.span`
 const MediaContent = styled.div`
   cursor: pointer;
   position: relative;
-  padding-top: 56.25%; // 16:9 Aspect Ratio
+  padding-top: 67.25%; // 16:9 Aspect Ratio (이미지 사이즈가 각기 다른 관계로 56.25 => 67.25 변경)
 `;
 
 const MediaThumbnail = styled.img<{$shouldBlur: boolean}>`

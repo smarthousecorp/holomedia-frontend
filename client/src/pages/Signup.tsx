@@ -1,0 +1,361 @@
+import React, {useState} from "react";
+import styled from "styled-components";
+import logo from "../assets/holomedia-logo.png";
+import {useNavigate} from "react-router-dom";
+import {useDispatch} from "react-redux";
+import {useTranslation} from "react-i18next";
+import axios, {AxiosError} from "axios";
+import {useSignUpValidation} from "../utils/SignUpValid";
+import {checkId, checkPassword, checkUsername} from "../utils/validCheck";
+import {showToast} from "../store/slices/toast";
+import {ToastType} from "../types/toast";
+import Toast from "../components/commons/Toast";
+
+interface SignUp {
+  [key: string]: any;
+  user_id: string;
+  password: string;
+  passwordCheck: string;
+  username: string;
+}
+
+interface ErrorMsg {
+  user_id: string;
+  password: string;
+  passwordCheck: string;
+  username: string;
+}
+
+const SignUp: React.FC = () => {
+  const {t} = useTranslation();
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
+
+  const [inputVal, setInputVal] = useState<SignUp>({
+    user_id: "",
+    password: "",
+    passwordCheck: "",
+    username: "",
+  });
+
+  const [errorMsg, setErrorMsg] = useState<ErrorMsg>({
+    user_id: "",
+    password: "",
+    passwordCheck: "",
+    username: "",
+  });
+
+  const [showPassword, setShowPassword] = useState(false);
+  const [showPasswordCheck, setShowPasswordCheck] = useState(false);
+
+  const validationResults = useSignUpValidation(inputVal);
+
+  const onChangeValues = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const {name, value} = e.target;
+    setInputVal({...inputVal, [name]: value});
+
+    switch (name) {
+      case "passwordCheck":
+        if (inputVal.password === value) {
+          setErrorMsg({...errorMsg, [name]: ""});
+        } else {
+          setErrorMsg({
+            ...errorMsg,
+            [name]: t("auth.signup.errors.passwordMismatch"),
+          });
+        }
+    }
+  };
+
+  const onBlurIdInput = () => {
+    const msg = {user_id: ""};
+    const {user_id} = inputVal;
+
+    if (!checkId(user_id)) {
+      msg.user_id = t("auth.signup.errors.idFormat");
+    }
+    setErrorMsg({...errorMsg, ...msg});
+  };
+
+  const onBlurPwdInputs = () => {
+    const msg = {password: "", passwordCheck: ""};
+    const {password, passwordCheck} = inputVal;
+
+    if (!checkPassword(password)) {
+      msg.password = t("auth.signup.errors.passwordFormat");
+      if (passwordCheck !== "" && password !== passwordCheck) {
+        msg.passwordCheck = t("auth.signup.errors.passwordMismatch");
+        setErrorMsg({...errorMsg, ...msg});
+      } else {
+        setErrorMsg({...errorMsg, ...msg});
+      }
+    } else if (passwordCheck !== "" && password !== passwordCheck) {
+      msg.passwordCheck = t("auth.signup.errors.passwordMismatch");
+      setErrorMsg({...errorMsg, ...msg});
+    } else {
+      setErrorMsg({...errorMsg, ...msg});
+    }
+  };
+
+  const onBlurNameInput = () => {
+    const msg = {username: ""};
+    const {username} = inputVal;
+
+    if (!checkUsername(username)) {
+      msg.username = t("auth.signup.errors.usernameFormat");
+    }
+    setErrorMsg({...errorMsg, ...msg});
+  };
+
+  const onSubmitSignUp = (e: React.FormEvent) => {
+    e.preventDefault();
+
+    axios
+      .post(`${import.meta.env.VITE_SERVER_DOMAIN}/signup`, inputVal)
+      .then(() => {
+        Toast(ToastType.success, t("auth.signup.success"));
+        dispatch(
+          showToast({
+            message: t("auth.signup.success"),
+            type: "success",
+          })
+        );
+        navigate("/");
+      })
+      .catch((error) => {
+        const msg = {user_id: "", username: ""};
+        const axiosError = error as AxiosError;
+        if (axiosError.response?.status === 409) {
+          const errorMessage = axiosError.response?.data;
+
+          if (errorMessage === "이미 존재하는 아이디 입니다.") {
+            msg.user_id = t("auth.signup.errors.duplicateId");
+          } else if (errorMessage === "이미 존재하는 닉네임 입니다.") {
+            msg.username = t("auth.signup.errors.duplicateUsername");
+          }
+          setErrorMsg({...errorMsg, ...msg});
+        }
+      });
+  };
+
+  return (
+    <Container>
+      <SignUpBox>
+        <Logo
+          onClick={() => {
+            navigate("/");
+          }}
+        >
+          <img src={logo} alt="로고" />
+        </Logo>
+        <Title>회원가입</Title>
+        <Form onSubmit={onSubmitSignUp}>
+          <InputWrapper>
+            <Input
+              name="user_id"
+              placeholder="6~15자 영문 소문자와 숫자"
+              value={inputVal.user_id}
+              onChange={onChangeValues}
+              onBlur={onBlurIdInput}
+            />
+          </InputWrapper>
+          {errorMsg.user_id && <ErrorMessage>{errorMsg.user_id}</ErrorMessage>}
+
+          <InputWrapper>
+            <Input
+              type={showPassword ? "text" : "password"}
+              name="password"
+              placeholder="8~15자 영문, 숫자, 특수문자 포함"
+              value={inputVal.password}
+              onChange={onChangeValues}
+              onBlur={onBlurPwdInputs}
+            />
+            <PasswordToggle
+              type="button"
+              onClick={() => setShowPassword(!showPassword)}
+            >
+              <i
+                className={`bi ${
+                  showPassword ? "bi-eye-slash-fill" : "bi-eye-fill"
+                }`}
+              ></i>
+            </PasswordToggle>
+          </InputWrapper>
+          {errorMsg.password && (
+            <ErrorMessage>{errorMsg.password}</ErrorMessage>
+          )}
+
+          <InputWrapper>
+            <Input
+              type={showPasswordCheck ? "text" : "password"}
+              name="passwordCheck"
+              placeholder="비밀번호 확인"
+              value={inputVal.passwordCheck}
+              onChange={onChangeValues}
+              onBlur={onBlurPwdInputs}
+            />
+            <PasswordToggle
+              type="button"
+              onClick={() => setShowPasswordCheck(!showPasswordCheck)}
+            >
+              <i
+                className={`bi ${
+                  showPasswordCheck ? "bi-eye-slash-fill" : "bi-eye-fill"
+                }`}
+              ></i>
+            </PasswordToggle>
+          </InputWrapper>
+          {errorMsg.passwordCheck && (
+            <ErrorMessage>{errorMsg.passwordCheck}</ErrorMessage>
+          )}
+
+          <InputWrapper>
+            <Input
+              name="username"
+              placeholder="2~12자 한글, 영문, 숫자"
+              value={inputVal.username}
+              onChange={onChangeValues}
+              onBlur={onBlurNameInput}
+            />
+          </InputWrapper>
+          {errorMsg.username && (
+            <ErrorMessage>{errorMsg.username}</ErrorMessage>
+          )}
+
+          <SignUpButton
+            type="submit"
+            disabled={
+              !validationResults.idValid ||
+              !validationResults.passwordValid ||
+              !validationResults.passwordsMatch ||
+              !validationResults.usernameValid
+            }
+          >
+            가입하기
+          </SignUpButton>
+          <About>
+            <a
+              onClick={() => {
+                navigate("/");
+              }}
+            >
+              이미 회원이신가요? <span className="strong">로그인</span> 페이지로
+              이동
+            </a>
+          </About>
+        </Form>
+      </SignUpBox>
+    </Container>
+  );
+};
+
+export default SignUp;
+
+const Container = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 3rem;
+  height: 100vh;
+  background-color: #f0f0f0;
+`;
+
+const SignUpBox = styled.div`
+  background-color: white;
+  padding: 3.5rem 5.5rem;
+  border-radius: 30px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  max-width: 335px;
+  min-height: 500px;
+  width: 100%;
+`;
+
+const Logo = styled.div`
+  cursor: pointer;
+  text-align: center;
+  font-size: 1.5rem;
+  font-weight: bold;
+  margin-bottom: 1.5rem;
+  > img {
+    width: 20rem;
+  }
+`;
+
+const Title = styled.h3`
+  font-size: 2rem;
+  margin-bottom: 3rem;
+`;
+
+const Form = styled.form`
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+`;
+
+const InputWrapper = styled.div`
+  width: 100%;
+  position: relative;
+  display: flex;
+  align-items: center;
+  border: 1px solid #d0d0d0;
+  margin-bottom: 1rem;
+  border-radius: 10px;
+`;
+
+const Input = styled.input`
+  border-radius: 10px;
+  flex: 1;
+  padding: 1rem;
+  font-size: 1.2rem;
+  width: 100%;
+`;
+
+const PasswordToggle = styled.button`
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #707070;
+  font-size: 1.2rem;
+`;
+
+const Button = styled.button`
+  background-color: #eb3553;
+  color: white;
+  padding: 1rem;
+  border: none;
+  border-radius: 10px;
+  font-size: 1.3rem;
+  cursor: pointer;
+
+  &:disabled {
+    background-color: #cccccc;
+    cursor: not-allowed;
+  }
+`;
+
+const SignUpButton = styled(Button)`
+  margin-top: 1.5rem;
+`;
+
+const About = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 1.2rem;
+  margin-top: 1rem;
+  color: #6e6d6d;
+  .strong {
+    font-weight: 600;
+    color: #eb3553;
+  }
+`;
+
+const ErrorMessage = styled.div`
+  position: relative;
+  left: 3px;
+  color: red;
+  font-size: 1rem;
+  margin-top: -1.5rem;
+  margin-bottom: 0.5rem;
+  text-align: left;
+`;

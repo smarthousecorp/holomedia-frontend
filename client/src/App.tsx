@@ -13,6 +13,7 @@ import {useCountryDetection} from "./hooks/useCountryDetection";
 import Loading from "./components/commons/Loading";
 import ErrorPage from "./pages/Error";
 import Login from "./pages/Login";
+import SignUp from "./pages/Signup";
 
 interface ErrorMessageProps {
   message?: string;
@@ -38,6 +39,7 @@ function App() {
       <Routes>
         <Route element={<MainLayout />}>
           <Route path="/" element={<Login />} />
+          <Route path="/signup" element={<SignUp />} />
         </Route>
         <Route element={<PublicLayout />}>
           <Route path="/main" element={<Main />} />
