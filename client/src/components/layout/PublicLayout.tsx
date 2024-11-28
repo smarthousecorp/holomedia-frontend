@@ -2,16 +2,18 @@ import {Outlet} from "react-router";
 import {styled} from "styled-components";
 import Header from "../commons/Header";
 import DefaultSidebar from "../commons/sidebar/DefaultSidebar";
+import BottomSidebar from "../commons/sidebar/BottomSidebar";
 
 const PublicLayout = () => {
   return (
     <Full>
       <Header />
       <Inner>
-        <DefaultSidebarStyled />
+        <DefaultSidebar />
         <Container>
           <Outlet />
         </Container>
+        <BottomSidebar />
       </Inner>
     </Full>
   );
@@ -34,17 +36,11 @@ const Inner = styled.div`
   display: flex;
 
   @media (max-width: 900px) {
-    padding-top: 8rem;
+    padding-top: 5rem;
   }
 `;
 
 const Container = styled.main`
   width: 100%;
   background-color: #ffffff;
-`;
-
-const DefaultSidebarStyled = styled(DefaultSidebar)`
-  @media (max-width: 768px) {
-    display: none;
-  }
 `;

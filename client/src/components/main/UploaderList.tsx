@@ -137,13 +137,13 @@ const Container = styled.div`
 `;
 
 const UploaderLists = styled.ul<{$isDragging: boolean}>`
+  width: 100%;
   display: grid;
   justify-content: space-around;
   grid-auto-flow: column;
   grid-auto-columns: 8.5rem;
-  gap: 1.2rem;
-  padding: 1rem 4rem;
-  border-radius: 17px;
+  padding: 0;
+  border-radius: 0 0 17px 17px;
   background-color: #ffffff;
   overflow-x: auto;
   list-style: none;
@@ -160,9 +160,12 @@ const UploaderLists = styled.ul<{$isDragging: boolean}>`
     display: none;
   }
 
-  @media (min-width: 850px) {
+  @media (min-width: 900px) {
     width: min(100%, calc(8.5rem * 7 + 1.2rem * 6 + 10rem));
     margin: 0 auto;
+    border-radius: 17px;
+    padding: 1rem 4rem;
+    gap: 1.2rem;
   }
 `;
 
@@ -192,11 +195,6 @@ const ProfileImage = styled.div<ProfileImageProps>`
   background-position: center;
   border: 2px solid #ffffff;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-
-  @media (max-width: 576px) {
-    width: 5.5rem;
-    height: 5.5rem;
-  }
 `;
 
 const Username = styled.span`

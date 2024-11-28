@@ -20,7 +20,6 @@ const LikeButton: React.FC<LikeButtonProps> = ({
 }) => {
   const [liked, setLiked] = useState(isLiked);
   const [likeCount, setLikeCount] = useState(initialLikeCount);
-  console.log(liked, likeCount);
 
   const handleLike = async () => {
     try {

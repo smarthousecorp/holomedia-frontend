@@ -41,7 +41,7 @@ const Container = styled.header`
 `;
 
 const Logo = styled.div`
-  height: 8rem;
+  height: 7rem;
   cursor: pointer;
   display: flex;
   align-items: center;

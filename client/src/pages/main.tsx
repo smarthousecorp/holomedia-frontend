@@ -212,8 +212,8 @@ const RetryButton = styled.button`
   padding: 1rem 2rem;
   font-size: 1.6rem;
   background-color: transparent;
-  border: 1px solid #ff627c;
-  color: #ff627c;
+  border: 1px solid #eb3553;
+  color: #ffffff;
   border-radius: 8px;
   cursor: pointer;
   transition: all 0.2s ease;
@@ -235,6 +235,32 @@ const MainContainer = styled.section`
 
   @media (max-width: 900px) {
     overflow-y: visible;
+    display: block;
+    padding-top: 0;
+  }
+
+  /* 웹킷 기반 브라우저용 스크롤바 스타일링 */
+  &::-webkit-scrollbar {
+    width: 10px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 5px;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: #eb3553;
+    border-radius: 5px;
+
+    /* 그라데이션 효과 추가 */
+    background: linear-gradient(180deg, #eb3553 0%, #ff4d6a 100%);
+  }
+
+  /* 호버 시 색상 변경 */
+  &::-webkit-scrollbar-thumb:hover {
+    background: #d42e4a;
+    background: linear-gradient(180deg, #d42e4a 0%, #eb3553 100%);
   }
 `;
 
@@ -243,8 +269,9 @@ const MovieContainer = styled.div`
   color: #000000;
   margin: 0 4rem;
 
-  @media (max-width: 600px) {
-    margin: 0 2rem;
+  @media (max-width: 900px) {
+    max-width: 900px;
+    margin: 0;
   }
 `;
 
@@ -298,7 +325,7 @@ const MovieMainContainer = styled.div`
   gap: 2rem;
 
   @media (max-width: 900px) {
-    padding-bottom: 7rem;
+    padding-bottom: 10rem;
   }
 `;
 
