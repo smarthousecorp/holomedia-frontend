@@ -15,6 +15,123 @@ const checkPaymentStatus = async (userId, mediaId) => {
   });
 };
 
+router.post("/like/:id", authenticateToken, (req, res) => {
+  const mediaId = parseInt(req.params.id);
+  const userId = req.user.id;
+
+  db.beginTransaction((transactionErr) => {
+    if (transactionErr) {
+      return res.status(500).send({message: "트랜잭션 시작 실패"});
+    }
+
+    // 좋아요 존재 확인과 현재 like_count 조회
+    const checkLikeSql = `
+      SELECT ml.*, m.like_count 
+      FROM media_likes ml
+      JOIN medias m ON ml.media_id = m.id
+      WHERE ml.media_id = ? AND ml.user_id = ?
+    `;
+
+    const getLikeCountSql = `
+      SELECT like_count 
+      FROM medias 
+      WHERE id = ?
+    `;
+
+    db.query(checkLikeSql, [mediaId, userId], (checkErr, checkResults) => {
+      if (checkErr) {
+        return db.rollback(() => {
+          res.status(500).send({message: "좋아요 확인 중 오류"});
+        });
+      }
+
+      if (checkResults.length > 0) {
+        // 좋아요 취소
+        const unlikeSql = `DELETE FROM media_likes WHERE media_id = ? AND user_id = ?`;
+        const updateLikeCountSql = `UPDATE medias SET like_count = GREATEST(0, like_count - 1) WHERE id = ?`;
+
+        db.query(unlikeSql, [mediaId, userId], (unlikeErr) => {
+          if (unlikeErr) {
+            return db.rollback(() => {
+              res.status(500).send({message: "좋아요 취소 실패"});
+            });
+          }
+
+          db.query(updateLikeCountSql, [mediaId], (updateErr) => {
+            if (updateErr) {
+              return db.rollback(() => {
+                res.status(500).send({message: "좋아요 카운트 업데이트 실패"});
+              });
+            }
+
+            db.commit((commitErr) => {
+              if (commitErr) {
+                return db.rollback(() => {
+                  res.status(500).send({message: "트랜잭션 커밋 실패"});
+                });
+              }
+
+              res.send({
+                status: "unliked",
+                likeCount: checkResults[0].like_count - 1,
+              });
+            });
+          });
+        });
+      } else {
+        // 좋아요가 없는 경우, 현재 like_count를 조회
+        db.query(getLikeCountSql, [mediaId], (countErr, countResults) => {
+          if (countErr) {
+            return db.rollback(() => {
+              res.status(500).send({message: "좋아요 수 조회 실패"});
+            });
+          }
+
+          const currentLikeCount = countResults[0]?.like_count || 0;
+
+          // 좋아요 추가
+          const insertLikeSql = `
+            INSERT INTO media_likes (media_id, user_id, created_at) 
+            VALUES (?, ?, NOW())
+          `;
+          const updateLikeCountSql = `UPDATE medias SET like_count = like_count + 1 WHERE id = ?`;
+
+          db.query(insertLikeSql, [mediaId, userId], (insertErr) => {
+            if (insertErr) {
+              return db.rollback(() => {
+                res.status(500).send({message: "좋아요 추가 실패"});
+              });
+            }
+
+            db.query(updateLikeCountSql, [mediaId], (updateErr) => {
+              if (updateErr) {
+                return db.rollback(() => {
+                  res
+                    .status(500)
+                    .send({message: "좋아요 카운트 업데이트 실패"});
+                });
+              }
+
+              db.commit((commitErr) => {
+                if (commitErr) {
+                  return db.rollback(() => {
+                    res.status(500).send({message: "트랜잭션 커밋 실패"});
+                  });
+                }
+
+                res.send({
+                  status: "liked",
+                  likeCount: currentLikeCount + 1,
+                });
+              });
+            });
+          });
+        });
+      }
+    });
+  });
+});
+
 // 업로더 목록 조회 API
 router.get("/uploaders", (req, res) => {
   const sql = `
@@ -38,19 +155,39 @@ router.get("/uploaders", (req, res) => {
   });
 });
 
-// 최근 생성된 영상 조회 (limit 파라미터 지원)
-router.get("/recent", (req, res) => {
-  const limit = parseInt(req.query.limit) || 10; // 기본값 10
-  const maxLimit = 50; // 최대 조회 가능한 개수
+// 최근 영상 순으로 조회
+router.get("/recent", authenticateToken, (req, res) => {
+  const limit = parseInt(req.query.limit) || 10;
+  const maxLimit = 50;
+  const userId = req.user?.id; // 인증된 사용자의 ID (없으면 undefined)
 
-  // limit 값 검증
   if (limit <= 0 || limit > maxLimit) {
     return res.status(400).send({
       message: `조회 개수는 1에서 ${maxLimit} 사이여야 합니다.`,
     });
   }
 
-  const sql = `
+  // 인증된 사용자인 경우와 아닌 경우의 SQL 분기
+  const sql = userId
+    ? `
+    SELECT 
+      m.id, 
+      m.title, 
+      m.views, 
+      m.thumbnail,
+      m.name,
+      m.price,
+      m.uploader_id,
+      m.description,
+      m.like_count,
+      DATE_FORMAT(m.created_at, '%Y-%m-%d') as created_date,
+      CASE WHEN ml.user_id IS NOT NULL THEN TRUE ELSE FALSE END as is_liked
+    FROM medias m
+    LEFT JOIN media_likes ml ON m.id = ml.media_id AND ml.user_id = ?
+    ORDER BY m.created_at DESC 
+    LIMIT ?
+  `
+    : `
     SELECT 
       id, 
       title, 
@@ -61,175 +198,25 @@ router.get("/recent", (req, res) => {
       uploader_id,
       description,
       like_count,
-      DATE_FORMAT(created_at, '%Y-%m-%d') as created_date
+      DATE_FORMAT(created_at, '%Y-%m-%d') as created_date,
+      FALSE as is_liked
     FROM medias 
     ORDER BY created_at DESC 
-    LIMIT ?`;
+    LIMIT ?
+  `;
 
-  db.query(sql, [limit], (err, results) => {
+  const queryParams = userId ? [userId, limit] : [limit];
+
+  db.query(sql, queryParams, (err, results) => {
     if (err) {
       console.error("최근 영상 조회 실패:", err);
       return res.status(500).send({message: "서버 오류가 발생했습니다."});
     }
 
-    // if (results.length === 0) {
-    //   return res.status(204).send({
-    //     status: "empty",
-    //     message: "등록된 영상이 없습니다.",
-    //   });
-    // }
-
     res.send({
       status: "success",
       data: results,
     });
-  });
-});
-
-// 실시간 베스트 영상 조회 (limit 파라미터 지원) 추후에는 일간, 주간, 월간 베스트로 변경 예정
-router.get("/best", (req, res) => {
-  const limit = parseInt(req.query.limit) || 12; // 기본값 10
-  const maxLimit = 50; // 최대 조회 가능한 개수
-
-  // limit 값 검증
-  if (limit <= 0 || limit > maxLimit) {
-    return res.status(400).send({
-      message: `조회 개수는 1에서 ${maxLimit} 사이여야 합니다.`,
-    });
-  }
-
-  const sql = `
-    SELECT 
-      id, 
-      title, 
-      views, 
-      thumbnail,
-      name,
-      price,
-      uploader_id,
-      description,
-      like_count,
-      DATE_FORMAT(created_at, '%Y-%m-%d') as created_date
-    FROM medias 
-    ORDER BY views DESC, created_at DESC 
-    LIMIT ?`;
-
-  db.query(sql, [limit], (err, results) => {
-    if (err) {
-      console.error("실시간 베스트 영상 조회 실패:", err);
-      return res.status(500).send({message: "서버 오류가 발생했습니다."});
-    }
-
-    if (results.length === 0) {
-      return res.status(404).send({
-        status: "empty",
-        message: "등록된 영상이 없습니다.",
-      });
-    }
-
-    res.send({
-      status: "success",
-      data: results,
-    });
-  });
-});
-
-// 주간 통계 API
-router.get("/weekly/:name", authenticateToken, (req, res) => {
-  const creatorName = req.params.name;
-
-  // 1. 크리에이터의 모든 영상을 조회하는 쿼리
-  const sql = `
-    SELECT 
-      m.id,
-      m.name,
-      m.title,
-      m.views as total_views,
-      thumbnail,
-      m.price,         /* Price 필드 추가 */
-      m.uploader_id,
-      COALESCE(weekly_views.view_count, 0) as weekly_views,
-      DATE_FORMAT(m.created_at, '%Y-%m-%d') as created_date,
-      CASE 
-        WHEN m.created_at >= DATE_SUB(NOW(), INTERVAL 7 DAY) THEN 'new'
-        WHEN m.created_at < DATE_SUB(NOW(), INTERVAL 30 DAY) THEN 'old'
-        ELSE 'regular'
-      END as content_age_status
-    FROM 
-      medias m
-    LEFT JOIN (
-      SELECT 
-        media_id,
-        COUNT(*) as view_count
-      FROM 
-        view_logs
-      WHERE 
-        viewed_at >= DATE_SUB(NOW(), INTERVAL 7 DAY)
-        AND viewed_at <= NOW()
-      GROUP BY 
-        media_id
-    ) weekly_views ON m.id = weekly_views.media_id
-    WHERE 
-      m.name = ?
-    ORDER BY 
-      CASE 
-        WHEN weekly_views.view_count IS NOT NULL AND weekly_views.view_count > 0 
-        THEN weekly_views.view_count 
-        ELSE m.views 
-      END DESC`;
-
-  db.query(sql, [creatorName], (err, results) => {
-    if (err) {
-      console.error("크리에이터 주간 통계 조회 실패:", err);
-      return res.status(500).send({message: "서버 오류가 발생했습니다."});
-    }
-
-    // 2. 크리에이터가 존재하지 않는 경우
-    if (results.length === 0) {
-      return res.status(404).send({
-        status: "empty",
-        message: "해당 크리에이터의 데이터가 없습니다.",
-      });
-    }
-
-    // 3. 통계 요약 정보
-    const summary = {
-      total_contents: results.length,
-      total_weekly_views: results.reduce(
-        (sum, item) => sum + item.weekly_views,
-        0
-      ),
-      total_views: results.reduce((sum, item) => sum + item.total_views, 0),
-      contents_with_no_weekly_views: results.filter(
-        (item) => item.weekly_views === 0
-      ).length,
-      new_contents: results.filter((item) => item.content_age_status === "new")
-        .length,
-      has_weekly_data: results.some((item) => item.weekly_views > 0),
-    };
-
-    res.send({
-      status: "success",
-      summary,
-      data: results.map(({content_age_status, ...item}) => ({
-        ...item,
-        view_status: item.weekly_views > 0 ? "active" : "inactive",
-      })),
-    });
-  });
-});
-
-// 랜덤 영상 3개 조회
-router.get("/recommend", authenticateToken, (req, res) => {
-  const sql =
-    "SELECT id, title, views, thumbnail, name FROM medias ORDER BY RAND() LIMIT 3";
-
-  db.query(sql, (err, results) => {
-    if (err) {
-      console.error("랜덤 영상 조회 실패:", err);
-      return res.status(500).send({message: "서버 오류가 발생했습니다."});
-    }
-    res.send(results);
   });
 });
 
