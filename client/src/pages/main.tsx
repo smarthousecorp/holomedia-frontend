@@ -15,7 +15,7 @@ import Toast from "../components/commons/Toast";
 import {ToastType} from "../types/toast";
 import {getCookie} from "../utils/cookie";
 import {Settings} from "lucide-react";
-// import Loading from "../components/commons/Loading";
+import Loading from "../components/commons/Loading";
 // import EmptyState from "../components/commons/EmptyState";
 // import searchIcon from "../assets/search.png";
 import SearchOutlinedIcon from "@mui/icons-material/SearchOutlined";
@@ -60,8 +60,12 @@ const Main = () => {
   const fetchData = async () => {
     try {
       setLoadingState("loading");
-      const mediaResponse = await api.get(`/media/recent?limit=12`);
-      const uploaderResponse = await api.get(`/uploaders?page=1&limit=10`);
+      // Promise.all을 사용하여 병렬로 API 요청
+      const [mediaResponse, uploaderResponse] = await Promise.all([
+        api.get(`/media/recent?limit=12`),
+        api.get(`/uploaders?page=1&limit=10`),
+      ]);
+
       setMedias(mediaResponse.data.data);
       setUploaders(uploaderResponse.data.data);
       setLoadingState("success");
@@ -98,9 +102,9 @@ const Main = () => {
   //   navigate(`/video/${id}`);
   // };
 
-  // if (loadingState === "loading") {
-  //   return <Loading />;
-  // }
+  if (loadingState === "loading") {
+    return <Loading />;
+  }
 
   if (loadingState === "error") {
     return (

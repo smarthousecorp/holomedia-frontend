@@ -11,6 +11,7 @@ export interface media {
   uploader_id: number;
   description: string;
   like_count: number;
+  is_liked: boolean;
 }
 
 export interface weeklyMedia {

@@ -3,8 +3,8 @@ import styled from "styled-components";
 import {Uploader} from "../../types/user";
 import {media} from "../../types/media";
 import VisibilityIcon from "@mui/icons-material/Visibility";
-import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
 import {SvgIcon} from "@mui/material";
+import LikeButton from "./LikeButton";
 
 interface MovieListProps {
   uploaders: Uploader[];
@@ -34,8 +34,6 @@ const MovieList: React.FC<MovieListProps> = ({
   const handleMediaClick = (media: media): void => {
     onMediaClick(media);
   };
-
-  console.log(shouldBlur);
 
   return (
     <>
@@ -74,10 +72,11 @@ const MovieList: React.FC<MovieListProps> = ({
 
               <PostFooter>
                 <Interactions>
-                  <InteractionItem>
-                    <SvgIcon component={FavoriteBorderIcon} />
-                    <Count>{media.like_count}</Count>
-                  </InteractionItem>
+                  <LikeButton
+                    mediaId={media.id}
+                    isLiked={media.is_liked}
+                    initialLikeCount={media.like_count}
+                  />
                   <InteractionItem>
                     <SvgIcon component={VisibilityIcon} />
                     <Count>{media.views}</Count>
