@@ -91,19 +91,35 @@ const BaseSidebar = ({
           <LanguageSwitcher />
         </LanguageSwitcherWrapper>
         <NavList>
-          <SidebarLi>
+          <SidebarLi
+            onClick={() => {
+              navigate("/main");
+            }}
+          >
             <img src={homeIcon} alt="홈" />
             <p>{t("sidebar.home")}</p>
           </SidebarLi>
-          <SidebarLi>
+          <SidebarLi
+            onClick={() => {
+              navigate("/alarm");
+            }}
+          >
             <img src={alarmIcon} alt="알림" />
             <p>{t("sidebar.alarm")}</p>
           </SidebarLi>
-          <SidebarLi>
+          <SidebarLi
+            onClick={() => {
+              navigate("/membership");
+            }}
+          >
             <img src={starIcon} alt="멤버십" />
             <p>{t("sidebar.membership")}</p>
           </SidebarLi>
-          <SidebarLi>
+          <SidebarLi
+            onClick={() => {
+              navigate("/settings");
+            }}
+          >
             <img src={settingIcon} alt="설정" />
             <p>{t("sidebar.setting")}</p>
           </SidebarLi>

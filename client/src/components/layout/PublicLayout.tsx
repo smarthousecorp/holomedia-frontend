@@ -60,7 +60,7 @@ const Full = styled.div`
 const Inner = styled.div`
   width: 100%;
   height: 100vh;
-  background-color: #ffffff;
+  background-color: #ededed;
   display: flex;
 
   @media (max-width: 900px) {
@@ -70,7 +70,7 @@ const Inner = styled.div`
 
 const Container = styled.main`
   width: 100%;
-  background-color: #ffffff;
+  background-color: #ededed;
 `;
 
 const DefaultSidebarStyled = styled(DefaultSidebar)`
