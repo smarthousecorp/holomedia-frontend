@@ -40,6 +40,7 @@ function App() {
         <Route element={<MainLayout />}>
           <Route path="/" element={<Login />} />
           <Route path="/signup" element={<SignUp />} />
+          <Route path="/*" element={<ErrorPage error="404" />} />
         </Route>
         <Route element={<PublicLayout />}>
           <Route path="/main" element={<Main />} />
@@ -65,7 +66,6 @@ function App() {
           <Route path="/settings" element={<PreparePage pageName="설정" />} />
           <Route path="/error" element={<ErrorPage error="500" />} />
         </Route>
-        <Route path="/*" element={<ErrorPage error="404" />} />
       </Routes>
       <ToastContainer style={{fontSize: "1.4rem"}} limit={1} />
     </>
