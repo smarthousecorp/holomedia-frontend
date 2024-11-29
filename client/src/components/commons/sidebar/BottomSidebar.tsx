@@ -2,18 +2,26 @@ import styled from "styled-components";
 import homeIcon from "../../../assets/home.png";
 import {useSelector} from "react-redux";
 import {RootState} from "../../../store";
+import {useNavigate} from "react-router-dom";
 
 interface BottomSidebarProps {
   onProfileClick: () => void;
 }
 
 const BottomSidebar = ({onProfileClick}: BottomSidebarProps) => {
+  const navigate = useNavigate();
+
   const profileImage = useSelector(
     (state: RootState) => state.user.profile_image
   );
+
   return (
     <Container>
-      <Home>
+      <Home
+        onClick={() => {
+          navigate("/main");
+        }}
+      >
         <img src={homeIcon} alt="홈 아이콘" />
       </Home>
       <Profile onClick={onProfileClick}>

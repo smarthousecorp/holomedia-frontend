@@ -5,8 +5,10 @@ import DefaultSidebar from "../commons/sidebar/DefaultSidebar";
 import BottomSidebar from "../commons/sidebar/BottomSidebar";
 import {useEffect, useState} from "react";
 import MobileSidebar from "../commons/sidebar/MobileSidebar";
+import {useLocation} from "react-router-dom";
 
 const PublicLayout = () => {
+  const location = useLocation();
   const [isOpenBS, setIsOpenBS] = useState<boolean>(false);
 
   const toggleBottomSidebar = () => {
@@ -27,6 +29,10 @@ const PublicLayout = () => {
       document.body.style.overflow = "unset";
     };
   }, [isOpenBS]);
+
+  useEffect(() => {
+    setIsOpenBS(false);
+  }, [location]);
 
   return (
     <Full>
