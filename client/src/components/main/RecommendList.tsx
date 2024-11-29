@@ -68,7 +68,7 @@ export const RecommendedUploaders: React.FC = () => {
 
   return (
     <Container>
-      <Title>블룸이들을 위한 추천</Title>
+      <Title>추천 업로더</Title>
       <UploaderList>
         {uploaders.map((uploader) => (
           <UploaderItem key={uploader.id}>

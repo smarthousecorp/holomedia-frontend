@@ -53,10 +53,6 @@ const Main = () => {
     navigate(`/user/${uploader.id}`);
   };
 
-  const handleMediaClick = (media: media): void => {
-    navigate(`/main/${media.id}`);
-  };
-
   const fetchData = async () => {
     try {
       setLoadingState("loading");
@@ -87,20 +83,20 @@ const Main = () => {
     }
   }, []);
 
-  // const handleClickList = (id: number) => {
-  //   if (!user) {
-  //     Toast(ToastType.error, "로그인 후에 접근 가능합니다.");
-  //     return;
-  //   }
+  const handleMediaClick = (media: media) => {
+    if (!user) {
+      Toast(ToastType.error, "로그인 후에 접근 가능합니다.");
+      return;
+    }
 
-  //   if (!isAdmin && !isAdultVerified) {
-  //     setSelectedVideoId(id);
-  //     setShowModal(true);
-  //     return;
-  //   }
+    if (!isAdmin && !isAdultVerified) {
+      setSelectedVideoId(media.id);
+      setShowModal(true);
+      return;
+    }
 
-  //   navigate(`/video/${id}`);
-  // };
+    navigate(`/video/${media.id}`);
+  };
 
   if (loadingState === "loading") {
     return <Loading />;

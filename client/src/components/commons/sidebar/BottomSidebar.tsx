@@ -3,7 +3,11 @@ import homeIcon from "../../../assets/home.png";
 import {useSelector} from "react-redux";
 import {RootState} from "../../../store";
 
-const BottomSidebar = () => {
+interface BottomSidebarProps {
+  onProfileClick: () => void;
+}
+
+const BottomSidebar = ({onProfileClick}: BottomSidebarProps) => {
   const profileImage = useSelector(
     (state: RootState) => state.user.profile_image
   );
@@ -12,7 +16,7 @@ const BottomSidebar = () => {
       <Home>
         <img src={homeIcon} alt="홈 아이콘" />
       </Home>
-      <Profile>
+      <Profile onClick={onProfileClick}>
         <img src={profileImage} alt="프로필 이미지" />
       </Profile>
     </Container>
@@ -24,7 +28,7 @@ export default BottomSidebar;
 const Container = styled.nav`
   display: none;
   width: 100vw;
-  height: 7rem;
+  height: 6.5rem;
   position: fixed;
   bottom: 0;
   background-color: #ffffff;
@@ -41,4 +45,6 @@ const Container = styled.nav`
 
 const Home = styled.div``;
 
-const Profile = styled.div``;
+const Profile = styled.div`
+  cursor: pointer;
+`;

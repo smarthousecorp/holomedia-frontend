@@ -51,6 +51,7 @@ function App() {
               </ProtectedRoute>
             }
           />
+          <Route path="/user/:id" />
           <Route path="/upload" element={<UploadForm />} />
           <Route path="/settings" element={<Settings />} />
           <Route path="/error" element={<ErrorPage error="500" />} />

@@ -7,6 +7,8 @@ import homeIcon from "../../../assets/home.png";
 import alarmIcon from "../../../assets/alarm.png";
 import settingIcon from "../../../assets/setting.png";
 import starIcon from "../../../assets/star.png";
+import {SvgIcon} from "@mui/material";
+import ClearIcon from "@mui/icons-material/Clear";
 import LanguageSwitcher from "../LanguageSwitcher";
 import {useNavigate} from "react-router-dom";
 import {useSelector} from "react-redux";
@@ -48,14 +50,26 @@ const BaseSidebar = ({
   }, [i18n, onClose]);
 
   return (
-    <SidebarContainer className={className} $variant={variant} $isOpen={isOpen}>
-      <ContentWrapper>
+    <SidebarContainer
+      className={className}
+      $variant={variant}
+      $isOpen={isOpen}
+      onClick={(e) => e.stopPropagation()}
+    >
+      <ContentWrapper $variant={variant}>
         <Logo>
           <img
             src={logo}
             alt="로고"
             onClick={() => navigate(isLogin ? "/main" : "/")}
           />
+          {variant === "mobile" && (
+            <SvgIcon
+              className="delete"
+              component={ClearIcon}
+              onClick={onClose}
+            />
+          )}
         </Logo>
         <Profile>
           <ProfileLeft>
@@ -112,19 +126,21 @@ const SidebarContainer = styled.nav<{
   flex-direction: column;
   height: 100vh;
 
-  @media (max-width: 900px) {
-    display: none;
-  }
-
   ${({$variant, $isOpen}) =>
     $variant === "mobile" &&
     css`
+      width: 26rem;
       position: fixed;
       top: 0;
       height: 100vh;
-      right: -25rem;
+      right: -26rem;
       transition: left 0.35s ease;
       box-shadow: 2px 0 5px rgba(0, 0, 0, 0.5);
+      z-index: 999;
+
+      @media (min-width: 900px) {
+        display: none;
+      }
 
       ${$isOpen &&
       css`
@@ -133,9 +149,17 @@ const SidebarContainer = styled.nav<{
     `}
 `;
 
-const ContentWrapper = styled.div`
+const ContentWrapper = styled.div<{
+  $variant: "default" | "mobile";
+}>`
   margin: 0 4rem 0 5rem;
   flex: 1;
+
+  ${({$variant}) =>
+    $variant === "mobile" &&
+    css`
+      margin: 0 1rem 0 2rem;
+    `}
 `;
 
 const Logo = styled.div`
@@ -143,24 +167,24 @@ const Logo = styled.div`
   cursor: pointer;
   display: flex;
   align-items: center;
+  justify-content: space-between;
 
   > svg {
+    position: relative;
+    right: 5px;
     font-size: 2.4rem;
-    color: white;
+    color: #5e5d5d;
   }
 
   > img {
     width: 16rem;
   }
 
-  @media (max-width: 600px) {
-    margin-left: 2.7rem;
-    & > img {
-      width: 10rem;
-    }
+  @media (max-width: 900px) {
+    height: 6rem;
 
-    & > svg {
-      font-size: 2.1rem;
+    > img {
+      width: 12rem;
     }
   }
 `;
