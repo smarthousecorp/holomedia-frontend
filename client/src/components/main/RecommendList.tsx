@@ -2,6 +2,7 @@ import React, {useEffect, useState} from "react";
 import styled from "styled-components";
 import {Uploader} from "../../types/user";
 import {api} from "../../utils/api";
+import {Users} from "lucide-react";
 
 interface UploaderWithFollowStatus extends Uploader {
   isFollowing: boolean;
@@ -63,38 +64,53 @@ export const RecommendedUploaders: React.FC = () => {
   };
 
   if (loading) {
-    return <Container>Loading...</Container>;
+    return <Container>로딩중..</Container>;
   }
 
   return (
     <Container>
       <Title>추천 업로더</Title>
-      <UploaderList>
-        {uploaders.map((uploader) => (
-          <UploaderItem key={uploader.id}>
-            <UploaderInfo>
-              <img
-                src={uploader.profile_image || "default.png"}
-                alt={uploader.username}
-              />
-              <UserDetails>
-                <Username>{uploader.username}</Username>
-                <UserId>@{uploader.user_id}</UserId>
-                <LastUpload>
-                  최근 업로드 : {formatLastUpload(uploader.last_upload)}
-                </LastUpload>
-              </UserDetails>
-            </UploaderInfo>
-            <FollowButton
-              onClick={() => !uploader.isFollowing && handleFollow(uploader.id)}
-              $isFollowing={uploader.isFollowing}
-              disabled={uploader.isFollowing}
-            >
-              {uploader.isFollowing ? "팔로우 됨" : "팔로우"}
-            </FollowButton>
-          </UploaderItem>
-        ))}
-      </UploaderList>
+      {uploaders.length === 0 ? (
+        <EmptyState>
+          <EmptyIcon>
+            {/* 🤷 */}
+            <Users size={48} color="#999" strokeWidth={1.5} />
+          </EmptyIcon>
+          <EmptyText>현재 추천 업로더가 없습니다.</EmptyText>
+          <EmptySubtext>
+            콘텐츠를 더 많이 탐색하고 관심있는 업로더를 팔로우해보세요.
+          </EmptySubtext>
+        </EmptyState>
+      ) : (
+        <UploaderList>
+          {uploaders.map((uploader) => (
+            <UploaderItem key={uploader.id}>
+              <UploaderInfo>
+                <img
+                  src={uploader.profile_image || "default.png"}
+                  alt={uploader.username}
+                />
+                <UserDetails>
+                  <Username>{uploader.username}</Username>
+                  <UserId>@{uploader.user_id}</UserId>
+                  <LastUpload>
+                    최근 업로드 : {formatLastUpload(uploader.last_upload)}
+                  </LastUpload>
+                </UserDetails>
+              </UploaderInfo>
+              <FollowButton
+                onClick={() =>
+                  !uploader.isFollowing && handleFollow(uploader.id)
+                }
+                $isFollowing={uploader.isFollowing}
+                disabled={uploader.isFollowing}
+              >
+                {uploader.isFollowing ? "팔로우 됨" : "팔로우"}
+              </FollowButton>
+            </UploaderItem>
+          ))}
+        </UploaderList>
+      )}
     </Container>
   );
 };
@@ -105,7 +121,7 @@ const Container = styled.div`
   border-radius: 12px;
   padding: 20px;
   width: 270px;
-  max-height: 360px;
+  max-height: 300px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 `;
 
@@ -181,4 +197,31 @@ const FollowButton = styled.button<{$isFollowing: boolean}>`
   &:disabled {
     opacity: 1;
   }
+`;
+
+// 새로 추가된 스타일 컴포넌트
+const EmptyState = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 20px;
+  color: #666;
+`;
+
+const EmptyIcon = styled.div`
+  font-size: 4rem;
+  margin-bottom: 16px;
+`;
+
+const EmptyText = styled.h4`
+  margin: 0 0 8px 0;
+  font-size: 14px;
+  font-weight: 500;
+`;
+
+const EmptySubtext = styled.p`
+  font-size: 12px;
+  color: #999;
+  max-width: 200px;
 `;
