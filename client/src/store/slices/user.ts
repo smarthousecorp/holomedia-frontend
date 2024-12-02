@@ -7,6 +7,7 @@ const userSlice = createSlice({
     user_id: "",
     username: "",
     profile_image: "",
+    background_image: "",
     is_adult_verified: 0,
     is_admin: 0,
     is_uploader: 0,
@@ -18,6 +19,7 @@ const userSlice = createSlice({
       state.user_id = actions.payload.user_id;
       state.username = actions.payload.username;
       state.profile_image = actions.payload.profile_image;
+      state.background_image = actions.payload.background_image;
       state.is_adult_verified = actions.payload.is_adult_verified;
       state.is_admin = actions.payload.is_admin;
       state.is_uploader = actions.payload.is_uploader;
@@ -28,6 +30,7 @@ const userSlice = createSlice({
       state.user_id = "";
       state.username = "";
       state.profile_image = "";
+      state.background_image = "";
       state.is_adult_verified = 0;
       state.is_admin = 0;
       state.is_uploader = 0;

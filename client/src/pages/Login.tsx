@@ -76,6 +76,7 @@ const Login: React.FC = () => {
             user_id: response.data.user_id,
             username: response.data.username,
             profile_image: response.data.profile_image,
+            background_image: response.data.background_image,
             is_adult_verified: response.data.is_adult_verified,
             is_admin: response.data.is_admin,
             is_uploader: response.data.is_uploader,

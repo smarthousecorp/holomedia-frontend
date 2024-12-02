@@ -30,7 +30,6 @@ const User = () => {
   const dispatch = useDispatch();
 
   const id = useParams().id;
-
   const user = useSelector((state: RootState) => state.user.isLoggedIn);
   const isAdultVerified = useSelector(
     (state: RootState) => state.user.is_adult_verified
@@ -44,6 +43,18 @@ const User = () => {
   // api 응답 저장 상태
   const [medias, setMedias] = useState<media[]>([]);
   const [uploaders, setUploaders] = useState<Uploader[]>([]);
+  const [uploader, setUploader] = useState<Uploader>({
+    id: 0,
+    user_id: "",
+    username: "",
+    profile_image: "",
+    created_at: "",
+    background_image: "",
+    bloom: 0,
+    media_count: 0,
+    total_views: 0,
+    last_upload: "",
+  });
 
   const [showModal, setShowModal] = useState<boolean>(false);
   const [selectedVideoId, setSelectedVideoId] = useState<number | null>(null);
@@ -63,6 +74,15 @@ const User = () => {
 
       setMedias(mediaResponse.data.data);
       setUploaders(uploaderResponse.data.data);
+      // 업로더 단일조회 정보 저장
+
+      const findUploaderIdx = (id: number) => {
+        return uploaderResponse.data.data.filter((uploader: Uploader) => {
+          return uploader.id === id;
+        })[0];
+      };
+      setUploader(findUploaderIdx(Number(id)));
+
       setLoadingState("success");
     } catch (error) {
       console.error("Error fetching data:", error);
@@ -113,9 +133,19 @@ const User = () => {
 
   return (
     <MainContainer>
-      <MovieContainer>
-        <MovieTopSection></MovieTopSection>
-        {/* <hr /> */}
+      <UserContainer>
+        <UserTopSection>
+          <ProfileBackground $image={uploader.background_image}>
+            <ProfilePicture
+              src={uploader.profile_image}
+              alt={uploader.username}
+            />
+          </ProfileBackground>
+          <ProfileHeader>
+            <Username>{uploader.username}</Username>
+            <Bio>{uploader.user_id}</Bio>
+          </ProfileHeader>
+        </UserTopSection>
         {medias.length === 0 ? (
           <EmptyState message={`등록된 영상이 없습니다`} />
         ) : (
@@ -129,7 +159,7 @@ const User = () => {
             />
           </MovieMainContainer>
         )}
-      </MovieContainer>
+      </UserContainer>
       <SideContainer>
         <RecommendedUploaders />
         {/* <img src={SideBannder} alt="광고 배너" /> */}
@@ -243,7 +273,7 @@ const MainContainer = styled.section`
   }
 `;
 
-const MovieContainer = styled.div`
+const UserContainer = styled.div`
   max-width: 750px;
   flex: 1;
   color: #000000;
@@ -255,14 +285,50 @@ const MovieContainer = styled.div`
   }
 `;
 
-const MovieTopSection = styled.div`
+const UserTopSection = styled.div`
   display: flex;
-  justify-content: space-between;
-  align-items: center;
+  flex-direction: column;
+  background-color: #ffffff;
+  border-radius: 0 0 8px 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  position: relative;
+`;
 
-  @media (max-width: 900px) {
-    display: none;
-  }
+const ProfileHeader = styled.div`
+  display: flex;
+  align-items: center;
+  margin: 7rem 0 1.5rem 0;
+  padding: 2rem;
+`;
+
+const ProfileBackground = styled.div<{$image: string}>`
+  position: relative;
+  background-image: url(${(props) => props.$image});
+  background-size: cover;
+  background-position: center;
+  height: 250px;
+`;
+
+const ProfilePicture = styled.img`
+  position: absolute;
+  bottom: -4.5rem;
+  left: 2rem;
+  width: 96px;
+  height: 96px;
+
+  border: 4px solid white;
+  border-radius: 50%;
+  margin-right: 1.5rem;
+`;
+
+const Username = styled.h2`
+  font-size: 1.8rem;
+  font-weight: 600;
+`;
+
+const Bio = styled.p`
+  font-size: 1.4rem;
+  color: #666;
 `;
 
 const MovieMainContainer = styled.div`

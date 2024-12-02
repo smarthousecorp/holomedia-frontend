@@ -3,7 +3,8 @@ export interface Uploader {
   user_id: string;
   username: string;
   created_at: string;
-  profile_image: string | null;
+  profile_image: string;
+  background_image: string;
   bloom: number;
   media_count: number; // 변경
   total_views: number;
