@@ -15,7 +15,7 @@ import {ToastType} from "../types/toast";
 import {getCookie} from "../utils/cookie";
 import {Settings} from "lucide-react";
 import Loading from "../components/commons/Loading";
-// import EmptyState from "../components/commons/EmptyState";
+import EmptyState from "../components/commons/EmptyState";
 // import searchIcon from "../assets/search.png";
 import {Uploader} from "../types/user";
 
@@ -57,7 +57,7 @@ const User = () => {
       setLoadingState("loading");
       // Promise.all을 사용하여 병렬로 API 요청
       const [mediaResponse, uploaderResponse] = await Promise.all([
-        api.get(`/media/recent?uploaderId=${id}?limit=12`),
+        api.get(`/media/recent?uploaderId=${id}limit=12`),
         api.get(`/uploaders?page=1&limit=10`),
       ]);
 
@@ -117,8 +117,7 @@ const User = () => {
         <MovieTopSection></MovieTopSection>
         {/* <hr /> */}
         {medias.length === 0 ? (
-          // <EmptyState message={`홈에 등록된 영상이 없습니다`} />
-          <></>
+          <EmptyState message={`등록된 영상이 없습니다`} />
         ) : (
           <MovieMainContainer>
             <MovieList
@@ -246,6 +245,7 @@ const MainContainer = styled.section`
 
 const MovieContainer = styled.div`
   max-width: 750px;
+  flex: 1;
   color: #000000;
   margin: 0 4rem;
 

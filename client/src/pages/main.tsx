@@ -262,6 +262,7 @@ const MainContainer = styled.section`
 
 const MovieContainer = styled.div`
   max-width: 750px;
+  flex: 1;
   color: #000000;
   margin: 0 4rem;
 

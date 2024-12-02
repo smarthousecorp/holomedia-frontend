@@ -33,6 +33,10 @@ const ErrorContainer = styled.div`
   gap: 3rem;
   text-align: center;
   padding: 0 2rem;
+
+  @media (max-width: 900px) {
+    height: calc(100vh - 13.5rem);
+  }
 `;
 
 const IconWrapper = styled.div`

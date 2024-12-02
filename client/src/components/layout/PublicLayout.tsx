@@ -70,7 +70,7 @@ const Inner = styled.div`
   display: flex;
 
   @media (max-width: 900px) {
-    padding-top: 5rem;
+    padding-top: 7rem;
   }
 `;
 
