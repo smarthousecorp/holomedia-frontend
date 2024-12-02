@@ -55,6 +55,7 @@ router.post("/login", function (request, response) {
           user_id: user.user_id,
           username: user.username,
           profile_image: user.profile_image,
+          background_image: user.background_image,
           is_adult_verified: user.is_adult_verified,
           is_admin: user.is_admin,
           is_uploader: user.is_uploader,
@@ -157,6 +158,7 @@ router.get("/validate-token", authenticateToken, function (req, res) {
         user_id: user.user_id,
         username: user.username,
         profile_image: user.profile_image,
+        background_image: user.background_image,
         is_adult_verified: user.is_adult_verified,
         is_admin: user.is_admin,
         is_uploader: user.is_uploader,
@@ -190,6 +192,7 @@ router.get("/user/:id", (req, res) => {
       is_admin,
       is_uploader,
       profile_image,
+      background_image,
       adult_verified_at
       bloom
     FROM users 
@@ -231,6 +234,7 @@ router.get("/uploaders", (req, res) => {
       u.username,
       u.created_at,
       u.profile_image,
+      u.background_image,
       u.bloom,
       COUNT(DISTINCT m.id) as media_count,
       COALESCE(SUM(m.views), 0) as total_views,
@@ -244,6 +248,7 @@ router.get("/uploaders", (req, res) => {
       u.username, 
       u.created_at, 
       u.profile_image,
+      u.background_image,
       u.bloom
     ORDER BY last_upload DESC
     LIMIT ? OFFSET ?
@@ -308,6 +313,7 @@ router.get("/recommended-uploaders", authenticateToken, (req, res) => {
       u.user_id,
       u.username,
       u.profile_image,
+      u.background_image,
       u.bloom,
       COUNT(DISTINCT m.id) as media_count,
       COALESCE(SUM(m.views), 0) as total_views,
@@ -326,6 +332,7 @@ router.get("/recommended-uploaders", authenticateToken, (req, res) => {
       u.user_id,
       u.username,
       u.profile_image,
+      u.background_image,
       u.bloom
     ORDER BY RAND()  /* 랜덤 정렬 */
     LIMIT ?
@@ -458,6 +465,7 @@ router.get("/following", authenticateToken, (req, res) => {
       u.user_id,
       u.username,
       u.profile_image,
+      u.background_image,
       u.bloom,
       f.created_at as followed_at,
       COUNT(DISTINCT m.id) as media_count,
@@ -471,6 +479,7 @@ router.get("/following", authenticateToken, (req, res) => {
       u.user_id,
       u.username,
       u.profile_image,
+      u.background_image,
       u.bloom,
       f.created_at
     ORDER BY f.created_at DESC
