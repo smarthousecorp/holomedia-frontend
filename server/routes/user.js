@@ -127,6 +127,45 @@ router.post("/signup", function (request, response) {
   }
 });
 
+// 토큰 검증 API 엔드포인트
+router.get("/validate-token", authenticateToken, function (req, res) {
+  // 토큰이 유효하면 사용자 정보를 조회
+  db.query(
+    "SELECT * FROM users WHERE user_id = ?",
+    [req.user.user_id],
+    function (error, results) {
+      if (error) {
+        return res.status(500).json({
+          valid: false,
+          message: "서버 오류가 발생했습니다.",
+        });
+      }
+
+      if (results.length === 0) {
+        return res.status(404).json({
+          valid: false,
+          message: "사용자를 찾을 수 없습니다.",
+        });
+      }
+
+      const user = results[0];
+
+      // 유효성 검증 성공 및 사용자 정보 반환
+      res.status(200).json({
+        valid: true,
+        message: "유효한 토큰입니다.",
+        user_id: user.user_id,
+        username: user.username,
+        profile_image: user.profile_image,
+        is_adult_verified: user.is_adult_verified,
+        is_admin: user.is_admin,
+        is_uploader: user.is_uploader,
+        bloom: user.bloom,
+      });
+    }
+  );
+});
+
 // 국가 코드와 언어 매핑
 const countryToLanguage = {
   KR: "ko",

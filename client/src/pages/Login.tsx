@@ -1,4 +1,4 @@
-import React, {useState} from "react";
+import React, {useState, useEffect} from "react";
 import styled from "styled-components";
 import logo from "../assets/holomedia-logo.png";
 import {useNavigate} from "react-router-dom";
@@ -7,7 +7,6 @@ import {useTranslation} from "react-i18next";
 import axios from "axios";
 import {setCookie} from "../utils/cookie";
 import {login} from "../store/slices/user";
-// import mockImg from "../assets/main.png";
 
 interface LoginCredentials {
   user_id: string;
@@ -33,6 +32,66 @@ const Login: React.FC = () => {
   const [rememberID, setRememberID] = useState(false);
   const [autoLogin, setAutoLogin] = useState(false);
 
+  // 컴포넌트 마운트 시 저장된 데이터 불러오기
+  useEffect(() => {
+    // 저장된 아이디 불러오기
+    const savedUserId = localStorage.getItem("remembered_user_id");
+    if (savedUserId) {
+      setInputVal((prev) => ({...prev, user_id: savedUserId}));
+      setRememberID(true);
+    }
+
+    // 자동 로그인 설정 불러오기
+    const autoLoginEnabled = localStorage.getItem("auto_login") === "true";
+    setAutoLogin(autoLoginEnabled);
+
+    // 자동 로그인이 설정되어 있다면 저장된 토큰으로 로그인 시도
+    if (autoLoginEnabled) {
+      const savedToken = localStorage.getItem("accessToken");
+      if (savedToken) {
+        handleAutoLogin(savedToken);
+      }
+    }
+  }, []);
+
+  // 자동 로그인 처리 함수
+  const handleAutoLogin = async (token: string) => {
+    try {
+      // 토큰 유효성 검증 API 호출
+      const response = await axios.get(
+        `${import.meta.env.VITE_SERVER_DOMAIN}/validate-token`,
+        {
+          headers: {
+            Authorization: `${token}`,
+          },
+        }
+      );
+
+      if (response.data.valid) {
+        // 토큰이 유효하면 사용자 정보를 가져와서 로그인 처리
+        dispatch(
+          login({
+            isLoggedIn: true,
+            user_id: response.data.user_id,
+            username: response.data.username,
+            profile_image: response.data.profile_image,
+            is_adult_verified: response.data.is_adult_verified,
+            is_admin: response.data.is_admin,
+            is_uploader: response.data.is_uploader,
+            bloom: response.data.bloom,
+          })
+        );
+        navigate("/main");
+      }
+    } catch (error) {
+      console.error("Auto login failed:", error);
+      // 자동 로그인 실패 시 토큰과 설정 초기화
+      localStorage.removeItem("accessToken");
+      localStorage.removeItem("auto_login");
+      setAutoLogin(false);
+    }
+  };
+
   // 입력값 변경 핸들러
   const onChangeValues = (e: React.ChangeEvent<HTMLInputElement>) => {
     const {name, value} = e.target;
@@ -46,75 +105,98 @@ const Login: React.FC = () => {
   };
 
   // 로그인 버튼 핸들러
-  const onClickLoginBtn = (e: React.FormEvent) => {
+  const onClickLoginBtn = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    axios
-      .post(`${import.meta.env.VITE_SERVER_DOMAIN}/login`, inputVal)
-      .then((res) => {
-        const current = new Date();
-        current.setMinutes(current.getMinutes() + 1440);
+    try {
+      const res = await axios.post(
+        `${import.meta.env.VITE_SERVER_DOMAIN}/login`,
+        inputVal
+      );
 
-        // accessToken 설정
-        setCookie("accessToken", res.data.accessToken, {
-          path: "/",
-          expires: current,
-        });
-        localStorage.setItem("accessToken", res.data.accessToken);
+      // 아이디 저장 처리
+      if (rememberID) {
+        localStorage.setItem("remembered_user_id", inputVal.user_id);
+      } else {
+        localStorage.removeItem("remembered_user_id");
+      }
 
-        // 전역상태 업데이트
-        dispatch(
-          login({
-            isLoggedIn: true,
-            user_id: res.data.user_id,
-            username: res.data.username,
-            profile_image: res.data.profile_image,
-            is_adult_verified: res.data.is_adult_verified,
-            is_admin: res.data.is_admin,
-            is_uploader: res.data.is_uploader,
-            bloom: res.data.bloom,
-          })
-        );
+      // 자동 로그인 설정 저장
+      localStorage.setItem("auto_login", autoLogin.toString());
 
-        // Navigate to main page
-        navigate("/main");
-      })
-      .catch((error) => {
-        if (error.response) {
-          let errorMessage = "";
-          // Handle specific error scenarios
-          switch (error.response.data.status) {
-            case 404:
+      // 토큰 설정
+      const current = new Date();
+      current.setMinutes(current.getMinutes() + 1440);
+
+      setCookie("accessToken", res.data.accessToken, {
+        path: "/",
+        expires: current,
+      });
+      localStorage.setItem("accessToken", res.data.accessToken);
+
+      // 전역상태 업데이트
+      dispatch(
+        login({
+          isLoggedIn: true,
+          user_id: res.data.user_id,
+          username: res.data.username,
+          profile_image: res.data.profile_image,
+          is_adult_verified: res.data.is_adult_verified,
+          is_admin: res.data.is_admin,
+          is_uploader: res.data.is_uploader,
+          bloom: res.data.bloom,
+        })
+      );
+
+      navigate("/main");
+    } catch (error: any) {
+      if (error.response) {
+        let errorMessage = "";
+        switch (error.response.data.status) {
+          case 404:
+            setErrorMsg((prev) => ({
+              ...prev,
+              user_id: t("auth.login.errors.userNotFound"),
+            }));
+            break;
+          case 400:
+            errorMessage = error.response.data.message;
+            if (errorMessage === "비밀번호가 틀립니다.") {
               setErrorMsg((prev) => ({
                 ...prev,
-                user_id: t("auth.login.errors.userNotFound"),
+                password: t("auth.login.errors.wrongPassword"),
               }));
-              break;
-            case 400:
-              errorMessage = error.response.data.message;
-              if (errorMessage === "비밀번호가 틀립니다.") {
-                setErrorMsg((prev) => ({
-                  ...prev,
-                  password: t("auth.login.errors.wrongPassword"),
-                }));
-              } else {
-                setErrorMsg((prev) => ({
-                  ...prev,
-                  password: t("auth.login.errors.requiredFields"),
-                }));
-              }
-              break;
-            default:
-              // Generic error handling
-              console.error("Login error:", error);
-          }
+            } else {
+              setErrorMsg((prev) => ({
+                ...prev,
+                password: t("auth.login.errors.requiredFields"),
+              }));
+            }
+            break;
+          default:
+            console.error("Login error:", error);
         }
-      });
+      }
+    }
+  };
+
+  // 체크박스 상태 변경 핸들러
+  const handleRememberIDChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setRememberID(e.target.checked);
+    if (!e.target.checked) {
+      localStorage.removeItem("remembered_user_id");
+    }
+  };
+
+  const handleAutoLoginChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setAutoLogin(e.target.checked);
+    if (!e.target.checked) {
+      localStorage.removeItem("auto_login");
+    }
   };
 
   return (
     <Container>
-      {/* <img src={mockImg} alt="목업 이미지" /> */}
       <LoginBox>
         <Logo>
           <img src={logo} alt="로고" />
@@ -132,7 +214,7 @@ const Login: React.FC = () => {
               <input
                 type="checkbox"
                 checked={rememberID}
-                onChange={() => setRememberID(!rememberID)}
+                onChange={handleRememberIDChange}
               />{" "}
               아이디 저장
             </InputLabel>
@@ -153,7 +235,6 @@ const Login: React.FC = () => {
               ></i>
             </PasswordToggle>
           </InputWrapper>
-          {/* Display error messages */}
           {(errorMsg.user_id || errorMsg.password) && (
             <ErrorMessage>{errorMsg.user_id || errorMsg.password}</ErrorMessage>
           )}
@@ -162,20 +243,14 @@ const Login: React.FC = () => {
               <AutoLoginInput
                 type="checkbox"
                 checked={autoLogin}
-                onChange={() => setAutoLogin(!autoLogin)}
+                onChange={handleAutoLoginChange}
               />{" "}
               자동 로그인
             </AutoLoginLabel>
           </AutoLoginWrapper>
           <LoginButton type="submit">로그인</LoginButton>
           <About>
-            <a
-              onClick={() => {
-                navigate("/signup");
-              }}
-            >
-              회원가입
-            </a>
+            <a onClick={() => navigate("/signup")}>회원가입</a>
             <div className="idpw">
               <a href="#">계정 찾기 |</a>
               <a href="#">비밀번호 찾기</a>
@@ -186,7 +261,9 @@ const Login: React.FC = () => {
     </Container>
   );
 };
+
 export default Login;
+
 const Container = styled.div`
   display: flex;
   justify-content: center;

@@ -132,40 +132,25 @@ router.post("/like/:id", authenticateToken, (req, res) => {
   });
 });
 
-// 업로더 목록 조회 API
-router.get("/uploaders", (req, res) => {
-  const sql = `
-    SELECT DISTINCT name 
-    FROM medias 
-    ORDER BY name`;
-
-  db.query(sql, (err, results) => {
-    if (err) {
-      console.error("업로더 목록 조회 실패:", err);
-      return res.status(500).send({message: "서버 오류가 발생했습니다."});
-    }
-
-    // 이름만 추출하여 배열로 변환
-    const uploaders = results.map((row) => row.name);
-
-    res.send({
-      status: "success",
-      data: uploaders, // ["미주", "수민", "채희", "민지"] 형태로 반환됨
-    });
-  });
-});
-
-// 최근 영상 순으로 조회
+// 최근 영상순 조회
+// 모든 영상 조회: /recent
+// 특정 업로더의 영상 조회: /recent?uploaderId=123
+// 페이지 크기 지정: /recent?limit=20
+// 둘 다 사용: /recent?uploaderId=123&limit=20
 router.get("/recent", authenticateToken, (req, res) => {
   const limit = parseInt(req.query.limit) || 10;
   const maxLimit = 50;
-  const userId = req.user?.id; // 인증된 사용자의 ID (없으면 undefined)
+  const userId = req.user?.id;
+  const uploaderId = req.query.uploaderId; // 업로더 ID 추가
 
   if (limit <= 0 || limit > maxLimit) {
     return res.status(400).send({
       message: `조회 개수는 1에서 ${maxLimit} 사이여야 합니다.`,
     });
   }
+
+  // WHERE 절에 업로더 ID 조건 추가
+  const uploaderCondition = uploaderId ? "WHERE m.uploader_id = ?" : "";
 
   // 인증된 사용자인 경우와 아닌 경우의 SQL 분기
   const sql = userId
@@ -184,6 +169,7 @@ router.get("/recent", authenticateToken, (req, res) => {
       CASE WHEN ml.user_id IS NOT NULL THEN TRUE ELSE FALSE END as is_liked
     FROM medias m
     LEFT JOIN media_likes ml ON m.id = ml.media_id AND ml.user_id = ?
+    ${uploaderCondition}
     ORDER BY m.created_at DESC 
     LIMIT ?
   `
@@ -201,11 +187,19 @@ router.get("/recent", authenticateToken, (req, res) => {
       DATE_FORMAT(created_at, '%Y-%m-%d') as created_date,
       FALSE as is_liked
     FROM medias 
+    ${uploaderCondition}
     ORDER BY created_at DESC 
     LIMIT ?
   `;
 
-  const queryParams = userId ? [userId, limit] : [limit];
+  // 쿼리 파라미터 배열 구성
+  const queryParams = userId
+    ? uploaderId
+      ? [userId, uploaderId, limit]
+      : [userId, limit]
+    : uploaderId
+    ? [uploaderId, limit]
+    : [limit];
 
   db.query(sql, queryParams, (err, results) => {
     if (err) {
