@@ -14,6 +14,7 @@ import ErrorPage from "./pages/Error";
 import Login from "./pages/Login";
 import SignUp from "./pages/Signup";
 import PreparePage from "./pages/Prepare";
+import User from "./pages/User";
 
 interface ErrorMessageProps {
   message?: string;
@@ -56,7 +57,7 @@ function App() {
               </ProtectedRoute>
             }
           /> */}
-          <Route path="/user/:id" />
+          <Route path="/user/:id" element={<User />} />
           <Route path="/upload" element={<UploadForm />} />
           <Route path="/alarm" element={<PreparePage pageName="알림" />} />
           <Route
