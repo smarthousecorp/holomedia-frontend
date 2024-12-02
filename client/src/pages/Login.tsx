@@ -1,6 +1,7 @@
 import React, {useState, useEffect} from "react";
-import styled from "styled-components";
+import styled, {keyframes} from "styled-components";
 import logo from "../assets/holomedia-logo.png";
+import {Check, Eye, EyeOff} from "lucide-react";
 import {useNavigate} from "react-router-dom";
 import {useDispatch} from "react-redux";
 import {useTranslation} from "react-i18next";
@@ -210,14 +211,17 @@ const Login: React.FC = () => {
               value={inputVal.user_id}
               onChange={onChangeValues}
             />
-            <InputLabel>
-              <input
+            <CustomCheckboxLabel>
+              <CheckboxInput
                 type="checkbox"
                 checked={rememberID}
                 onChange={handleRememberIDChange}
-              />{" "}
-              아이디 저장
-            </InputLabel>
+              />
+              <CheckboxControl>
+                <Check size={12} />
+              </CheckboxControl>
+              <span>아이디 저장</span>
+            </CustomCheckboxLabel>
           </InputWrapper>
           <InputWrapper>
             <Input
@@ -228,25 +232,24 @@ const Login: React.FC = () => {
               onChange={onChangeValues}
             />
             <PasswordToggle type="button" onClick={togglePasswordVisibility}>
-              <i
-                className={`bi ${
-                  showPassword ? "bi-eye-slash-fill" : "bi-eye-fill"
-                }`}
-              ></i>
+              {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
             </PasswordToggle>
           </InputWrapper>
           {(errorMsg.user_id || errorMsg.password) && (
             <ErrorMessage>{errorMsg.user_id || errorMsg.password}</ErrorMessage>
           )}
           <AutoLoginWrapper>
-            <AutoLoginLabel>
-              <AutoLoginInput
+            <AutoCheckboxLabel>
+              <CheckboxInput
                 type="checkbox"
                 checked={autoLogin}
                 onChange={handleAutoLoginChange}
-              />{" "}
-              자동 로그인
-            </AutoLoginLabel>
+              />
+              <CheckboxControl>
+                <Check size={12} />
+              </CheckboxControl>
+              <span>자동 로그인</span>
+            </AutoCheckboxLabel>
           </AutoLoginWrapper>
           <LoginButton type="submit">로그인</LoginButton>
           <About>
@@ -310,29 +313,7 @@ const InputWrapper = styled.div`
     padding-right: 8rem;
   }
 `;
-const InputLabel = styled.label`
-  position: absolute;
-  right: 0;
-  display: flex;
-  align-items: center;
-  font-size: 1.2rem;
-  color: #707070;
-  gap: 0.3rem;
 
-  input[type="checkbox"] {
-    width: 1.1rem;
-    height: 1.1rem;
-    border-radius: 50%;
-    border: 1px solid #999;
-    appearance: none;
-    cursor: pointer;
-  }
-
-  input[type="checkbox"]:checked {
-    background: #eb3553;
-    border: none;
-  }
-`;
 const Input = styled.input`
   flex: 1;
   padding: 0.75rem 0;
@@ -344,7 +325,14 @@ const PasswordToggle = styled.button`
   border: none;
   cursor: pointer;
   color: #707070;
-  font-size: 1.3rem;
+  padding: 0.5rem;
+  display: flex;
+  align-items: center;
+  transition: color 0.2s;
+
+  &:hover {
+    color: #eb3553;
+  }
 `;
 const AutoLoginWrapper = styled.div`
   display: flex;
@@ -353,29 +341,85 @@ const AutoLoginWrapper = styled.div`
   font-size: 1.2rem;
   color: #707070;
 `;
-const AutoLoginLabel = styled.label`
+
+const checkboxAppear = keyframes`
+  0% {
+    transform: scale(0.5);
+    opacity: 0;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+`;
+
+const CustomCheckboxLabel = styled.label`
+  position: absolute;
+  right: 0;
   display: flex;
   align-items: center;
   gap: 0.5rem;
+  font-size: 1.2rem;
+  color: #707070;
+  cursor: pointer;
+  user-select: none;
 
-  input[type="checkbox"] {
-    margin: 0;
-    width: 1.1rem;
-    height: 1.1rem;
-    border-radius: 50%;
-    border: 1px solid #999;
-    appearance: none;
-    cursor: pointer;
+  &:hover {
+    color: #eb3553;
   }
 
-  input[type="checkbox"]:checked {
-    background: #eb3553;
-    border: none;
+  span {
+    transition: color 0.2s;
   }
 `;
-const AutoLoginInput = styled.input`
-  width: 1.2rem;
-  height: 1.2rem;
+
+const AutoCheckboxLabel = styled(CustomCheckboxLabel)`
+  position: relative;
+`;
+
+const CheckboxInput = styled.input`
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+`;
+
+const CheckboxControl = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.3rem;
+  height: 1.3rem;
+  border-radius: 8px;
+  border: 1px solid #d0d0d0;
+  background: white;
+  transition: all 0.2s ease;
+
+  svg {
+    color: white;
+    opacity: 0;
+    transform: scale(0.5);
+    transition: all 0.2s ease;
+  }
+
+  ${CheckboxInput}:checked + & {
+    background: #eb3553;
+    border-color: #eb3553;
+
+    svg {
+      opacity: 1;
+      transform: scale(1);
+      animation: ${checkboxAppear} 0.2s ease;
+    }
+  }
+
+  ${CheckboxInput}:focus + & {
+    box-shadow: 0 0 0 2px rgba(235, 53, 83, 0.2);
+  }
+
+  ${CustomCheckboxLabel}:hover & {
+    border-color: #eb3553;
+  }
 `;
 
 const Button = styled.button`
@@ -398,10 +442,40 @@ const About = styled.div`
   align-items: center;
   font-size: 1.2rem;
 
+  a {
+    position: relative;
+    text-decoration: none;
+    color: #333;
+    transition: color 0.3s ease;
+
+    &:hover {
+      color: #eb3553;
+    }
+
+    &::after {
+      content: "";
+      position: absolute;
+      width: 0;
+      height: 2px;
+      bottom: -3px;
+      left: 0;
+      background-color: #eb3553;
+      transition: width 0.3s ease;
+    }
+
+    &:hover::after {
+      width: 100%;
+    }
+  }
+
   > .idpw {
     display: flex;
     gap: 0.3rem;
     white-space: nowrap;
+
+    a {
+      margin-right: 0.3rem;
+    }
   }
 `;
 

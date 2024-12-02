@@ -6,6 +6,7 @@ import {useDispatch} from "react-redux";
 import {useTranslation} from "react-i18next";
 import axios, {AxiosError} from "axios";
 import {useSignUpValidation} from "../utils/SignUpValid";
+import {Eye, EyeOff} from "lucide-react";
 import {checkId, checkPassword, checkUsername} from "../utils/validCheck";
 import {showToast} from "../store/slices/toast";
 import {ToastType} from "../types/toast";
@@ -198,11 +199,7 @@ const SignUp: React.FC = () => {
               type="button"
               onClick={() => setShowPasswordCheck(!showPasswordCheck)}
             >
-              <i
-                className={`bi ${
-                  showPasswordCheck ? "bi-eye-slash-fill" : "bi-eye-fill"
-                }`}
-              ></i>
+              {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
             </PasswordToggle>
           </InputWrapper>
           {errorMsg.passwordCheck && (
@@ -234,14 +231,14 @@ const SignUp: React.FC = () => {
             가입하기
           </SignUpButton>
           <About>
-            <a
+            <p
               onClick={() => {
                 navigate("/");
               }}
             >
               이미 회원이신가요? <span className="strong">로그인</span> 페이지로
               이동
-            </a>
+            </p>
           </About>
         </Form>
       </SignUpBox>
@@ -315,7 +312,14 @@ const PasswordToggle = styled.button`
   border: none;
   cursor: pointer;
   color: #707070;
-  font-size: 1.2rem;
+  padding: 0.5rem;
+  display: flex;
+  align-items: center;
+  transition: color 0.2s;
+
+  &:hover {
+    color: #eb3553;
+  }
 `;
 
 const Button = styled.button`
@@ -344,6 +348,35 @@ const About = styled.div`
   font-size: 1.2rem;
   margin-top: 1rem;
   color: #6e6d6d;
+
+  span {
+    cursor: pointer;
+    position: relative;
+    text-decoration: none;
+    color: #6e6d6d;
+    transition: color 0.3s ease;
+    margin: 0 0.3rem;
+
+    &:hover {
+      color: #eb3553;
+    }
+
+    &::after {
+      content: "";
+      position: absolute;
+      width: 0;
+      height: 2px;
+      bottom: -3px;
+      left: 0;
+      background-color: #eb3553;
+      transition: width 0.3s ease;
+    }
+
+    &:hover::after {
+      width: 100%;
+    }
+  }
+
   .strong {
     font-weight: 600;
     color: #eb3553;
