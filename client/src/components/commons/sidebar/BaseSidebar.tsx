@@ -6,7 +6,7 @@ import logo from "../../../assets/logo_test.png";
 import homeIcon from "../../../assets/home.png";
 import alarmIcon from "../../../assets/alarm.png";
 import settingIcon from "../../../assets/setting.png";
-import starIcon from "../../../assets/star.png";
+// import starIcon from "../../../assets/star.png";
 import {SvgIcon} from "@mui/material";
 import ClearIcon from "@mui/icons-material/Clear";
 import LanguageSwitcher from "../LanguageSwitcher";
@@ -107,14 +107,14 @@ const BaseSidebar = ({
             <img src={alarmIcon} alt="알림" />
             <p>{t("sidebar.alarm")}</p>
           </SidebarLi>
-          <SidebarLi
+          {/* <SidebarLi
             onClick={() => {
               navigate("/membership");
             }}
           >
             <img src={starIcon} alt="멤버십" />
             <p>{t("sidebar.membership")}</p>
-          </SidebarLi>
+          </SidebarLi> */}
           <SidebarLi
             onClick={() => {
               navigate("/settings");
