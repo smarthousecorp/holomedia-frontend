@@ -5,6 +5,8 @@ import useUploadVideo from "../hooks/useUploadVideo";
 import {api} from "../utils/api";
 import VideoThumbnailSelector from "../components/commons/media/VideoThumbnailSelector";
 import {useTranslation} from "react-i18next";
+import ReactQuill from "react-quill";
+import "react-quill/dist/quill.snow.css";
 
 interface UploadFormData {
   title: string;
@@ -12,6 +14,7 @@ interface UploadFormData {
   video_file: File | null;
   thumbnail: string | null;
   name: string;
+  description: string;
 }
 
 export default function UploadForm() {
@@ -23,7 +26,10 @@ export default function UploadForm() {
     video_file: null,
     thumbnail: null,
     name: "",
+    description: "",
   });
+
+  console.log(formData);
 
   const [selectedThumbnail, setSelectedThumbnail] = useState<string>("");
   const [videoPreview, setVideoPreview] = useState<string>("");
@@ -37,6 +43,13 @@ export default function UploadForm() {
     setFormData((prev) => ({
       ...prev,
       [name]: value,
+    }));
+  };
+
+  const handleDescriptionChange = (value: string) => {
+    setFormData((prev) => ({
+      ...prev,
+      description: value,
     }));
   };
 
@@ -113,6 +126,7 @@ export default function UploadForm() {
           video_file: null,
           thumbnail: null,
           name: "",
+          description: "",
         });
         setVideoPreview("");
         setSelectedThumbnail("");
@@ -133,6 +147,31 @@ export default function UploadForm() {
       }
     };
   }, []);
+
+  // React Quill 모듈 설정
+  const modules = {
+    toolbar: [
+      [{header: [1, 2, false]}],
+      ["bold", "italic", "underline", "strike"],
+      ["blockquote", "code-block"],
+      [{list: "ordered"}, {list: "bullet"}],
+      ["link"],
+      ["clean"],
+    ],
+  };
+
+  const formats = [
+    "header",
+    "bold",
+    "italic",
+    "underline",
+    "strike",
+    "blockquote",
+    "code-block",
+    "list",
+    "bullet",
+    "link",
+  ];
 
   return (
     <Container>
@@ -203,6 +242,20 @@ export default function UploadForm() {
           />
         </FormGroup>
 
+        <FormGroup>
+          <Label>{t("upload.form.description.label")}</Label>
+          <EditorContainer>
+            <ReactQuill
+              theme="snow"
+              value={formData.description}
+              onChange={handleDescriptionChange}
+              modules={modules}
+              formats={formats}
+              placeholder={t("upload.form.description.placeholder")}
+            />
+          </EditorContainer>
+        </FormGroup>
+
         <SubmitButton type="submit">{t("upload.form.submit")}</SubmitButton>
       </Form>
     </Container>
@@ -213,7 +266,7 @@ const Container = styled.div`
   max-width: 80rem;
   margin: 0 auto;
   padding: 2rem;
-  color: white;
+  color: #333;
 
   @media (max-width: 768px) {
     padding: 1rem;
@@ -224,7 +277,7 @@ const Title = styled.h1`
   font-size: 2.4rem;
   font-weight: bold;
   margin-bottom: 3rem;
-  color: white;
+  color: #333;
 
   @media (max-width: 768px) {
     font-size: 2rem;
@@ -252,16 +305,16 @@ const Label = styled.label`
   font-size: 1.4rem;
   font-weight: 500;
   margin-bottom: 1rem;
-  color: #e2e8f0;
+  color: #333;
 `;
 
 const Input = styled.input`
   width: 100%;
   padding: 1rem;
-  background-color: #1a1a1a;
-  border: 1px solid #333;
+  background-color: #ffffff;
+  border: 1px solid #ddd;
   border-radius: 0.5rem;
-  color: white;
+  color: #333;
   font-size: 1.4rem;
 
   &:focus {
@@ -271,7 +324,28 @@ const Input = styled.input`
   }
 
   &::placeholder {
-    color: #666;
+    color: #999;
+  }
+`;
+
+const EditorContainer = styled.div`
+  .ql-container {
+    border-bottom-left-radius: 0.5rem;
+    border-bottom-right-radius: 0.5rem;
+    background: #ffffff;
+    min-height: 15rem;
+  }
+
+  .ql-toolbar {
+    border-top-left-radius: 0.5rem;
+    border-top-right-radius: 0.5rem;
+    background: #ffffff;
+  }
+
+  .ql-editor {
+    min-height: 15rem;
+    font-size: 1.4rem;
+    color: #333;
   }
 `;
 
@@ -286,14 +360,14 @@ const FileUploadLabel = styled.label`
   justify-content: center;
   width: 100%;
   height: 20rem;
-  border: 2px dashed #333;
+  border: 2px dashed #ddd;
   border-radius: 1rem;
   cursor: pointer;
-  background-color: #1a1a1a;
+  background-color: #ffffff;
   transition: all 0.2s ease;
 
   &:hover {
-    background-color: #242424;
+    background-color: #f8f8f8;
     border-color: #3b82f6;
   }
 
@@ -315,7 +389,7 @@ const UploadIcon = styled.span`
 const UploadText = styled.p`
   margin-bottom: 0.5rem;
   font-size: 1.4rem;
-  color: #999;
+  color: #666;
 `;
 
 const SubmitButton = styled.button`

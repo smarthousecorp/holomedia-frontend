@@ -102,6 +102,10 @@ i18n.use(initReactI18next).init({
               label: "Creator Name",
               placeholder: "Enter creator name",
             },
+            description: {
+              label: "Description",
+              placeholder: "Enter description",
+            },
             submit: "Upload",
           },
           messages: {
@@ -208,6 +212,10 @@ i18n.use(initReactI18next).init({
               label: "크리에이터 이름",
               placeholder: "크리에이터 이름을 입력하세요",
             },
+            description: {
+              label: "영상 내용",
+              placeholder: "영상 설명을 입력하세요",
+            },
             submit: "업로드",
           },
           messages: {
@@ -312,6 +320,10 @@ i18n.use(initReactI18next).init({
             creatorName: {
               label: "クリエイター名",
               placeholder: "クリエイター名を入力してください",
+            },
+            description: {
+              label: "영상 내용",
+              placeholder: "영상 내용을 입력하세요",
             },
             submit: "アップロード",
           },
@@ -420,6 +432,10 @@ i18n.use(initReactI18next).init({
             creatorName: {
               label: "创作者名称",
               placeholder: "请输入创作者名称",
+            },
+            description: {
+              label: "영상 내용",
+              placeholder: "입력",
             },
             submit: "上传",
           },

@@ -15,6 +15,8 @@ import Login from "./pages/Login";
 import SignUp from "./pages/Signup";
 import PreparePage from "./pages/Prepare";
 import User from "./pages/User";
+import ProtectedRoute from "./components/layout/ProtectedRoute";
+import VideoDetail from "./pages/videoDetail";
 
 interface ErrorMessageProps {
   message?: string;
@@ -45,25 +47,25 @@ function App() {
         </Route>
         <Route element={<PublicLayout />}>
           <Route path="/main" element={<Main />} />
-          <Route
+          {/* <Route
             path="/video/:id"
             element={<PreparePage pageName="영상 조회" />}
-          />
-          {/* <Route
+          /> */}
+          <Route
             path="/video/:id"
             element={
               <ProtectedRoute>
                 <VideoDetail />
               </ProtectedRoute>
             }
-          /> */}
+          />
           <Route path="/user/:id" element={<User />} />
           <Route path="/upload" element={<UploadForm />} />
           <Route path="/alarm" element={<PreparePage pageName="알림" />} />
-          <Route
+          {/* <Route
             path="/membership"
             element={<PreparePage pageName="멤버십" />}
-          />
+          /> */}
           <Route path="/settings" element={<PreparePage pageName="설정" />} />
           <Route path="/error" element={<ErrorPage error="500" />} />
         </Route>
