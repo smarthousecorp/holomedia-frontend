@@ -21,7 +21,7 @@ import Loading from "../components/commons/Loading";
 import SearchOutlinedIcon from "@mui/icons-material/SearchOutlined";
 import {Uploader} from "../types/user";
 import UploaderList from "../components/main/UploaderList";
-import ScoreProgress from "../components/main/ScoreProgress";
+// import ScoreProgress from "../components/main/ScoreProgress";
 import MovieList from "../components/main/MovieList";
 import {RecommendedUploaders} from "../components/main/RecommendList";
 // import SideBannder from "../assets/side-banner.png";
@@ -136,7 +136,8 @@ const Main = () => {
               uploaders={uploaders}
               onUploaderClick={handleUploaderClick}
             />
-            <ScoreProgress currentScore={10} />
+            {/* 241211 출석체크 기능 주석처리 */}
+            {/* <ScoreProgress currentScore={10} /> */}
             <MovieList
               medias={medias}
               uploaders={uploaders}
