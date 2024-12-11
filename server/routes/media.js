@@ -339,9 +339,8 @@ router.get("/:id", authenticateToken, async (req, res) => {
 
 // 영상 등록 API 수정 (업로더 정보 추가)
 router.post("/", authenticateToken, (req, res) => {
-  const {title, url, thumbnail, name} = req.body;
+  const {title, url, thumbnail, name, description} = req.body;
   const uploader_id = req.user.id; // JWT 토큰에서 사용자 ID 추출
-  console.log(req.user);
 
   // 필수 값 체크
   if (!title || !url || !thumbnail || !name) {
@@ -349,8 +348,8 @@ router.post("/", authenticateToken, (req, res) => {
   }
 
   const sql =
-    "INSERT INTO medias (title, url, thumbnail, name, uploader_id) VALUES (?, ?, ?, ?, ?)";
-  const values = [title, url, thumbnail, name, uploader_id];
+    "INSERT INTO medias (title, url, thumbnail, name, uploader_id, description) VALUES (?, ?, ?, ?, ?, ?)";
+  const values = [title, url, thumbnail, name, uploader_id, description];
 
   db.query(sql, values, (err, result) => {
     if (err) {
