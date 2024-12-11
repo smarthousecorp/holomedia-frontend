@@ -29,8 +29,6 @@ export default function UploadForm() {
     description: "",
   });
 
-  console.log(formData);
-
   const [selectedThumbnail, setSelectedThumbnail] = useState<string>("");
   const [videoPreview, setVideoPreview] = useState<string>("");
 
