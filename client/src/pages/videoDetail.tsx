@@ -34,6 +34,7 @@ const VideoDetail = () => {
   const [played, setPlayed] = useState<number>(0);
   console.log(played);
 
+  // 초기 볼륨을 0.8로 설정
   const [volume, setVolume] = useState<number>(0.8);
 
   const handlePlay = () => {
@@ -48,8 +49,18 @@ const VideoDetail = () => {
     setPlayed(state.played);
   };
 
-  const handleVolumeChange = (newVolume: number) => {
-    setVolume(newVolume);
+  // 볼륨 변경 핸들러 수정
+  const handleVolumeChange = (event: any) => {
+    // 유효한 볼륨 값인지 확인하고 적용
+    const newVolume = parseFloat(event?.target?.value || event);
+    if (
+      !isNaN(newVolume) &&
+      isFinite(newVolume) &&
+      newVolume >= 0 &&
+      newVolume <= 1
+    ) {
+      setVolume(newVolume);
+    }
   };
 
   const onClosePaymentDialog = () => {
@@ -117,8 +128,8 @@ const VideoDetail = () => {
               config={{
                 file: {
                   attributes: {
-                    controlsList: "nodownload", // 다운로드 버튼 비활성화
-                    disablePictureInPicture: false, // PiP 모드 활성화
+                    controlsList: "nodownload",
+                    disablePictureInPicture: false,
                   },
                 },
               }}
