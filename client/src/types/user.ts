@@ -2,6 +2,7 @@ export interface Uploader {
   id: number;
   user_id: string;
   username: string;
+  description: string;
   created_at: string;
   profile_image: string;
   background_image: string;

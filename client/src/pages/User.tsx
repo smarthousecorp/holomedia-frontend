@@ -21,6 +21,7 @@ import {Uploader} from "../types/user";
 
 import MovieList from "../components/main/MovieList";
 import {RecommendedUploaders} from "../components/main/RecommendList";
+import ReactQuill from "react-quill";
 // import SideBannder from "../assets/side-banner.png";
 
 type LoadingState = "loading" | "error" | "success";
@@ -47,6 +48,7 @@ const User = () => {
     id: 0,
     user_id: "",
     username: "",
+    description: "",
     profile_image: "",
     created_at: "",
     background_image: "",
@@ -143,7 +145,17 @@ const User = () => {
           </ProfileBackground>
           <ProfileHeader>
             <Username>{uploader.username}</Username>
-            <Bio>{uploader.user_id}</Bio>
+            <Bio>@{uploader.user_id}</Bio>
+            <StyledQuillWrapper>
+              <ReactQuill
+                value={uploader.description}
+                readOnly={true}
+                theme="bubble"
+                modules={{
+                  toolbar: false,
+                }}
+              />
+            </StyledQuillWrapper>
           </ProfileHeader>
         </UserTopSection>
         {medias.length === 0 ? (
@@ -296,7 +308,7 @@ const UserTopSection = styled.div`
 
 const ProfileHeader = styled.div`
   display: flex;
-  align-items: center;
+  flex-direction: column;
   margin: 7rem 0 1.5rem 0;
   padding: 2rem;
 `;
@@ -324,6 +336,7 @@ const ProfilePicture = styled.img`
 const Username = styled.h2`
   font-size: 1.8rem;
   font-weight: 600;
+  margin-bottom: 0.5rem;
 `;
 
 const Bio = styled.p`
@@ -352,5 +365,33 @@ const SideContainer = styled.div`
 
   @media (max-width: 1150px) {
     display: none;
+  }
+`;
+
+const StyledQuillWrapper = styled.div`
+  margin-top: 2rem;
+
+  .ql-container {
+    font-family: inherit;
+  }
+
+  .ql-editor {
+    padding: 0;
+    font-size: 1.2rem;
+    line-height: 1.4;
+    color: #000000;
+
+    p {
+      margin: 0;
+    }
+  }
+
+  .ql-bubble .ql-editor a {
+    color: #007aff;
+    text-decoration: none;
+
+    &:hover {
+      text-decoration: underline;
+    }
   }
 `;

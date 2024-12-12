@@ -1,5 +1,7 @@
 import React from "react";
 import styled from "styled-components";
+import ReactQuill from "react-quill";
+import "react-quill/dist/quill.bubble.css"; // Bubble 테마 사용
 import {Uploader} from "../../types/user";
 import {media} from "../../types/media";
 import VisibilityIcon from "@mui/icons-material/Visibility";
@@ -53,7 +55,16 @@ const MovieList: React.FC<MovieListProps> = ({
                     <UploaderId>@{uploader.user_id}</UploaderId>
                   </UploaderItem>
                 </UploaderInfo>
-                <MediaDescription>{media.description}</MediaDescription>
+                <StyledQuillWrapper>
+                  <ReactQuill
+                    value={media.description}
+                    readOnly={true}
+                    theme="bubble"
+                    modules={{
+                      toolbar: false,
+                    }}
+                  />
+                </StyledQuillWrapper>
               </PostHeader>
 
               <MediaContent onClick={() => handleMediaClick(media)}>
@@ -82,7 +93,6 @@ const MovieList: React.FC<MovieListProps> = ({
                     <Count>{media.views}</Count>
                   </InteractionItem>
                 </Interactions>
-                {/* <MediaTitle>{media.title}</MediaTitle> */}
               </PostFooter>
             </MediaItem>
           </MediaLists>
@@ -93,6 +103,36 @@ const MovieList: React.FC<MovieListProps> = ({
 };
 
 export default MovieList;
+
+const StyledQuillWrapper = styled.div`
+  margin-top: 2rem;
+
+  .ql-container {
+    font-family: inherit;
+  }
+
+  .ql-editor {
+    padding: 0;
+    font-size: 1.2rem;
+    line-height: 1.4;
+    color: #000000;
+
+    p {
+      margin: 0;
+    }
+  }
+
+  .ql-bubble .ql-editor a {
+    color: #007aff;
+    text-decoration: none;
+
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+`;
+
+// MediaDescription 스타일 컴포넌트는 제거 (Quill로 대체)
 
 const MediaLists = styled.ul`
   position: relative;
@@ -234,10 +274,10 @@ const Count = styled.span`
 //   font-weight: 600;
 // `;
 
-const MediaDescription = styled.p`
-  margin: 0;
-  margin-top: 2rem;
-  color: #000000;
-  font-size: 1.2rem;
-  line-height: 1.4;
-`;
+// const MediaDescription = styled.p`
+//   margin: 0;
+//   margin-top: 2rem;
+//   color: #000000;
+//   font-size: 1.2rem;
+//   line-height: 1.4;
+// `;
