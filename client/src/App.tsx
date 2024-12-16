@@ -47,10 +47,6 @@ function App() {
         </Route>
         <Route element={<PublicLayout />}>
           <Route path="/main" element={<Main />} />
-          {/* <Route
-            path="/video/:id"
-            element={<PreparePage pageName="영상 조회" />}
-          /> */}
           <Route
             path="/video/:id"
             element={
