@@ -66,22 +66,22 @@ const VideoDetail = () => {
   const onClosePaymentDialog = () => {
     setShowPaymentDialog(false);
     setTimeout(() => {
-      navigate({pathname: "/"});
+      navigate({pathname: "/main"});
     }, 0);
   };
 
-  const handlePayment = async () => {
-    try {
-      await api.post(`/media/${id}/payment`, {
-        amount: paymentInfo?.price,
-      });
-      setShowPaymentDialog(false);
-      fetchMediaData();
-    } catch (error) {
-      console.error("Payment failed:", error);
-      alert("결제에 실패했습니다. 다시 시도해주세요.");
-    }
-  };
+  // const handlePayment = async () => {
+  //   try {
+  //     await api.post(`/media/${id}/payment`, {
+  //       amount: paymentInfo?.price,
+  //     });
+  //     setShowPaymentDialog(false);
+  //     fetchMediaData();
+  //   } catch (error) {
+  //     console.error("Payment failed:", error);
+  //     alert("결제에 실패했습니다. 다시 시도해주세요.");
+  //   }
+  // };
 
   const fetchMediaData = async () => {
     try {
@@ -105,6 +105,7 @@ const VideoDetail = () => {
   useEffect(() => {
     fetchMediaData();
   }, [id]);
+
 
   return (
     <VideoDetailContainer>
@@ -149,10 +150,11 @@ const VideoDetail = () => {
           <p>가격: {paymentInfo?.price?.toLocaleString()}원</p>
         </CustomDialogContent>
         <DialogActions>
-          <Button onClick={onClosePaymentDialog}>취소</Button>
+          {/* <Button onClick={onClosePaymentDialog}>취소</Button>
           <Button onClick={handlePayment} variant="contained" color="primary">
             결제하기
-          </Button>
+          </Button> */}
+          <Button onClick={onClosePaymentDialog} variant="contained" color="primary">돌아가기</Button>
         </DialogActions>
       </CustomDialog>
     </VideoDetailContainer>
