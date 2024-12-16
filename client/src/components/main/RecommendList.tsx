@@ -117,6 +117,7 @@ export const RecommendedUploaders: React.FC = () => {
 
 const Container = styled.div`
   margin-top: 5.8rem;
+  margin-bottom: 2rem;
   background: white;
   border-radius: 12px;
   padding: 20px;

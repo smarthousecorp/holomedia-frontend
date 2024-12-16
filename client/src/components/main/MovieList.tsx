@@ -1,11 +1,11 @@
-import React from "react";
+import React, { useState } from "react";
 import styled from "styled-components";
 import ReactQuill from "react-quill";
-import "react-quill/dist/quill.bubble.css"; // Bubble 테마 사용
-import {Uploader} from "../../types/user";
-import {media} from "../../types/media";
+import "react-quill/dist/quill.bubble.css";
+import { Uploader } from "../../types/user";
+import { media } from "../../types/media";
 import VisibilityIcon from "@mui/icons-material/Visibility";
-import {SvgIcon} from "@mui/material";
+import { SvgIcon } from "@mui/material";
 import LikeButton from "./LikeButton";
 
 interface MovieListProps {
@@ -23,6 +23,8 @@ const MovieList: React.FC<MovieListProps> = ({
   onMediaClick,
   shouldBlur,
 }) => {
+  const [expandedDescriptions, setExpandedDescriptions] = useState<number[]>([]);
+
   const findUploaderIdx = (id: number) => {
     return uploaders.filter((uploader) => {
       return uploader.id === id;
@@ -37,10 +39,20 @@ const MovieList: React.FC<MovieListProps> = ({
     onMediaClick(media);
   };
 
+  const toggleDescription = (mediaId: number) => {
+    setExpandedDescriptions(prev => 
+      prev.includes(mediaId) 
+        ? prev.filter(id => id !== mediaId)
+        : [...prev, mediaId]
+    );
+  };
+
   return (
     <>
       {medias.map((media) => {
         const uploader = findUploaderIdx(media.uploader_id);
+        const isExpanded = expandedDescriptions.includes(media.id);
+
         return (
           <MediaLists key={media.id}>
             <MediaItem>
@@ -55,15 +67,20 @@ const MovieList: React.FC<MovieListProps> = ({
                     <UploaderId>@{uploader.user_id}</UploaderId>
                   </UploaderItem>
                 </UploaderInfo>
-                <StyledQuillWrapper>
-                  <ReactQuill
-                    value={media.description}
-                    readOnly={true}
-                    theme="bubble"
-                    modules={{
-                      toolbar: false,
-                    }}
-                  />
+                <StyledQuillWrapper $isExpanded={isExpanded}>
+                  <div className="quill-container">
+                    <ReactQuill
+                      value={media.description}
+                      readOnly={true}
+                      theme="bubble"
+                      modules={{
+                        toolbar: false,
+                      }}
+                    />
+                  </div>
+                  <ExpandButton onClick={() => toggleDescription(media.id)}>
+                    {isExpanded ? "접기" : "더보기"}
+                  </ExpandButton>
                 </StyledQuillWrapper>
               </PostHeader>
 
@@ -104,8 +121,14 @@ const MovieList: React.FC<MovieListProps> = ({
 
 export default MovieList;
 
-const StyledQuillWrapper = styled.div`
+const StyledQuillWrapper = styled.div<{ $isExpanded: boolean }>`
   margin-top: 2rem;
+  position: relative;
+
+  .quill-container {
+    max-height: ${props => props.$isExpanded ? 'none' : '4.8rem'};
+    overflow: hidden;
+  }
 
   .ql-container {
     font-family: inherit;
@@ -116,6 +139,7 @@ const StyledQuillWrapper = styled.div`
     font-size: 1.2rem;
     line-height: 1.4;
     color: #000000;
+    padding-right: ${props => props.$isExpanded ? '0' : '4rem'};
 
     p {
       margin: 0;
@@ -129,6 +153,22 @@ const StyledQuillWrapper = styled.div`
     &:hover {
       text-decoration: underline;
     }
+  }
+`;
+
+const ExpandButton = styled.button`
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  background: none;
+  border: none;
+  color: #007aff;
+  cursor: pointer;
+  padding: 0 0.5rem;
+  font-size: 1.2rem;
+
+  &:hover {
+    text-decoration: underline;
   }
 `;
 

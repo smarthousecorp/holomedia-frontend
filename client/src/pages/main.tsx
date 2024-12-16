@@ -150,7 +150,7 @@ const Main = () => {
       </MovieContainer>
       <SideContainer>
         <RecommendedUploaders />
-        {/* <img src={SideBannder} alt="광고 배너" /> */}
+        <img src="https://firebasestorage.googleapis.com/v0/b/quill-image-store.appspot.com/o/HOLOMEDIA%2FMask%20group.png?alt=media&token=8c8f852f-e813-45f6-bd00-83c0a8accd60" alt="광고 배너" />
       </SideContainer>
 
       {showModal && (
@@ -333,6 +333,12 @@ const SideContainer = styled.div`
   top: 0.1rem; // 상단에서 2rem 떨어진 위치에 고정
   height: fit-content; // 내용물 높이에 맞게 조정
   align-self: flex-start; // 플렉스 컨테이너의 상단에 정렬
+
+  > img {
+   width: 270px;
+    height: 750px;
+    margin-bottom: 5rem;
+  }
 
   @media (max-width: 1150px) {
     display: none;
