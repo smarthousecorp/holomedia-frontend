@@ -26,7 +26,7 @@ const ProtectedRoute = ({children}: ProtectedRouteProps) => {
 
   // 성인인증 체크
   if (!isAdmin && !isAdultVerified) {
-    return <Navigate to="/" replace />;
+    return <Navigate to="/main" replace />;
   }
 
   return <>{children}</>;
