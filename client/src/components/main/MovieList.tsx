@@ -157,15 +157,28 @@ const StyledQuillWrapper = styled.div<{ $isExpanded: boolean }>`
 `;
 
 const ExpandButton = styled.button`
-  position: absolute;
-  right: 0;
-  bottom: 0;
+  position: relative;
+  width: 100%;
+  margin: 1rem 0 0 0;
+  padding: 0;
   background: none;
   border: none;
   color: #007aff;
   cursor: pointer;
-  padding: 0 0.5rem;
   font-size: 1.2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+
+  &::before,
+  &::after {
+    content: "";
+    flex: 1;
+    height: 1px;
+    background: #e0e0e0;
+    max-width: 350px;
+  }
 
   &:hover {
     text-decoration: underline;
