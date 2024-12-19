@@ -177,7 +177,7 @@ const ExpandButton = styled.button`
     flex: 1;
     height: 1px;
     background: #e0e0e0;
-    max-width: 350px;
+    max-width: 400px;
   }
 
   &:hover {

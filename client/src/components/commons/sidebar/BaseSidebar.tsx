@@ -125,6 +125,26 @@ const BaseSidebar = ({
           </SidebarLi>
         </NavList>
       </ContentWrapper>
+      <Footer $variant={variant}>
+        <FooterLinks>
+          <FooterRow>
+            <FooterLink href="/terms">홀로미디어 이용약관</FooterLink>
+            {/* <FooterDivider>|</FooterDivider> */}
+            <FooterLink href="/privacy">개인정보처리방침</FooterLink>
+          </FooterRow>
+          <FooterRow>
+            <FooterLink href="/protection">청소년 보호정책</FooterLink>
+            {/* <FooterDivider>|</FooterDivider> */}
+            <FooterLink href="/business">사업자 이용약관</FooterLink>
+          </FooterRow>
+        </FooterLinks>
+        <BusinessInfo>
+          <BusinessText>홀로미디어(주) &nbsp;&nbsp;&nbsp;대표이사: 차윤태</BusinessText>
+          <BusinessText>사업자등록번호: 256-81-03803</BusinessText>
+          <BusinessText>인천광역시 연수구 인천타워대로 323, 에이동 3012-40호</BusinessText>
+          <Copyright>©HOLOMEDIA All Rights Reserved.</Copyright>
+        </BusinessInfo>
+      </Footer>
     </SidebarContainer>
   );
 };
@@ -307,4 +327,77 @@ const BloomText = styled.p`
 const ButtonText = styled.span`
   font-family: "Pretendard-Bold";
   font-size: 1.2rem;
+`;
+
+// 푸터 스타일
+
+const Footer = styled.footer<{
+  $variant: "default" | "mobile";
+}>`
+  padding: 2.3rem;
+  margin: 2rem;
+  margin-top: auto;
+  border: 1px solid #eee;
+  border-radius: 8px;
+  background-color: #fbfbfb;
+
+  ${({$variant}) =>
+    $variant === "mobile" &&
+    css`
+      padding: 2rem;
+      margin: 1.5rem;
+    `}
+`;
+
+const FooterLinks = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+  margin-bottom: 1.5rem;
+`;
+
+const FooterRow = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.8rem;
+  width: 100%;
+`;
+
+const FooterLink = styled.a`
+  color: #ff627c;
+  font-size: 1.15rem;
+  font-weight: 600;
+  text-decoration: none;
+  transition: color 0.2s ease;
+
+  &:hover {
+    color: #ee3e5b;
+  }
+`;
+
+// const FooterDivider = styled.span`
+//   color: #ddd;
+//   font-size: 1.2rem;
+//   text-align: center;
+//   flex-grow: 1;  // This ensures divider stays in the center
+// `;
+
+
+const BusinessInfo = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+`;
+
+const BusinessText = styled.p`
+  color: #999;
+  font-size: 1.1rem;
+  line-height: 1.4;
+`;
+
+const Copyright = styled.p`
+  color: #999;
+  font-size: 1.1rem;
+  margin-top: 0.8rem;
 `;
