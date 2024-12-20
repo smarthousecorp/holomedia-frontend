@@ -17,7 +17,7 @@ import PreparePage from "./pages/Prepare";
 import User from "./pages/User";
 import ProtectedRoute from "./components/layout/ProtectedRoute";
 import VideoDetail from "./pages/videoDetail";
-import UploaderRoute from "./components/layout/UploaderRoute";
+// import UploaderRoute from "./components/layout/UploaderRoute";
 
 interface ErrorMessageProps {
   message?: string;
@@ -58,9 +58,9 @@ function App() {
           />
           <Route path="/user/:id" element={<User />} />
           <Route path="/upload" element={
-            <UploaderRoute>
+            // <UploaderRoute>
               <UploadForm />
-            </UploaderRoute>
+            // </UploaderRoute>
             } />
           <Route path="/alarm" element={<PreparePage pageName="알림" />} />
           {/* <Route
