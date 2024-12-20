@@ -24,7 +24,6 @@ const Full = styled.div`
 const Inner = styled.div`
   width: 100%;
   height: 100vh;
-  overflow-x: hidden;
   background-color: #ffffff;
   display: flex;
 `;
