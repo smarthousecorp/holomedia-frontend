@@ -35,7 +35,7 @@ export const preventDevTools = () => {
       console.profile();
       console.profileEnd();
       const end = performance.now();
-
+      
       if (end - start > 100) {
         window.location.href = '/dev-tools-alert';
       }
