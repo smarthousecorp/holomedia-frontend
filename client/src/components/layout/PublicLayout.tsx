@@ -9,6 +9,7 @@ import {useLocation} from "react-router-dom";
 
 const PublicLayout = () => {
   const location = useLocation();
+  
   const [isOpenBS, setIsOpenBS] = useState<boolean>(false);
 
   const toggleBottomSidebar = () => {
@@ -39,7 +40,7 @@ const PublicLayout = () => {
       <Header />
       <Inner>
         <DefaultSidebarStyled />
-        <Container>
+        <Container $isSettingsPage={location.pathname === '/settings'}>
           <Outlet />
         </Container>
         <BottomSidebar onProfileClick={toggleBottomSidebar} />
@@ -75,9 +76,10 @@ const Inner = styled.div`
   }
 `;
 
-const Container = styled.main`
+const Container = styled.main<{ $isSettingsPage: boolean }>`
   width: 100%;
-  background-color: #ededed;
+  background-color: ${props => props.$isSettingsPage ? '#fff' : '#ededed'};
+  border-left: ${props => props.$isSettingsPage ? '2px solid #eee' : 'none'};
 `;
 
 const DefaultSidebarStyled = styled(DefaultSidebar)`

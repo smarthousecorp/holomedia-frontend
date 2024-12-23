@@ -17,6 +17,7 @@ import PreparePage from "./pages/Prepare";
 import User from "./pages/User";
 import ProtectedRoute from "./components/layout/ProtectedRoute";
 import VideoDetail from "./pages/videoDetail";
+import Settings from "./pages/setting";
 // import UploaderRoute from "./components/layout/UploaderRoute";
 
 interface ErrorMessageProps {
@@ -67,7 +68,7 @@ function App() {
             path="/membership"
             element={<PreparePage pageName="멤버십" />}
           /> */}
-          <Route path="/settings" element={<PreparePage pageName="설정" />} />
+          <Route path="/settings" element={<Settings />} />
           <Route path="/error" element={<ErrorPage error="500" />} />
         </Route>
       </Routes>
