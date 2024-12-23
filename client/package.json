@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
-    "deploy": "aws s3 sync ./dist s3://holomedia.co.kr --profile=holomedia-s3",
+    "deploy": "tsc -b && vite build && aws s3 sync ./dist s3://holomedia.co.kr --profile=holomedia-s3",
     "lint": "eslint .",
     "preview": "vite preview"
   },
