@@ -34,9 +34,10 @@ const ErrorMessage: React.FC<ErrorMessageProps> = ({
 function App() {
   const {countryInfo, error, loading} = useCountryDetection();
   const location = useLocation();
+  
 
   useEffect(() => {
-    if (import.meta.env.NODE_ENV === "production" && 
+    if (import.meta.env.VITE_NODE_ENV === "production" && 
         !(['/dev-tools-alert', '/'].includes(location.pathname))) {
       preventDevTools();
     }
