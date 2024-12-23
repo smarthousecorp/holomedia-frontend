@@ -5,8 +5,8 @@ export const preventDevTools = () => {
       // Windows: Ctrl + Shift + I, Ctrl + Shift + J, Ctrl + Shift + C, F12
       // Mac: Cmd + Option + I, Cmd + Option + J, Cmd + Option + C
       if (
-        (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'J' || e.key === 'C')) ||
-        (e.metaKey && e.altKey && (e.key === 'I' || e.key === 'J' || e.key === 'C')) ||
+        (e.ctrlKey && e.shiftKey && ['I', 'J', 'C'].includes(e.key)) || // Windows
+        (e.metaKey && e.altKey && ['I', 'J', 'C'].includes(e.key)) ||  // Mac
         e.key === 'F12'
       ) {
         e.preventDefault();
@@ -19,7 +19,7 @@ export const preventDevTools = () => {
     });
   
     // 3. 개발자 도구 감지
-    const devToolsCheck = () => {
+    const detectDevTools = () => {
       const threshold = 160;
       const widthThreshold = window.outerWidth - window.innerWidth > threshold;
       const heightThreshold = window.outerHeight - window.innerHeight > threshold;
@@ -28,8 +28,26 @@ export const preventDevTools = () => {
         window.location.href = '/dev-tools-alert';
       }
     };
+
+    // 새 창(undock) 상태 감지
+    const detectUndockedDevTools = () => {
+      const start = performance.now();
+      console.profile();
+      console.profileEnd();
+      const end = performance.now();
+
+      if (end - start > 100) {
+        window.location.href = '/dev-tools-alert';
+      }
+    };
+    
+    // 개발자 도구 감지 병행 방식
+    window.addEventListener('resize', detectDevTools); // 실시간 감지
+    setInterval(() => {
+      detectDevTools();
+      detectUndockedDevTools(); // undock 상태 탐지
+    }, 1000);
   
-    setInterval(devToolsCheck, 1000);
   
     // 4. console.* 메서드 덮어쓰기
     const disableConsole = () => {
