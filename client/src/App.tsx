@@ -1,4 +1,4 @@
-import {Routes, Route} from "react-router-dom";
+import {Routes, Route, useLocation} from "react-router-dom";
 import Main from "./pages/main";
 import MainLayout from "./components/layout/MainLayout";
 import "./index.css";
@@ -18,6 +18,9 @@ import User from "./pages/User";
 import ProtectedRoute from "./components/layout/ProtectedRoute";
 import VideoDetail from "./pages/videoDetail";
 import Settings from "./pages/setting";
+import { useEffect } from "react";
+import { preventDevTools } from "./utils/preventDevTools";
+import DevToolsAlert from "./pages/devToolsAlert";
 // import UploaderRoute from "./components/layout/UploaderRoute";
 
 interface ErrorMessageProps {
@@ -30,6 +33,14 @@ const ErrorMessage: React.FC<ErrorMessageProps> = ({
 
 function App() {
   const {countryInfo, error, loading} = useCountryDetection();
+  const location = useLocation();
+
+  useEffect(() => {
+    if (import.meta.env.NODE_ENV === "production" && 
+        !(['/dev-tools-alert', '/'].includes(location.pathname))) {
+      preventDevTools();
+    }
+  }, [location.pathname]);
 
   if (countryInfo && loading) {
     return <Loading />;
@@ -46,6 +57,8 @@ function App() {
           <Route path="/" element={<Login />} />
           <Route path="/signup" element={<SignUp />} />
           <Route path="/*" element={<ErrorPage error="404" />} />
+          <Route path="/error" element={<ErrorPage error="500" />} />
+          <Route path="/dev-tools-alert" element={<DevToolsAlert />} />
         </Route>
         <Route element={<PublicLayout />}>
           <Route path="/main" element={<Main />} />
@@ -69,7 +82,6 @@ function App() {
             element={<PreparePage pageName="멤버십" />}
           /> */}
           <Route path="/settings" element={<Settings />} />
-          <Route path="/error" element={<ErrorPage error="500" />} />
         </Route>
       </Routes>
       <ToastContainer style={{fontSize: "1.4rem"}} limit={1} />
