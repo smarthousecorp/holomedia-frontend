@@ -1,29 +1,29 @@
 // src/pages/Main.tsx
-import {useEffect, useState} from "react";
+import { useEffect, useState } from "react";
 import styled from "styled-components";
 // import VisibilityIcon from "@mui/icons-material/Visibility";
-import {SvgIcon} from "@mui/material";
-import {useNavigate} from "react-router-dom";
-import {media} from "../types/media";
+import { SvgIcon } from "@mui/material";
+import { useNavigate } from "react-router-dom";
+import { media } from "../types/media";
 // import {SkeletonImage} from "../components/commons/media/Skeleton";
-import {api} from "../utils/api";
-import {RootState} from "../store";
-import {useSelector, useDispatch} from "react-redux";
-import {logout, verifyAdult} from "../store/slices/user";
+import { api } from "../utils/api";
+import { RootState } from "../store";
+import { useSelector, useDispatch } from "react-redux";
+import { logout, verifyAdult } from "../store/slices/user";
 import AdultVerificationModal from "../components/commons/media/AdultVerificationModal";
 import Toast from "../components/commons/Toast";
-import {ToastType} from "../types/toast";
-import {getCookie} from "../utils/cookie";
-import {Settings} from "lucide-react";
+import { ToastType } from "../types/toast";
+import { getCookie } from "../utils/cookie";
+import { Settings } from "lucide-react";
 import Loading from "../components/commons/Loading";
 // import EmptyState from "../components/commons/EmptyState";
 // import searchIcon from "../assets/search.png";
 import SearchOutlinedIcon from "@mui/icons-material/SearchOutlined";
-import {Uploader} from "../types/user";
+import { Uploader } from "../types/user";
 import UploaderList from "../components/main/UploaderList";
 // import ScoreProgress from "../components/main/ScoreProgress";
 import MovieList from "../components/main/MovieList";
-import {RecommendedUploaders} from "../components/main/RecommendList";
+import { RecommendedUploaders } from "../components/main/RecommendList";
 // import SideBannder from "../assets/side-banner.png";
 
 type LoadingState = "loading" | "error" | "success";
@@ -69,7 +69,7 @@ const Main = () => {
       console.error("Error fetching data:", error);
       setLoadingState("error");
       Toast(ToastType.error, "데이터를 불러오는데 실패했습니다.");
-      navigate("/error", {state: 500});
+      navigate("/error", { state: 500 });
     }
   };
 
@@ -150,9 +150,12 @@ const Main = () => {
       </MovieContainer>
       <SideContainer>
         <RecommendedUploaders />
-        <img src="https://firebasestorage.googleapis.com/v0/b/quill-image-store.appspot.com/o/HOLOMEDIA%2FMask%20group.png?alt=media&token=8c8f852f-e813-45f6-bd00-83c0a8accd60" alt="광고 배너" />
+        <img
+          src="https://firebasestorage.googleapis.com/v0/b/quill-image-store.appspot.com/o/HOLOMEDIA%2FMask%20group.png?alt=media&token=8c8f852f-e813-45f6-bd00-83c0a8accd60"
+          alt="광고 배너"
+        />
       </SideContainer>
-
+      {/* 성인인증 모달 */}
       {showModal && (
         <AdultVerificationModal
           isOpen={showModal}
@@ -335,7 +338,7 @@ const SideContainer = styled.div`
   align-self: flex-start; // 플렉스 컨테이너의 상단에 정렬
 
   > img {
-   width: 270px;
+    width: 270px;
     height: 750px;
     margin-bottom: 5rem;
   }

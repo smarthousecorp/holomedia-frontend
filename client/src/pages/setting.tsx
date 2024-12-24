@@ -43,13 +43,17 @@ const MenuList = styled.div`
   display: flex;
   flex-direction: column;
   gap: 8px;
+  margin-left: 12px;
 `;
 
 const MenuItem = styled.div`
+font-family: "Pretendard-Bold";
+  max-width: 300px;
   display: flex;
+  justify-content: space-between;
   align-items: center;
-  padding: 12px;
-  border-radius: 8px;
+  padding: 12px 0;
+  border-bottom: 1px solid #eee;
   cursor: pointer;
   transition: background-color 0.2s;
 

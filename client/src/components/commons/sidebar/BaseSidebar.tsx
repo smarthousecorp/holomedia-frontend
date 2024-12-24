@@ -1,20 +1,21 @@
 // BaseSidebar.tsx
-import {useEffect} from "react";
-import styled, {css} from "styled-components";
-import {useTranslation} from "react-i18next";
+import { useEffect, useState } from "react";
+import styled, { css } from "styled-components";
+import { useTranslation } from "react-i18next";
 import logo from "../../../assets/logo_test.png";
 import homeIcon from "../../../assets/home.png";
 import alarmIcon from "../../../assets/alarm.png";
 import settingIcon from "../../../assets/setting.png";
 // import starIcon from "../../../assets/star.png";
-import {SvgIcon} from "@mui/material";
+import { SvgIcon } from "@mui/material";
 import ClearIcon from "@mui/icons-material/Clear";
 import LanguageSwitcher from "../LanguageSwitcher";
-import {useNavigate} from "react-router-dom";
-import {useSelector} from "react-redux";
-import {RootState} from "../../../store";
+import { useNavigate } from "react-router-dom";
+import { useSelector } from "react-redux";
+import { RootState } from "../../../store";
 import GgulImg from "../../../assets/Ggul.png";
-import {getCookie} from "../../../utils/cookie";
+import { getCookie } from "../../../utils/cookie";
+import PaymentModal from "../../main/PaymentModal";
 
 interface BaseSidebarProps {
   isOpen?: boolean;
@@ -29,13 +30,17 @@ const BaseSidebar = ({
   variant = "default",
   className,
 }: BaseSidebarProps) => {
-  const {t, i18n} = useTranslation();
+  const { t, i18n } = useTranslation();
   const navigate = useNavigate();
 
   const user = useSelector((state: RootState) => state.user);
   const isLogin = getCookie("accessToken");
 
-  const handleClickChargeBtn = () => {};
+  const [showPaymentModal, setShowPaymentModal] = useState<boolean>(false);
+
+  const handleClickChargeBtn = () => {
+    setShowPaymentModal(true);
+  };
 
   useEffect(() => {
     const handleLanguageChange = () => {
@@ -50,64 +55,65 @@ const BaseSidebar = ({
   }, [i18n, onClose]);
 
   return (
-    <SidebarContainer
-      className={className}
-      $variant={variant}
-      $isOpen={isOpen}
-      onClick={(e) => e.stopPropagation()}
-    >
-      <ContentWrapper $variant={variant}>
-        <Logo>
-          <img
-            src={logo}
-            alt="로고"
-            onClick={() => navigate(isLogin ? "/main" : "/")}
-          />
-          {variant === "mobile" && (
-            <SvgIcon
-              className="delete"
-              component={ClearIcon}
-              onClick={onClose}
+    <>
+      <SidebarContainer
+        className={className}
+        $variant={variant}
+        $isOpen={isOpen}
+        onClick={(e) => e.stopPropagation()}
+      >
+        <ContentWrapper $variant={variant}>
+          <Logo>
+            <img
+              src={logo}
+              alt="로고"
+              onClick={() => navigate(isLogin ? "/main" : "/")}
             />
-          )}
-        </Logo>
-        <Profile>
-          <ProfileLeft>
-            <img src={user.profile_image} alt="프로필 사진" />
-          </ProfileLeft>
-          <ProfileRight>
-            <h5>{user.username}</h5>
-            <p>@{user.user_id}</p>
-          </ProfileRight>
-        </Profile>
-        <Bloom>
-          <img src={GgulImg} alt="bloom 아이콘" />
-          <BloomText>{user.bloom}</BloomText>
-          <SelectButton onClick={handleClickChargeBtn}>
-            <ButtonText>충전하기</ButtonText>
-          </SelectButton>
-        </Bloom>
-        <LanguageSwitcherWrapper>
-          <LanguageSwitcher />
-        </LanguageSwitcherWrapper>
-        <NavList>
-          <SidebarLi
-            onClick={() => {
-              navigate("/main");
-            }}
-          >
-            <img src={homeIcon} alt="홈" />
-            <p>{t("sidebar.home")}</p>
-          </SidebarLi>
-          <SidebarLi
-            onClick={() => {
-              navigate("/alarm");
-            }}
-          >
-            <img src={alarmIcon} alt="알림" />
-            <p>{t("sidebar.alarm")}</p>
-          </SidebarLi>
-          {/* <SidebarLi
+            {variant === "mobile" && (
+              <SvgIcon
+                className="delete"
+                component={ClearIcon}
+                onClick={onClose}
+              />
+            )}
+          </Logo>
+          <Profile>
+            <ProfileLeft>
+              <img src={user.profile_image} alt="프로필 사진" />
+            </ProfileLeft>
+            <ProfileRight>
+              <h5>{user.username}</h5>
+              <p>@{user.user_id}</p>
+            </ProfileRight>
+          </Profile>
+          <Bloom>
+            <img src={GgulImg} alt="bloom 아이콘" />
+            <BloomText>{user.bloom}</BloomText>
+            <SelectButton onClick={handleClickChargeBtn}>
+              <ButtonText>충전하기</ButtonText>
+            </SelectButton>
+          </Bloom>
+          <LanguageSwitcherWrapper>
+            <LanguageSwitcher />
+          </LanguageSwitcherWrapper>
+          <NavList>
+            <SidebarLi
+              onClick={() => {
+                navigate("/main");
+              }}
+            >
+              <img src={homeIcon} alt="홈" />
+              <p>{t("sidebar.home")}</p>
+            </SidebarLi>
+            <SidebarLi
+              onClick={() => {
+                navigate("/alarm");
+              }}
+            >
+              <img src={alarmIcon} alt="알림" />
+              <p>{t("sidebar.alarm")}</p>
+            </SidebarLi>
+            {/* <SidebarLi
             onClick={() => {
               navigate("/membership");
             }}
@@ -115,37 +121,49 @@ const BaseSidebar = ({
             <img src={starIcon} alt="멤버십" />
             <p>{t("sidebar.membership")}</p>
           </SidebarLi> */}
-          <SidebarLi
-            onClick={() => {
-              navigate("/settings");
-            }}
-          >
-            <img src={settingIcon} alt="설정" />
-            <p>{t("sidebar.setting")}</p>
-          </SidebarLi>
-        </NavList>
-      </ContentWrapper>
-      <Footer $variant={variant}>
-        <FooterLinks>
-          <FooterRow>
-            <FooterLink href="/terms">홀로미디어 이용약관</FooterLink>
-            {/* <FooterDivider>|</FooterDivider> */}
-            <FooterLink href="/privacy">개인정보처리방침</FooterLink>
-          </FooterRow>
-          <FooterRow>
-            <FooterLink href="/protection">청소년 보호정책</FooterLink>
-            {/* <FooterDivider>|</FooterDivider> */}
-            <FooterLink href="/business">사업자 이용약관</FooterLink>
-          </FooterRow>
-        </FooterLinks>
-        <BusinessInfo>
-          <BusinessText>홀로미디어(주) &nbsp;&nbsp;&nbsp;대표이사: 차윤태</BusinessText>
-          <BusinessText>사업자등록번호: 256-81-03803</BusinessText>
-          <BusinessText>인천광역시 연수구 인천타워대로 323, 에이동 3012-40호</BusinessText>
-          <Copyright>©HOLOMEDIA All Rights Reserved.</Copyright>
-        </BusinessInfo>
-      </Footer>
-    </SidebarContainer>
+            <SidebarLi
+              onClick={() => {
+                navigate("/settings");
+              }}
+            >
+              <img src={settingIcon} alt="설정" />
+              <p>{t("sidebar.setting")}</p>
+            </SidebarLi>
+          </NavList>
+        </ContentWrapper>
+        <Footer $variant={variant}>
+          <FooterLinks>
+            <FooterRow>
+              <FooterLink href="/terms">홀로미디어 이용약관</FooterLink>
+              {/* <FooterDivider>|</FooterDivider> */}
+              <FooterLink href="/privacy">개인정보처리방침</FooterLink>
+            </FooterRow>
+            <FooterRow>
+              <FooterLink href="/protection">청소년 보호정책</FooterLink>
+              {/* <FooterDivider>|</FooterDivider> */}
+              <FooterLink href="/business">사업자 이용약관</FooterLink>
+            </FooterRow>
+          </FooterLinks>
+          <BusinessInfo>
+            <BusinessText>
+              홀로미디어(주) &nbsp;&nbsp;&nbsp;대표이사: 차윤태
+            </BusinessText>
+            <BusinessText>사업자등록번호: 256-81-03803</BusinessText>
+            <BusinessText>
+              인천광역시 연수구 인천타워대로 323, 에이동 3012-40호
+            </BusinessText>
+            <Copyright>©HOLOMEDIA All Rights Reserved.</Copyright>
+          </BusinessInfo>
+        </Footer>
+      </SidebarContainer>
+      {showPaymentModal && (
+        <PaymentModal
+          onClose={() => {
+            setShowPaymentModal(false);
+          }}
+        />
+      )}
+    </>
   );
 };
 
@@ -162,7 +180,7 @@ const SidebarContainer = styled.nav<{
   flex-direction: column;
   height: 100vh;
 
-  ${({$variant, $isOpen}) =>
+  ${({ $variant, $isOpen }) =>
     $variant === "mobile" &&
     css`
       width: 26rem;
@@ -191,7 +209,7 @@ const ContentWrapper = styled.div<{
   margin: 0 4rem 0 5rem;
   flex: 1;
 
-  ${({$variant}) =>
+  ${({ $variant }) =>
     $variant === "mobile" &&
     css`
       margin: 0 1rem 0 2rem;
@@ -341,7 +359,7 @@ const Footer = styled.footer<{
   border-radius: 8px;
   background-color: #fbfbfb;
 
-  ${({$variant}) =>
+  ${({ $variant }) =>
     $variant === "mobile" &&
     css`
       padding: 2rem;
@@ -382,7 +400,6 @@ const FooterLink = styled.a`
 //   text-align: center;
 //   flex-grow: 1;  // This ensures divider stays in the center
 // `;
-
 
 const BusinessInfo = styled.div`
   display: flex;
