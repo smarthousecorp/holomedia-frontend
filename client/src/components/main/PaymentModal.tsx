@@ -78,13 +78,18 @@ const PaymentModal = ({ onClose }: PaymentModalProps) => {
             placeholder="직접 입력 (꿀 개수)"
           />
 
+          <SectionTitle>결제 수단</SectionTitle>
           <CheckboxContainer>
-            <CheckboxLabel htmlFor="foreignCheck">한국에서 결제</CheckboxLabel>
-            <Checkbox type="checkbox" id="foreignCheck" />
+            <CheckboxLabel>
+              <span>한국에서 결제</span>
+              <RadioInput name="payment" id="domestic" defaultChecked />
+            </CheckboxLabel>
           </CheckboxContainer>
           <CheckboxContainer>
-            <CheckboxLabel htmlFor="foreignCheck">해외에서 결제</CheckboxLabel>
-            <Checkbox type="checkbox" id="foreignCheck" />
+            <CheckboxLabel>
+              <span>해외에서 결제</span>
+              <RadioInput name="payment" id="foreign" />
+            </CheckboxLabel>
           </CheckboxContainer>
 
           <PriceSection>
@@ -121,7 +126,7 @@ const Background = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 50;
+  z-index: 1000;
 `;
 
 const Container = styled.div`
@@ -203,9 +208,10 @@ const HoneyImage = styled.img`
 
 const CustomAmountInput = styled.input`
   width: 100%;
-  padding: 0.75rem 1rem;
+  padding: 0.65rem 1rem;
   border: 1px solid #eb3553;
   border-radius: 0.25rem;
+  margin-bottom: 1rem;
 
   &:focus {
     outline: none;
@@ -215,26 +221,58 @@ const CustomAmountInput = styled.input`
 
 const CheckboxContainer = styled.div`
   display: flex;
+  justify-content: space-between;
   align-items: center;
   gap: 0.5rem;
   font-size: 1.2rem;
   color: #6b7280;
 `;
 
-const Checkbox = styled.input`
-  border-radius: 0.25rem;
-  border-color: #d1d5db;
+const CheckboxLabel = styled.label`
+  flex: 1;
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.5rem;
+`;
+
+const RadioInput = styled.input.attrs({ type: "radio" })`
+  appearance: none;
+  width: 1.2rem;
+  height: 1.2rem;
+  border: 2px solid #eb3553;
+  border-radius: 50%;
+  position: relative;
+  cursor: pointer;
+  transition: all 0.2s;
 
   &:checked {
-    background-color: #eb3553;
+    background-color: white;
     border-color: #eb3553;
+
+    &::after {
+      content: "";
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 0.7rem;
+      height: 0.7rem;
+      background-color: #eb3553;
+      border-radius: 50%;
+    }
+  }
+
+  &:hover {
+    border-color: #ff506d;
+  }
+
+  &:focus {
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(235, 53, 83, 0.2);
   }
 `;
-
-const CheckboxLabel = styled.label`
-  cursor: pointer;
-`;
-
 const PriceSection = styled.div`
   display: flex;
   flex-direction: column;
