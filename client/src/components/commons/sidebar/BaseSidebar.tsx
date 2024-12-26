@@ -21,7 +21,8 @@ interface BaseSidebarProps {
   isOpen?: boolean;
   onClose?: () => void;
   variant?: "default" | "mobile";
-  className?: string; // Allow styled-components to pass className
+  className?: string;
+  onPaymentClick: () => void; // 새로운 prop 추가
 }
 
 const BaseSidebar = ({
@@ -29,6 +30,7 @@ const BaseSidebar = ({
   onClose,
   variant = "default",
   className,
+  onPaymentClick,
 }: BaseSidebarProps) => {
   const { t, i18n } = useTranslation();
   const navigate = useNavigate();
@@ -39,7 +41,7 @@ const BaseSidebar = ({
   const [showPaymentModal, setShowPaymentModal] = useState<boolean>(false);
 
   const handleClickChargeBtn = () => {
-    setShowPaymentModal(true);
+    onPaymentClick();
   };
 
   useEffect(() => {

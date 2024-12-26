@@ -1,35 +1,46 @@
-import {Outlet} from "react-router";
-import {styled} from "styled-components";
+// PublicLayout.tsx
+import { Outlet } from "react-router";
+import { styled } from "styled-components";
 import Header from "../commons/Header";
 import DefaultSidebar from "../commons/sidebar/DefaultSidebar";
 import BottomSidebar from "../commons/sidebar/BottomSidebar";
-import {useEffect, useState} from "react";
+import { useEffect, useState } from "react";
 import MobileSidebar from "../commons/sidebar/MobileSidebar";
-import {useLocation} from "react-router-dom";
+import { useLocation } from "react-router-dom";
+import PaymentModal from "../main/PaymentModal";
 
 const PublicLayout = () => {
   const location = useLocation();
-  
+
   const [isOpenBS, setIsOpenBS] = useState<boolean>(false);
+  const [showPaymentModal, setShowPaymentModal] = useState<boolean>(false);
 
   const toggleBottomSidebar = () => {
     setIsOpenBS(!isOpenBS);
   };
 
+  const handlePaymentModalOpen = () => {
+    setShowPaymentModal(true);
+    setIsOpenBS(false); // 결제 모달이 열릴 때 MobileSidebar를 닫습니다
+  };
+
+  const handlePaymentModalClose = () => {
+    setShowPaymentModal(false);
+  };
+
   useEffect(() => {
-    if (isOpenBS) {
-      // 사이드바가 열렸을 때 body의 스크롤 방지
+    if (isOpenBS || showPaymentModal) {
+      // 사이드바나 결제 모달이 열렸을 때 body의 스크롤 방지
       document.body.style.overflow = "hidden";
     } else {
-      // 사이드바가 닫혔을 때 스크롤 복원
+      // 둘 다 닫혔을 때 스크롤 복원
       document.body.style.overflow = "unset";
     }
 
-    // 컴포넌트 언마운트 시 스크롤 설정 초기화
     return () => {
       document.body.style.overflow = "unset";
     };
-  }, [isOpenBS]);
+  }, [isOpenBS, showPaymentModal]);
 
   useEffect(() => {
     setIsOpenBS(false);
@@ -39,17 +50,22 @@ const PublicLayout = () => {
     <Full>
       <Header />
       <Inner>
-        <DefaultSidebarStyled />
-        <Container $isSettingsPage={location.pathname === '/settings'}>
+        <DefaultSidebarStyled onPaymentClick={handlePaymentModalOpen} />
+        <Container $isSettingsPage={location.pathname === "/settings"}>
           <Outlet />
         </Container>
         <BottomSidebar onProfileClick={toggleBottomSidebar} />
       </Inner>
       {isOpenBS && (
         <OverlayBackground onClick={toggleBottomSidebar}>
-          <MobileSidebar isOpen={isOpenBS} onClose={toggleBottomSidebar} />
+          <MobileSidebar
+            isOpen={isOpenBS}
+            onClose={toggleBottomSidebar}
+            onPaymentClick={handlePaymentModalOpen}
+          />
         </OverlayBackground>
       )}
+      {showPaymentModal && <PaymentModal onClose={handlePaymentModalClose} />}
     </Full>
   );
 };
@@ -78,8 +94,9 @@ const Inner = styled.div`
 
 const Container = styled.main<{ $isSettingsPage: boolean }>`
   width: 100%;
-  background-color: ${props => props.$isSettingsPage ? '#fff' : '#ededed'};
-  border-left: ${props => props.$isSettingsPage ? '2px solid #eee' : 'none'};
+  background-color: ${(props) => (props.$isSettingsPage ? "#fff" : "#ededed")};
+  border-left: ${(props) =>
+    props.$isSettingsPage ? "2px solid #eee" : "none"};
 `;
 
 const DefaultSidebarStyled = styled(DefaultSidebar)`
