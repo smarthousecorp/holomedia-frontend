@@ -1,6 +1,7 @@
 import React, { useState, useMemo } from "react";
 import styled from "styled-components";
 import { X } from "lucide-react";
+import GgulImg from "../../assets/Ggul.png";
 
 interface PaymentModalProps {
   onClose: () => void;
@@ -65,7 +66,7 @@ const PaymentModal = ({ onClose }: PaymentModalProps) => {
                 selected={selectedAmount === amount}
               >
                 <span>{amount}</span>
-                <HoneyImage src="/src/assets/Ggul.png" alt="honey" />
+                <HoneyImage src={GgulImg} alt="honey" />
               </AmountButton>
             ))}
           </AmountGrid>
