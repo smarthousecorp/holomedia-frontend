@@ -79,18 +79,20 @@ const PaymentModal = ({ onClose }: PaymentModalProps) => {
           />
 
           <SectionTitle>결제 수단</SectionTitle>
-          <CheckboxContainer>
-            <CheckboxLabel>
-              <span>한국에서 결제</span>
-              <RadioInput name="payment" id="domestic" defaultChecked />
-            </CheckboxLabel>
-          </CheckboxContainer>
-          <CheckboxContainer>
-            <CheckboxLabel>
-              <span>해외에서 결제</span>
-              <RadioInput name="payment" id="foreign" />
-            </CheckboxLabel>
-          </CheckboxContainer>
+          <PaymentContainer>
+            <CheckboxContainer>
+              <CheckboxLabel id="domestic">
+                <span>한국에서 결제</span>
+                <RadioInput name="payment" id="domestic" defaultChecked />
+              </CheckboxLabel>
+            </CheckboxContainer>
+            <CheckboxContainer>
+              <CheckboxLabel id="foreign">
+                <span>해외에서 결제</span>
+                <RadioInput name="payment" id="foreign" />
+              </CheckboxLabel>
+            </CheckboxContainer>
+          </PaymentContainer>
 
           <PriceSection>
             <SectionTitle>전체 금액</SectionTitle>
@@ -105,7 +107,7 @@ const PaymentModal = ({ onClose }: PaymentModalProps) => {
               <span>₩ {formatPrice(vat)}</span>
             </PriceRow>
             <TotalRow>
-              <span>결제 금액</span>
+              <span>최종 결제 금액</span>
               <span>₩ {formatPrice(totalPrice)}</span>
             </TotalRow>
           </PriceSection>
@@ -131,16 +133,16 @@ const Background = styled.div`
 
 const Container = styled.div`
   background-color: white;
-  border-radius: 0.5rem;
+  border-radius: 1rem;
   width: 400px;
-  padding: 2rem;
+  padding: 3rem 2rem;
   position: relative;
 `;
 
 const CloseButton = styled.button`
   position: absolute;
-  right: 1rem;
-  top: 1rem;
+  right: 1.5rem;
+  top: 2rem;
   color: #6b7280;
 
   &:hover {
@@ -149,9 +151,9 @@ const CloseButton = styled.button`
 `;
 
 const Header = styled.h2`
-  font-size: 1.6rem;
+  font-size: 1.8rem;
   font-weight: bold;
-  margin-bottom: 2rem;
+  margin-bottom: 3rem;
 `;
 
 const Content = styled.div`
@@ -161,9 +163,9 @@ const Content = styled.div`
 `;
 
 const SectionTitle = styled.h3`
-  font-size: 1.3rem;
-  font-weight: bold;
-  margin-bottom: 0.75rem;
+  font-family: "Pretendard-Bold";
+  font-size: 1.4rem;
+  margin-bottom: 0.5rem;
 `;
 
 // const AmountGrid = styled.div`
@@ -219,6 +221,8 @@ const CustomAmountInput = styled.input`
   }
 `;
 
+const PaymentContainer = styled.div``;
+
 const CheckboxContainer = styled.div`
   display: flex;
   justify-content: space-between;
@@ -235,12 +239,17 @@ const CheckboxLabel = styled.label`
   justify-content: space-between;
   align-items: center;
   gap: 0.5rem;
+  padding: 0.5rem 1rem;
+
+  &#domestic {
+    border-bottom: 1px solid #eb3553;
+  }
 `;
 
 const RadioInput = styled.input.attrs({ type: "radio" })`
   appearance: none;
-  width: 1.2rem;
-  height: 1.2rem;
+  width: 1.4rem;
+  height: 1.4rem;
   border: 2px solid #eb3553;
   border-radius: 50%;
   position: relative;
@@ -273,6 +282,7 @@ const RadioInput = styled.input.attrs({ type: "radio" })`
     box-shadow: 0 0 0 2px rgba(235, 53, 83, 0.2);
   }
 `;
+
 const PriceSection = styled.div`
   display: flex;
   flex-direction: column;
@@ -284,10 +294,14 @@ const PriceRow = styled.div`
   display: flex;
   justify-content: space-between;
   font-size: 1.2rem;
+  padding: 0.8rem 1rem;
+  border-bottom: 1px solid #eb3553;
 `;
 
 const TotalRow = styled(PriceRow)`
+  font-size: 1.3rem;
   font-weight: bold;
+  border-bottom: none;
 `;
 
 const PayButton = styled.button`
@@ -295,7 +309,7 @@ const PayButton = styled.button`
   padding: 1rem;
   background-color: #eb3553;
   color: white;
-  border-radius: 0.25rem;
+  border-radius: 0.5rem;
   font-size: 1.125rem;
   font-weight: 500;
   transition: background-color 0.2s;

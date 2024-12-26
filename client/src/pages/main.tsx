@@ -338,8 +338,8 @@ const SideContainer = styled.div`
   align-self: flex-start; // 플렉스 컨테이너의 상단에 정렬
 
   > img {
-    width: 270px;
-    height: 750px;
+    width: 200px;
+    height: 540px;
     margin-bottom: 5rem;
   }
 
