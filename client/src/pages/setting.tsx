@@ -1,14 +1,21 @@
+import { useState } from "react";
 import styled from "styled-components";
 import { ChevronRight } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import Modal from "../components/commons/Modal";
+import Button from "../components/commons/Button";
+import { removeCookie } from "../utils/cookie";
 
-interface menuItemProps {
+interface MenuItemProps {
   id: number;
   label: string;
   link?: string;
 }
 
 const Settings = () => {
+  const [isLogoutDialogOpen, setIsLogoutDialogOpen] = useState(false);
+  const navigate = useNavigate();
+
   const menuItems = [
     { id: 1, label: "프로필 설정", link: "profile" },
     { id: 2, label: "계정 설정", link: "account" },
@@ -17,24 +24,34 @@ const Settings = () => {
     { id: 5, label: "로그아웃" },
   ];
 
-  const navigate = useNavigate();
-
   const handleLogout = () => {
-    // 여기에 로그아웃 로직을 구현하세요
-    console.log("로그아웃 처리");
-    // 예시:
-    // localStorage.removeItem('token');
-    // navigate('/login');
+    localStorage.removeItem("token");
+    removeCookie("accessToken");
+    navigate("/");
   };
 
-  // navigate, logout 함수 실행 로직을 분리하기 위한 함수
-  const handleMenuClick = (item: menuItemProps) => {
+  const handleMenuClick = (item: MenuItemProps) => {
     if (item.id === 5) {
-      handleLogout();
+      setIsLogoutDialogOpen(true);
     } else {
       navigate(`${item.link}`);
     }
   };
+
+  const logoutFooter = (
+    <>
+      <Button
+        onClick={() => setIsLogoutDialogOpen(false)}
+        variant="modal-cancel"
+        radius="4px"
+      >
+        취소
+      </Button>
+      <Button onClick={handleLogout} variant="modal-action" radius="4px">
+        로그아웃
+      </Button>
+    </>
+  );
 
   return (
     <Container>
@@ -47,6 +64,17 @@ const Settings = () => {
           </MenuItem>
         ))}
       </MenuList>
+
+      {isLogoutDialogOpen && (
+        <Modal
+          isOpen={isLogoutDialogOpen}
+          onClose={() => setIsLogoutDialogOpen(false)}
+          title="로그아웃"
+          footer={logoutFooter}
+        >
+          정말 로그아웃 하시겠습니까?
+        </Modal>
+      )}
     </Container>
   );
 };
