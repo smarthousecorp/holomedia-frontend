@@ -1,15 +1,15 @@
-import React, {useState} from "react";
+import React, { useState } from "react";
 import styled from "styled-components";
 import logo from "../assets/holomedia-logo.png";
-import {useNavigate} from "react-router-dom";
-import {useDispatch} from "react-redux";
-import {useTranslation} from "react-i18next";
-import axios, {AxiosError} from "axios";
-import {useSignUpValidation} from "../utils/SignUpValid";
-import {Eye, EyeOff} from "lucide-react";
-import {checkId, checkPassword, checkUsername} from "../utils/validCheck";
-import {showToast} from "../store/slices/toast";
-import {ToastType} from "../types/toast";
+import { useNavigate } from "react-router-dom";
+import { useDispatch } from "react-redux";
+import { useTranslation } from "react-i18next";
+import axios, { AxiosError } from "axios";
+import { useSignUpValidation } from "../utils/SignUpValid";
+import { Eye, EyeOff } from "lucide-react";
+import { checkId, checkPassword, checkUsername } from "../utils/validCheck";
+import { showToast } from "../store/slices/toast";
+import { ToastType } from "../types/toast";
 import Toast from "../components/commons/Toast";
 
 interface SignUp {
@@ -28,7 +28,7 @@ interface ErrorMsg {
 }
 
 const SignUp: React.FC = () => {
-  const {t} = useTranslation();
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
@@ -52,13 +52,13 @@ const SignUp: React.FC = () => {
   const validationResults = useSignUpValidation(inputVal);
 
   const onChangeValues = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const {name, value} = e.target;
-    setInputVal({...inputVal, [name]: value});
+    const { name, value } = e.target;
+    setInputVal({ ...inputVal, [name]: value });
 
     switch (name) {
       case "passwordCheck":
         if (inputVal.password === value) {
-          setErrorMsg({...errorMsg, [name]: ""});
+          setErrorMsg({ ...errorMsg, [name]: "" });
         } else {
           setErrorMsg({
             ...errorMsg,
@@ -69,43 +69,43 @@ const SignUp: React.FC = () => {
   };
 
   const onBlurIdInput = () => {
-    const msg = {user_id: ""};
-    const {user_id} = inputVal;
+    const msg = { user_id: "" };
+    const { user_id } = inputVal;
 
     if (!checkId(user_id)) {
       msg.user_id = t("auth.signup.errors.idFormat");
     }
-    setErrorMsg({...errorMsg, ...msg});
+    setErrorMsg({ ...errorMsg, ...msg });
   };
 
   const onBlurPwdInputs = () => {
-    const msg = {password: "", passwordCheck: ""};
-    const {password, passwordCheck} = inputVal;
+    const msg = { password: "", passwordCheck: "" };
+    const { password, passwordCheck } = inputVal;
 
     if (!checkPassword(password)) {
       msg.password = t("auth.signup.errors.passwordFormat");
       if (passwordCheck !== "" && password !== passwordCheck) {
         msg.passwordCheck = t("auth.signup.errors.passwordMismatch");
-        setErrorMsg({...errorMsg, ...msg});
+        setErrorMsg({ ...errorMsg, ...msg });
       } else {
-        setErrorMsg({...errorMsg, ...msg});
+        setErrorMsg({ ...errorMsg, ...msg });
       }
     } else if (passwordCheck !== "" && password !== passwordCheck) {
       msg.passwordCheck = t("auth.signup.errors.passwordMismatch");
-      setErrorMsg({...errorMsg, ...msg});
+      setErrorMsg({ ...errorMsg, ...msg });
     } else {
-      setErrorMsg({...errorMsg, ...msg});
+      setErrorMsg({ ...errorMsg, ...msg });
     }
   };
 
   const onBlurNameInput = () => {
-    const msg = {username: ""};
-    const {username} = inputVal;
+    const msg = { username: "" };
+    const { username } = inputVal;
 
     if (!checkUsername(username)) {
       msg.username = t("auth.signup.errors.usernameFormat");
     }
-    setErrorMsg({...errorMsg, ...msg});
+    setErrorMsg({ ...errorMsg, ...msg });
   };
 
   const onSubmitSignUp = (e: React.FormEvent) => {
@@ -124,7 +124,7 @@ const SignUp: React.FC = () => {
         navigate("/");
       })
       .catch((error) => {
-        const msg = {user_id: "", username: ""};
+        const msg = { user_id: "", username: "" };
         const axiosError = error as AxiosError;
         if (axiosError.response?.status === 409) {
           const errorMessage = axiosError.response?.data;
@@ -134,7 +134,7 @@ const SignUp: React.FC = () => {
           } else if (errorMessage === "이미 존재하는 닉네임 입니다.") {
             msg.username = t("auth.signup.errors.duplicateUsername");
           }
-          setErrorMsg({...errorMsg, ...msg});
+          setErrorMsg({ ...errorMsg, ...msg });
         }
       });
   };
@@ -175,11 +175,7 @@ const SignUp: React.FC = () => {
               type="button"
               onClick={() => setShowPassword(!showPassword)}
             >
-              <i
-                className={`bi ${
-                  showPassword ? "bi-eye-slash-fill" : "bi-eye-fill"
-                }`}
-              ></i>
+              {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
             </PasswordToggle>
           </InputWrapper>
           {errorMsg.password && (
@@ -199,7 +195,7 @@ const SignUp: React.FC = () => {
               type="button"
               onClick={() => setShowPasswordCheck(!showPasswordCheck)}
             >
-              {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+              {showPasswordCheck ? <EyeOff size={18} /> : <Eye size={18} />}
             </PasswordToggle>
           </InputWrapper>
           {errorMsg.passwordCheck && (
