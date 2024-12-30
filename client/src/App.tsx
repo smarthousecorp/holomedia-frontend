@@ -21,6 +21,7 @@ import Settings from "./pages/setting";
 import { useEffect } from "react";
 import { preventDevTools } from "./utils/preventDevTools";
 import DevToolsAlert from "./pages/devToolsAlert";
+import NotificationPage from "./pages/Alarm";
 // import UploaderRoute from "./components/layout/UploaderRoute";
 
 interface ErrorMessageProps {
@@ -81,7 +82,7 @@ function App() {
               // </UploaderRoute>
             }
           />
-          <Route path="/alarm" element={<PreparePage pageName="알림" />} />
+          <Route path="/alarm" element={<NotificationPage />} />
           {/* <Route
             path="/membership"
             element={<PreparePage pageName="멤버십" />}
