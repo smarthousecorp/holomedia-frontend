@@ -1,14 +1,16 @@
 import styled from "styled-components";
 import { Bell } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 const NotificationPage = () => {
+  const { t } = useTranslation();
   return (
     <Container>
       <IconWrapper>
         <Bell size={64} strokeWidth={1.5} />
       </IconWrapper>
       <NotificationText>
-        <HighlightText>새로운 알림이 없습니다</HighlightText>
+        <HighlightText>{t("notification.noNew")}</HighlightText>
       </NotificationText>
     </Container>
   );

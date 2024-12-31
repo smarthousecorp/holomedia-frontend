@@ -24,11 +24,14 @@ import UploaderList from "../components/main/UploaderList";
 // import ScoreProgress from "../components/main/ScoreProgress";
 import MovieList from "../components/main/MovieList";
 import { RecommendedUploaders } from "../components/main/RecommendList";
+import { useTranslation } from "react-i18next";
 // import SideBannder from "../assets/side-banner.png";
 
 type LoadingState = "loading" | "error" | "success";
 
 const Main = () => {
+  const { t } = useTranslation();
+
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
@@ -116,9 +119,9 @@ const Main = () => {
     <MainContainer>
       <MovieContainer>
         <MovieTopSection>
-          <MovieTitle>홈</MovieTitle>
+          <MovieTitle>{t("main.home")}</MovieTitle>
           <InputWrapper>
-            <SearchContainer placeholder="아이돌 찾기" />
+            <SearchContainer placeholder={t("main.search.placeholder")} />
             <SvgIcon
               className="searchIcon"
               component={SearchOutlinedIcon}

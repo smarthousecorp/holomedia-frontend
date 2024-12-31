@@ -2,6 +2,7 @@ import { useState } from "react";
 import styled from "styled-components";
 import { ChevronRight } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import Modal from "../components/commons/Modal";
 import Button from "../components/commons/Button";
 import { removeCookie } from "../utils/cookie";
@@ -15,13 +16,14 @@ interface MenuItemProps {
 const Settings = () => {
   const [isLogoutDialogOpen, setIsLogoutDialogOpen] = useState(false);
   const navigate = useNavigate();
+  const { t } = useTranslation();
 
   const menuItems = [
-    { id: 1, label: "프로필 설정", link: "profile" },
-    { id: 2, label: "계정 설정", link: "account" },
-    { id: 3, label: "결제 관리", link: "payment-manage" },
-    { id: 4, label: "비밀번호 변경", link: "password-change" },
-    { id: 5, label: "로그아웃" },
+    { id: 1, label: t("settings.profile"), link: "profile" },
+    { id: 2, label: t("settings.account"), link: "account" },
+    { id: 3, label: t("settings.payment"), link: "payment-manage" },
+    { id: 4, label: t("settings.password"), link: "password-change" },
+    { id: 5, label: t("settings.logout") },
   ];
 
   const handleLogout = () => {
@@ -45,17 +47,17 @@ const Settings = () => {
         variant="modal-cancel"
         radius="4px"
       >
-        취소
+        {t("common.cancel")}
       </Button>
       <Button onClick={handleLogout} variant="modal-action" radius="4px">
-        로그아웃
+        {t("settings.logout")}
       </Button>
     </>
   );
 
   return (
     <Container>
-      <Header>설정</Header>
+      <Header>{t("settings.title")}</Header>
       <MenuList>
         {menuItems.map((item) => (
           <MenuItem key={item.id} onClick={() => handleMenuClick(item)}>
@@ -69,10 +71,10 @@ const Settings = () => {
         <Modal
           isOpen={isLogoutDialogOpen}
           onClose={() => setIsLogoutDialogOpen(false)}
-          title="로그아웃"
+          title={t("settings.logoutModal.title")}
           footer={logoutFooter}
         >
-          정말 로그아웃 하시겠습니까?
+          {t("settings.logoutModal.message")}
         </Modal>
       )}
     </Container>

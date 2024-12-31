@@ -68,7 +68,7 @@ const BaseSidebar = ({
           <Logo>
             <img
               src={logo}
-              alt="로고"
+              alt={t("sidebar.logo.alt")}
               onClick={() => navigate(isLogin ? "/main" : "/")}
             />
             {variant === "mobile" && (
@@ -81,7 +81,10 @@ const BaseSidebar = ({
           </Logo>
           <Profile>
             <ProfileLeft>
-              <img src={user.profile_image} alt="프로필 사진" />
+              <img
+                src={user.profile_image}
+                alt={t("sidebar.profile.picture")}
+              />
             </ProfileLeft>
             <ProfileRight>
               <h5>{user.username}</h5>
@@ -89,10 +92,10 @@ const BaseSidebar = ({
             </ProfileRight>
           </Profile>
           <Bloom>
-            <img src={GgulImg} alt="bloom 아이콘" />
+            <img src={GgulImg} alt={t("sidebar.profile.bloom.icon")} />
             <BloomText>{user.bloom}</BloomText>
             <SelectButton onClick={handleClickChargeBtn}>
-              <ButtonText>충전하기</ButtonText>
+              <ButtonText>{t("sidebar.profile.bloom.charge")}</ButtonText>
             </SelectButton>
           </Bloom>
           <LanguageSwitcherWrapper>
@@ -105,7 +108,7 @@ const BaseSidebar = ({
               }}
             >
               <img src={homeIcon} alt="홈" />
-              <p>{t("sidebar.home")}</p>
+              <p>{t("sidebar.nav.home")}</p>
             </SidebarLi>
             <SidebarLi
               onClick={() => {
@@ -113,7 +116,7 @@ const BaseSidebar = ({
               }}
             >
               <img src={alarmIcon} alt="알림" />
-              <p>{t("sidebar.alarm")}</p>
+              <p>{t("sidebar.nav.alarm")}</p>
             </SidebarLi>
             {/* <SidebarLi
             onClick={() => {
@@ -129,32 +132,32 @@ const BaseSidebar = ({
               }}
             >
               <img src={settingIcon} alt="설정" />
-              <p>{t("sidebar.setting")}</p>
+              <p>{t("sidebar.nav.setting")}</p>
             </SidebarLi>
           </NavList>
         </ContentWrapper>
         <Footer $variant={variant}>
           <FooterLinks>
             <FooterRow>
-              <FooterLink href="/terms">홀로미디어 이용약관</FooterLink>
-              {/* <FooterDivider>|</FooterDivider> */}
-              <FooterLink href="/privacy">개인정보처리방침</FooterLink>
+              <FooterLink href="/terms">{t("sidebar.footer.terms")}</FooterLink>
+              <FooterLink href="/privacy">
+                {t("sidebar.footer.privacy")}
+              </FooterLink>
             </FooterRow>
             <FooterRow>
-              <FooterLink href="/protection">청소년 보호정책</FooterLink>
-              {/* <FooterDivider>|</FooterDivider> */}
-              <FooterLink href="/business">사업자 이용약관</FooterLink>
+              <FooterLink href="/protection">
+                {t("sidebar.footer.youth")}
+              </FooterLink>
+              <FooterLink href="/business">
+                {t("sidebar.footer.business")}
+              </FooterLink>
             </FooterRow>
           </FooterLinks>
           <BusinessInfo>
-            <BusinessText>
-              홀로미디어(주) &nbsp;&nbsp;&nbsp;대표이사: 차윤태
-            </BusinessText>
-            <BusinessText>사업자등록번호: 256-81-03803</BusinessText>
-            <BusinessText>
-              인천광역시 연수구 인천타워대로 323, 에이동 3012-40호
-            </BusinessText>
-            <Copyright>©HOLOMEDIA All Rights Reserved.</Copyright>
+            <BusinessText>{t("sidebar.footer.info.company")}</BusinessText>
+            <BusinessText>{t("sidebar.footer.info.registration")}</BusinessText>
+            <BusinessText>{t("sidebar.footer.info.address")}</BusinessText>
+            <Copyright>{t("sidebar.footer.info.copyright")}</Copyright>
           </BusinessInfo>
         </Footer>
       </SidebarContainer>

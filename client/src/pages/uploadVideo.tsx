@@ -1,10 +1,11 @@
-import React, {useState, ChangeEvent, useCallback, useEffect} from "react";
+// 어드민 페이지 완성되면 삭제 예정
+import React, { useState, ChangeEvent, useCallback, useEffect } from "react";
 import styled from "styled-components";
 import useUploadImage from "../hooks/useUploadImage";
 import useUploadVideo from "../hooks/useUploadVideo";
-import {api} from "../utils/api";
+import { api } from "../utils/api";
 import VideoThumbnailSelector from "../components/commons/media/VideoThumbnailSelector";
-import {useTranslation} from "react-i18next";
+import { useTranslation } from "react-i18next";
 import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css";
 
@@ -18,7 +19,7 @@ interface UploadFormData {
 }
 
 export default function UploadForm() {
-  const {t} = useTranslation();
+  const { t } = useTranslation();
 
   const [formData, setFormData] = useState<UploadFormData>({
     title: "",
@@ -37,7 +38,7 @@ export default function UploadForm() {
   const uploadVideo = useUploadVideo();
 
   const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
-    const {name, value} = e.target;
+    const { name, value } = e.target;
     setFormData((prev) => ({
       ...prev,
       [name]: value,
@@ -54,7 +55,7 @@ export default function UploadForm() {
   // 비디오 파일 변경 핸들러를 useCallback으로 최적화
   const handleFileChange = useCallback(
     (e: ChangeEvent<HTMLInputElement>) => {
-      const {name, files} = e.target;
+      const { name, files } = e.target;
       if (files && files[0]) {
         setFormData((prev) => ({
           ...prev,
@@ -149,10 +150,10 @@ export default function UploadForm() {
   // React Quill 모듈 설정
   const modules = {
     toolbar: [
-      [{header: [1, 2, false]}],
+      [{ header: [1, 2, false] }],
       ["bold", "italic", "underline", "strike"],
       ["blockquote", "code-block"],
-      [{list: "ordered"}, {list: "bullet"}],
+      [{ list: "ordered" }, { list: "bullet" }],
       ["link"],
       ["clean"],
     ],
@@ -195,7 +196,11 @@ export default function UploadForm() {
                 <video
                   src={videoPreview}
                   controls
-                  style={{width: "100%", height: "100%", objectFit: "contain"}}
+                  style={{
+                    width: "100%",
+                    height: "100%",
+                    objectFit: "contain",
+                  }}
                 />
               ) : (
                 <>
@@ -209,7 +214,7 @@ export default function UploadForm() {
                 type="file"
                 name="video_file"
                 onChange={handleFileChange}
-                style={{display: "none"}}
+                style={{ display: "none" }}
                 accept="video/*"
                 required
               />

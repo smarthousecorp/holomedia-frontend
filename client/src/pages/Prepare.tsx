@@ -1,11 +1,14 @@
 import styled from "styled-components";
-import {Construction, Sparkles} from "lucide-react";
+import { Construction, Sparkles } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 interface PreparePageProps {
   pageName: string;
 }
 
-const PreparePage = ({pageName}: PreparePageProps) => {
+const PreparePage = ({ pageName }: PreparePageProps) => {
+  const { t } = useTranslation();
+
   return (
     <ErrorContainer>
       <IconWrapper>
@@ -13,9 +16,10 @@ const PreparePage = ({pageName}: PreparePageProps) => {
         <Sparkles size={48} color="#ff627c" className="sparkle" />
       </IconWrapper>
       <ErrorText>
-        <PageNameText>{pageName}</PageNameText>기능을
-        <HighlightText>준비하고 있습니다</HighlightText>
-        <SubText>곧 멋진 업데이트로 찾아오겠습니다 🚀</SubText>
+        <PageNameText>{pageName}</PageNameText>
+        {t("prepare.message")}
+        <HighlightText>{t("prepare.feature")}</HighlightText>
+        <SubText>{t("prepare.comingSoon")}</SubText>
       </ErrorText>
     </ErrorContainer>
   );

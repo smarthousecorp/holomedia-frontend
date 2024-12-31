@@ -1,6 +1,6 @@
-import {useTranslation} from "react-i18next";
+import { useTranslation } from "react-i18next";
 import styled from "styled-components";
-import {useState} from "react";
+import { useState } from "react";
 
 interface LanguageInfo {
   nativeName: string;
@@ -10,14 +10,14 @@ type LanguageCode = "ko" | "en" | "jp" | "zh";
 type Languages = Record<LanguageCode, LanguageInfo>;
 
 const lngs: Languages = {
-  ko: {nativeName: "한국어"},
-  en: {nativeName: "English"},
-  jp: {nativeName: "日本語"},
-  zh: {nativeName: "中國語"},
+  ko: { nativeName: "한국어" },
+  en: { nativeName: "English" },
+  jp: { nativeName: "日本語" },
+  zh: { nativeName: "中國語" },
 };
 
 const LanguageSwitcher = () => {
-  const {i18n} = useTranslation();
+  const { t, i18n } = useTranslation();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
   const getCurrentLanguage = (): LanguageCode => {
@@ -40,7 +40,7 @@ const LanguageSwitcher = () => {
     <Container $isDropdownOpen={isDropdownOpen}>
       <SelectedText>{lngs[getCurrentLanguage()].nativeName}</SelectedText>
       <SwitcherButton onClick={handleDropdownToggle}>
-        <ButtonText>선택하기</ButtonText>
+        <ButtonText>{t("sidebar.profile.select")}</ButtonText>
       </SwitcherButton>
 
       {isDropdownOpen && (
@@ -60,7 +60,7 @@ const LanguageSwitcher = () => {
 
 export default LanguageSwitcher;
 
-const Container = styled.div<{$isDropdownOpen: boolean}>`
+const Container = styled.div<{ $isDropdownOpen: boolean }>`
   width: 21rem;
   box-shadow: 0 1px 2px 2px rgba(0, 0, 0, 0.04);
   display: flex;

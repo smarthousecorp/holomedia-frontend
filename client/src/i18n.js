@@ -79,15 +79,52 @@ i18n.use(initReactI18next).init({
           },
         },
         sidebar: {
-          home: "HOME",
-          alarm: "ALARM",
-          setting: "SETTING",
-          membership: "MEMBERSHIP",
+          logo: {
+            alt: "Logo",
+          },
+          profile: {
+            picture: "Profile Picture",
+            bloom: {
+              icon: "Bloom icon",
+              charge: "Charge",
+            },
+            select: "Select",
+          },
+          nav: {
+            home: "HOME",
+            alarm: "ALARM",
+            setting: "SETTING",
+            membership: "MEMBERSHIP",
+          },
+          footer: {
+            terms: "HOLOMEDIA Terms of Service",
+            privacy: "Privacy Policy",
+            youth: "Youth Protection Policy",
+            business: "Business Terms of Service",
+            info: {
+              company: "HOLOMEDIA Co., Ltd.    CEO: Yuntae Cha",
+              registration: "Business Registration Number: 256-81-03803",
+              address:
+                "Room 3012-40, Building A, 323, Incheontawerdae-ro, Yeonsu-gu, Incheon, Republic of Korea",
+              copyright: "©HOLOMEDIA All Rights Reserved.",
+            },
+          },
         },
-        sectionTitles: {
-          new: "Recently Uploaded Videos",
-          best: "Real-time Best",
-          weekly: "{{uploader}}'s Videos",
+        main: {
+          home: "Home",
+          search: {
+            placeholder: "Find Idol",
+          },
+          loading: {
+            error: "Failed to load data.",
+            retry: "Retry",
+          },
+          errors: {
+            loginRequired: "Please login to access",
+            loadFailed: "Failed to load data.",
+          },
+          noVideos: "No videos registered in home",
+          adBanner: "Advertisement Banner",
         },
         upload: {
           pageTitle: "Upload New Video",
@@ -117,6 +154,41 @@ i18n.use(initReactI18next).init({
           messages: {
             uploadSuccess: "Upload completed!",
             uploadError: "An error occurred during upload.",
+          },
+        },
+        settings: {
+          title: "Settings",
+          profile: "Profile Settings",
+          account: "Account Settings",
+          payment: "Payment Management",
+          password: "Change Password",
+          logout: "Logout",
+          logoutModal: {
+            title: "Logout",
+            message: "Are you sure you want to logout?",
+          },
+        },
+        common: {
+          cancel: "Cancel",
+        },
+        prepare: {
+          message: "We are preparing the",
+          feature: "feature",
+          comingSoon: "We'll be back with an exciting update soon 🚀",
+        },
+        notification: {
+          noNew: "No new notifications",
+        },
+        error: {
+          404: {
+            message:
+              "Page not found.\nThe address you entered does not exist or\nthe requested page has been changed or deleted.",
+            button: "Go to Main Page",
+          },
+          unknown: {
+            message:
+              "An unexpected error has occurred.\nIt may be a temporary server issue or network problem.\nPlease try again later.",
+            button: "Try Again",
           },
         },
       },
@@ -195,15 +267,51 @@ i18n.use(initReactI18next).init({
           },
         },
         sidebar: {
-          home: "홈",
-          alarm: "알림",
-          setting: "설정",
-          membership: "멤버십",
+          logo: {
+            alt: "로고",
+          },
+          profile: {
+            picture: "프로필 사진",
+            bloom: {
+              icon: "bloom 아이콘",
+              charge: "충전하기",
+            },
+            select: "선택하기",
+          },
+          nav: {
+            home: "홈",
+            alarm: "알림",
+            setting: "설정",
+            membership: "멤버십",
+          },
+          footer: {
+            terms: "홀로미디어 이용약관",
+            privacy: "개인정보처리방침",
+            youth: "청소년 보호정책",
+            business: "사업자 이용약관",
+            info: {
+              company: "홀로미디어(주)    대표이사: 차윤태",
+              registration: "사업자등록번호: 256-81-03803",
+              address: "인천광역시 연수구 인천타워대로 323, 에이동 3012-40호",
+              copyright: "©HOLOMEDIA All Rights Reserved.",
+            },
+          },
         },
-        sectionTitles: {
-          new: "최근에 등록된 동영상",
-          best: "실시간 베스트",
-          weekly: "{{uploader}}의 동영상",
+        main: {
+          home: "홈",
+          search: {
+            placeholder: "아이돌 찾기",
+          },
+          loading: {
+            error: "데이터 로딩에 실패했습니다.",
+            retry: "다시 시도",
+          },
+          errors: {
+            loginRequired: "로그인 후에 접근 가능합니다.",
+            loadFailed: "데이터를 불러오는데 실패했습니다.",
+          },
+          noVideos: "홈에 등록된 영상이 없습니다",
+          adBanner: "광고 배너",
         },
         upload: {
           pageTitle: "새 영상 업로드",
@@ -233,6 +341,41 @@ i18n.use(initReactI18next).init({
           messages: {
             uploadSuccess: "업로드가 완료되었습니다!",
             uploadError: "업로드 중 오류가 발생했습니다.",
+          },
+        },
+        settings: {
+          title: "설정",
+          profile: "프로필 설정",
+          account: "계정 설정",
+          payment: "결제 관리",
+          password: "비밀번호 변경",
+          logout: "로그아웃",
+          logoutModal: {
+            title: "로그아웃",
+            message: "정말 로그아웃 하시겠습니까?",
+          },
+        },
+        common: {
+          cancel: "취소",
+        },
+        prepare: {
+          message: "기능을",
+          feature: "준비하고 있습니다",
+          comingSoon: "곧 멋진 업데이트로 찾아오겠습니다 🚀",
+        },
+        notification: {
+          noNew: "새로운 알림이 없습니다",
+        },
+        error: {
+          404: {
+            message:
+              "페이지를 찾을 수 없습니다.\n존재하지 않는 주소를 입력하셨거나\n요청하신 페이지의 주소가 변경, 삭제되어 찾을 수 없습니다.",
+            button: "메인 페이지로 이동",
+          },
+          unknown: {
+            message:
+              "예상하지 못한 오류가 발생했습니다.\n서버의 일시적인 장애이거나 네트워크 문제일 수 있습니다.\n잠시 후에 다시 시도해 주세요.",
+            button: "다시 시도",
           },
         },
       },
@@ -312,13 +455,51 @@ i18n.use(initReactI18next).init({
           },
         },
         sidebar: {
-          new: "新着",
-          realTimeBest: "リアルタイムベスト",
+          logo: {
+            alt: "ロゴ",
+          },
+          profile: {
+            picture: "プロフィール写真",
+            bloom: {
+              icon: "ブルームアイコン",
+              charge: "チャージ",
+            },
+            select: "選択する",
+          },
+          nav: {
+            home: "ホーム",
+            alarm: "通知",
+            setting: "設定",
+            membership: "メンバーシップ",
+          },
+          footer: {
+            terms: "HOLOMEDIA利用規約",
+            privacy: "プライバシーポリシー",
+            youth: "青少年保護方針",
+            business: "事業者利用規約",
+            info: {
+              company: "HOLOMEDIA株式会社    代表取締役：チャ・ユンテ",
+              registration: "事業者登録番号：256-81-03803",
+              address: "仁川広域市延寿区仁川タワー大路323、A棟3012-40号",
+              copyright: "©HOLOMEDIA All Rights Reserved.",
+            },
+          },
         },
-        sectionTitles: {
-          new: "最近アップロードされた動画",
-          best: "リアルタイムベスト",
-          weekly: "{{uploader}}の動画",
+        main: {
+          home: "ホーム",
+          search: {
+            placeholder: "アイドル検索",
+          },
+          loading: {
+            error: "データの読み込みに失敗しました。",
+            retry: "再試行",
+          },
+          errors: {
+            loginRequired: "ログインが必要です",
+            loadFailed: "データの読み込みに失敗しました。",
+          },
+          noVideos: "ホームに登録された動画はありません",
+          adBanner: "広告バナー",
         },
         upload: {
           pageTitle: "新規動画アップロード",
@@ -348,6 +529,41 @@ i18n.use(initReactI18next).init({
           messages: {
             uploadSuccess: "アップロードが完了しました！",
             uploadError: "アップロード中にエラーが発生しました。",
+          },
+        },
+        settings: {
+          title: "設定",
+          profile: "プロフィール設定",
+          account: "アカウント設定",
+          payment: "決済管理",
+          password: "パスワード変更",
+          logout: "ログアウト",
+          logoutModal: {
+            title: "ログアウト",
+            message: "本当にログアウトしますか？",
+          },
+        },
+        common: {
+          cancel: "キャンセル",
+        },
+        prepare: {
+          message: "機能を",
+          feature: "準備しています",
+          comingSoon: "まもなく素敵なアップデートでお会いしましょう 🚀",
+        },
+        notification: {
+          noNew: "新しい通知はありません",
+        },
+        error: {
+          404: {
+            message:
+              "ページが見つかりません。\n存在しないアドレスを入力されたか、\nページのアドレスが変更・削除されて見つかりません。",
+            button: "メインページへ",
+          },
+          unknown: {
+            message:
+              "予期せぬエラーが発生しました。\nサーバーの一時的な障害またはネットワークの問題の可能性があります。\n後ほど再度お試しください。",
+            button: "再試行",
           },
         },
       },
@@ -425,14 +641,51 @@ i18n.use(initReactI18next).init({
           },
         },
         sidebar: {
-          new: "最新",
-          realTimeBest: "实时最佳",
+          logo: {
+            alt: "标志",
+          },
+          profile: {
+            picture: "个人头像",
+            bloom: {
+              icon: "Bloom图标",
+              charge: "充值",
+            },
+            select: "选择",
+          },
+          nav: {
+            home: "首页",
+            alarm: "通知",
+            setting: "设置",
+            membership: "会员",
+          },
+          footer: {
+            terms: "HOLOMEDIA使用条款",
+            privacy: "隐私政策",
+            youth: "青少年保护政策",
+            business: "商家使用条款",
+            info: {
+              company: "HOLOMEDIA有限公司    董事长：车允泰",
+              registration: "营业执照号：256-81-03803",
+              address: "仁川广域市延寿区仁川塔大路323号A栋3012-40室",
+              copyright: "©HOLOMEDIA All Rights Reserved.",
+            },
+          },
         },
-
-        sectionTitles: {
-          new: "最近上传的视频",
-          best: "实时最佳",
-          weekly: "{{uploader}}的视频",
+        main: {
+          home: "首页",
+          search: {
+            placeholder: "搜索偶像",
+          },
+          loading: {
+            error: "数据加载失败。",
+            retry: "重试",
+          },
+          errors: {
+            loginRequired: "请登录后访问",
+            loadFailed: "数据加载失败。",
+          },
+          noVideos: "首页暂无视频",
+          adBanner: "广告横幅",
         },
         upload: {
           pageTitle: "上传新视频",
@@ -466,6 +719,41 @@ i18n.use(initReactI18next).init({
           messages: {
             uploadSuccess: "上传完成！",
             uploadError: "上传过程中发生错误。",
+          },
+        },
+        settings: {
+          title: "设置",
+          profile: "个人资料设置",
+          account: "账号设置",
+          payment: "支付管理",
+          password: "修改密码",
+          logout: "退出登录",
+          logoutModal: {
+            title: "退出登录",
+            message: "确定要退出登录吗？",
+          },
+        },
+        common: {
+          cancel: "取消",
+        },
+        prepare: {
+          message: "功能",
+          feature: "正在准备中",
+          comingSoon: "即将带来精彩更新 🚀",
+        },
+        notification: {
+          noNew: "暂无新通知",
+        },
+        error: {
+          404: {
+            message:
+              "找不到页面。\n您输入的地址不存在，或者\n请求的页面地址已更改或删除。",
+            button: "转到主页",
+          },
+          unknown: {
+            message:
+              "发生意外错误。\n可能是服务器暂时故障或网络问题。\n请稍后重试。",
+            button: "重试",
           },
         },
       },
