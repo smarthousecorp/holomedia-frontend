@@ -12,7 +12,8 @@ const detectCountry = (req, res, next) => {
     // localhost 체크
     if (ip === "::1" || ip === "localhost" || ip === "127.0.0.1") {
       // ip = "1.34.1.1"; // 중국
-      ip = "192.168.0.1"; // 중국
+      // ip = "165.140.112.0"; // 미국
+      ip = "192.168.0.1"; // 한국
     }
 
     // IPv6 to IPv4 변환
@@ -42,4 +43,4 @@ const detectCountry = (req, res, next) => {
   next();
 };
 
-module.exports = {detectCountry};
+module.exports = { detectCountry };
