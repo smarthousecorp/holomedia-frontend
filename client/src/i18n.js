@@ -1,5 +1,5 @@
 import i18n from "i18next";
-import {initReactI18next} from "react-i18next";
+import { initReactI18next } from "react-i18next";
 
 i18n.use(initReactI18next).init({
   resources: {
@@ -26,6 +26,10 @@ i18n.use(initReactI18next).init({
             idPlaceholder: "Enter your ID",
             passwordPlaceholder: "Enter your password",
             button: "Login",
+            rememberID: "Remember ID",
+            autoLogin: "Auto Login",
+            findAccount: "Find Account",
+            findPassword: "Find Password",
             errors: {
               userNotFound: "Account does not exist",
               wrongPassword: "Password is incorrect",
@@ -248,6 +252,10 @@ i18n.use(initReactI18next).init({
             idPlaceholder: "IDを入力してください",
             passwordPlaceholder: "パスワードを入力してください",
             button: "ログイン",
+            rememberID: "IDを保存",
+            autoLogin: "自動ログイン",
+            findAccount: "アカウント検索",
+            findPassword: "パスワード検索",
             errors: {
               userNotFound: "アカウントが存在しません",
               wrongPassword: "パスワードが一致しません",
@@ -357,6 +365,10 @@ i18n.use(initReactI18next).init({
             idPlaceholder: "请输入账号",
             passwordPlaceholder: "请输入密码",
             button: "登录",
+            rememberID: "记住账号",
+            autoLogin: "自动登录",
+            findAccount: "查找账号",
+            findPassword: "找回密码",
             errors: {
               userNotFound: "账号不存在",
               wrongPassword: "密码不正确",
