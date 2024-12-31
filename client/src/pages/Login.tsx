@@ -1,13 +1,13 @@
-import React, {useState, useEffect} from "react";
-import styled, {keyframes} from "styled-components";
+import React, { useState, useEffect } from "react";
+import styled, { keyframes } from "styled-components";
 import logo from "../assets/holomedia-logo.png";
-import {Check, Eye, EyeOff} from "lucide-react";
-import {useNavigate} from "react-router-dom";
-import {useDispatch} from "react-redux";
-import {useTranslation} from "react-i18next";
+import { Check, Eye, EyeOff } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import { useDispatch } from "react-redux";
+import { useTranslation } from "react-i18next";
 import axios from "axios";
-import {setCookie} from "../utils/cookie";
-import {login} from "../store/slices/user";
+import { setCookie } from "../utils/cookie";
+import { login } from "../store/slices/user";
 
 interface LoginCredentials {
   user_id: string;
@@ -15,7 +15,7 @@ interface LoginCredentials {
 }
 
 const Login: React.FC = () => {
-  const {t} = useTranslation();
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
@@ -33,20 +33,16 @@ const Login: React.FC = () => {
   const [rememberID, setRememberID] = useState(false);
   const [autoLogin, setAutoLogin] = useState(false);
 
-  // 컴포넌트 마운트 시 저장된 데이터 불러오기
   useEffect(() => {
-    // 저장된 아이디 불러오기
     const savedUserId = localStorage.getItem("remembered_user_id");
     if (savedUserId) {
-      setInputVal((prev) => ({...prev, user_id: savedUserId}));
+      setInputVal((prev) => ({ ...prev, user_id: savedUserId }));
       setRememberID(true);
     }
 
-    // 자동 로그인 설정 불러오기
     const autoLoginEnabled = localStorage.getItem("auto_login") === "true";
     setAutoLogin(autoLoginEnabled);
 
-    // 자동 로그인이 설정되어 있다면 저장된 토큰으로 로그인 시도
     if (autoLoginEnabled) {
       const savedToken = localStorage.getItem("accessToken");
       if (savedToken) {
@@ -55,10 +51,8 @@ const Login: React.FC = () => {
     }
   }, []);
 
-  // 자동 로그인 처리 함수
   const handleAutoLogin = async (token: string) => {
     try {
-      // 토큰 유효성 검증 API 호출
       const response = await axios.get(
         `${import.meta.env.VITE_SERVER_DOMAIN}/validate-token`,
         {
@@ -69,7 +63,6 @@ const Login: React.FC = () => {
       );
 
       if (response.data.valid) {
-        // 토큰이 유효하면 사용자 정보를 가져와서 로그인 처리
         dispatch(
           login({
             isLoggedIn: true,
@@ -87,26 +80,22 @@ const Login: React.FC = () => {
       }
     } catch (error) {
       console.error("Auto login failed:", error);
-      // 자동 로그인 실패 시 토큰과 설정 초기화
       localStorage.removeItem("accessToken");
       localStorage.removeItem("auto_login");
       setAutoLogin(false);
     }
   };
 
-  // 입력값 변경 핸들러
   const onChangeValues = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const {name, value} = e.target;
-    setInputVal((prev) => ({...prev, [name]: value}));
-    setErrorMsg((prev) => ({...prev, [name]: ""}));
+    const { name, value } = e.target;
+    setInputVal((prev) => ({ ...prev, [name]: value }));
+    setErrorMsg((prev) => ({ ...prev, [name]: "" }));
   };
 
-  // 패스워드 숨기기/보이기 핸들러
   const togglePasswordVisibility = () => {
     setShowPassword(!showPassword);
   };
 
-  // 로그인 버튼 핸들러
   const onClickLoginBtn = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -116,17 +105,14 @@ const Login: React.FC = () => {
         inputVal
       );
 
-      // 아이디 저장 처리
       if (rememberID) {
         localStorage.setItem("remembered_user_id", inputVal.user_id);
       } else {
         localStorage.removeItem("remembered_user_id");
       }
 
-      // 자동 로그인 설정 저장
       localStorage.setItem("auto_login", autoLogin.toString());
 
-      // 토큰 설정
       const current = new Date();
       current.setMinutes(current.getMinutes() + 1440);
 
@@ -136,7 +122,6 @@ const Login: React.FC = () => {
       });
       localStorage.setItem("accessToken", res.data.accessToken);
 
-      // 전역상태 업데이트
       dispatch(
         login({
           isLoggedIn: true,
@@ -182,7 +167,6 @@ const Login: React.FC = () => {
     }
   };
 
-  // 체크박스 상태 변경 핸들러
   const handleRememberIDChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setRememberID(e.target.checked);
     if (!e.target.checked) {
@@ -201,14 +185,14 @@ const Login: React.FC = () => {
     <Container>
       <LoginBox>
         <Logo>
-          <img src={logo} alt="로고" />
+          <img src={logo} alt={t("auth.social.loginTitle")} />
         </Logo>
-        <Title>로그인</Title>
+        <Title>{t("auth.modal.title.login")}</Title>
         <Form onSubmit={onClickLoginBtn}>
           <InputWrapper>
             <Input
               name="user_id"
-              placeholder="아이디"
+              placeholder={t("auth.login.idPlaceholder")}
               value={inputVal.user_id}
               onChange={onChangeValues}
             />
@@ -221,14 +205,14 @@ const Login: React.FC = () => {
               <CheckboxControl>
                 <Check size={12} />
               </CheckboxControl>
-              <span>아이디 저장</span>
+              <span>{t("auth.login.rememberID")}</span>
             </CustomCheckboxLabel>
           </InputWrapper>
           <InputWrapper>
             <Input
               type={showPassword ? "text" : "password"}
               name="password"
-              placeholder="비밀번호"
+              placeholder={t("auth.login.passwordPlaceholder")}
               value={inputVal.password}
               onChange={onChangeValues}
             />
@@ -249,15 +233,17 @@ const Login: React.FC = () => {
               <CheckboxControl>
                 <Check size={12} />
               </CheckboxControl>
-              <span>자동 로그인</span>
+              <span>{t("auth.login.autoLogin")}</span>
             </AutoCheckboxLabel>
           </AutoLoginWrapper>
-          <LoginButton type="submit">로그인</LoginButton>
+          <LoginButton type="submit">{t("auth.login.button")}</LoginButton>
           <About>
-            <a onClick={() => navigate("/signup")}>회원가입</a>
+            <a onClick={() => navigate("/signup")}>
+              {t("auth.modal.title.signup")}
+            </a>
             <div className="idpw">
-              <a href="#">계정 찾기 |</a>
-              <a href="#">비밀번호 찾기</a>
+              <a href="#">{t("auth.login.findAccount")} |</a>
+              <a href="#">{t("auth.login.findPassword")}</a>
             </div>
           </About>
         </Form>
@@ -276,6 +262,7 @@ const Container = styled.div`
   height: 100vh;
   background-color: #f0f0f0;
 `;
+
 const LoginBox = styled.div`
   background-color: white;
   padding: 3.5rem 5.5rem;
@@ -285,6 +272,7 @@ const LoginBox = styled.div`
   min-height: 500px;
   width: 100%;
 `;
+
 const Logo = styled.div`
   text-align: center;
   font-size: 1.5rem;
