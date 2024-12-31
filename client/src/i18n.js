@@ -47,6 +47,8 @@ i18n.use(initReactI18next).init({
             passwordCheckPlaceholder: "Confirm your password",
             usernamePlaceholder: "2-12 characters (Korean, English, numbers)",
             button: "Sign Up",
+            alreadyMember: "Already a member?",
+            goToLogin: "page",
             errors: {
               idFormat:
                 "Must be 6-15 characters including English lowercase and numbers",
@@ -142,6 +144,10 @@ i18n.use(initReactI18next).init({
             idPlaceholder: "아이디를 입력하세요",
             passwordPlaceholder: "비밀번호를 입력하세요",
             button: "로그인",
+            rememberID: "아이디 저장",
+            autoLogin: "자동 로그인",
+            findAccount: "계정 찾기",
+            findPassword: "비밀번호 찾기",
             errors: {
               userNotFound: "존재하지 않는 계정입니다",
               wrongPassword: "비밀번호가 일치하지 않습니다",
@@ -159,6 +165,8 @@ i18n.use(initReactI18next).init({
             passwordCheckPlaceholder: "비밀번호 확인",
             usernamePlaceholder: "2~12자 한글, 영문, 숫자",
             button: "회원가입",
+            alreadyMember: "이미 회원이신가요?",
+            goToLogin: "",
             errors: {
               idFormat: "6~15자의 영문 소문자 및 숫자가 포함되어야 합니다",
               passwordFormat:
@@ -273,6 +281,8 @@ i18n.use(initReactI18next).init({
             passwordCheckPlaceholder: "パスワードを再入力",
             usernamePlaceholder: "2~12文字の日本語、英字、数字",
             button: "登録",
+            alreadyMember: "すでに会員ですか？",
+            goToLogin: "ページへ",
             errors: {
               idFormat: "6~15文字の英字小文字と数字を含める必要があります",
               passwordFormat:
@@ -386,6 +396,8 @@ i18n.use(initReactI18next).init({
             passwordCheckPlaceholder: "请确认密码",
             usernamePlaceholder: "2-12位中文、英文、数字",
             button: "注册",
+            alreadyMember: "已经是会员了吗？",
+            goToLogin: "页面",
             errors: {
               idFormat: "必须包含6-15位英文小写字母和数字",
               passwordFormat: "必须包含8-15位英文大小写字母、数字和特殊符号",

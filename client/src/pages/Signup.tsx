@@ -108,53 +108,50 @@ const SignUp: React.FC = () => {
     setErrorMsg({ ...errorMsg, ...msg });
   };
 
-  const onSubmitSignUp = (e: React.FormEvent) => {
+  const onSubmitSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    axios
-      .post(`${import.meta.env.VITE_SERVER_DOMAIN}/signup`, inputVal)
-      .then(() => {
-        Toast(ToastType.success, t("auth.signup.success"));
-        dispatch(
-          showToast({
-            message: t("auth.signup.success"),
-            type: "success",
-          })
-        );
-        navigate("/");
-      })
-      .catch((error) => {
-        const msg = { user_id: "", username: "" };
-        const axiosError = error as AxiosError;
-        if (axiosError.response?.status === 409) {
-          const errorMessage = axiosError.response?.data;
+    try {
+      await axios.post(
+        `${import.meta.env.VITE_SERVER_DOMAIN}/signup`,
+        inputVal
+      );
+      Toast(ToastType.success, t("auth.signup.success"));
+      dispatch(
+        showToast({
+          message: t("auth.signup.success"),
+          type: "success",
+        })
+      );
+      navigate("/");
+    } catch (error) {
+      const msg = { user_id: "", username: "" };
+      const axiosError = error as AxiosError;
+      if (axiosError.response?.status === 409) {
+        const errorMessage = axiosError.response?.data;
 
-          if (errorMessage === "이미 존재하는 아이디 입니다.") {
-            msg.user_id = t("auth.signup.errors.duplicateId");
-          } else if (errorMessage === "이미 존재하는 닉네임 입니다.") {
-            msg.username = t("auth.signup.errors.duplicateUsername");
-          }
-          setErrorMsg({ ...errorMsg, ...msg });
+        if (errorMessage === "이미 존재하는 아이디 입니다.") {
+          msg.user_id = t("auth.signup.errors.duplicateId");
+        } else if (errorMessage === "이미 존재하는 닉네임 입니다.") {
+          msg.username = t("auth.signup.errors.duplicateUsername");
         }
-      });
+        setErrorMsg({ ...errorMsg, ...msg });
+      }
+    }
   };
 
   return (
     <Container>
       <SignUpBox>
-        <Logo
-          onClick={() => {
-            navigate("/");
-          }}
-        >
-          <img src={logo} alt="로고" />
+        <Logo onClick={() => navigate("/")}>
+          <img src={logo} alt={t("auth.social.signupTitle")} />
         </Logo>
-        <Title>회원가입</Title>
+        <Title>{t("auth.modal.title.signup")}</Title>
         <Form onSubmit={onSubmitSignUp}>
           <InputWrapper>
             <Input
               name="user_id"
-              placeholder="6~15자 영문 소문자와 숫자"
+              placeholder={t("auth.signup.idPlaceholder")}
               value={inputVal.user_id}
               onChange={onChangeValues}
               onBlur={onBlurIdInput}
@@ -166,7 +163,7 @@ const SignUp: React.FC = () => {
             <Input
               type={showPassword ? "text" : "password"}
               name="password"
-              placeholder="8~15자 영문, 숫자, 특수문자 포함"
+              placeholder={t("auth.signup.passwordPlaceholder")}
               value={inputVal.password}
               onChange={onChangeValues}
               onBlur={onBlurPwdInputs}
@@ -186,7 +183,7 @@ const SignUp: React.FC = () => {
             <Input
               type={showPasswordCheck ? "text" : "password"}
               name="passwordCheck"
-              placeholder="비밀번호 확인"
+              placeholder={t("auth.signup.passwordCheckPlaceholder")}
               value={inputVal.passwordCheck}
               onChange={onChangeValues}
               onBlur={onBlurPwdInputs}
@@ -205,7 +202,7 @@ const SignUp: React.FC = () => {
           <InputWrapper>
             <Input
               name="username"
-              placeholder="2~12자 한글, 영문, 숫자"
+              placeholder={t("auth.signup.usernamePlaceholder")}
               value={inputVal.username}
               onChange={onChangeValues}
               onBlur={onBlurNameInput}
@@ -224,16 +221,13 @@ const SignUp: React.FC = () => {
               !validationResults.usernameValid
             }
           >
-            가입하기
+            {t("auth.signup.button")}
           </SignUpButton>
           <About>
-            <p
-              onClick={() => {
-                navigate("/");
-              }}
-            >
-              이미 회원이신가요? <span className="strong">로그인</span> 페이지로
-              이동
+            <p onClick={() => navigate("/")}>
+              {t("auth.signup.alreadyMember")}{" "}
+              <span className="strong">{t("auth.modal.title.login")}</span>{" "}
+              {/* {t("auth.signup.goToLogin")} */}
             </p>
           </About>
         </Form>
