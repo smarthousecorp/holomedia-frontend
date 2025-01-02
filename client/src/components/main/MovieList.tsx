@@ -23,7 +23,9 @@ const MovieList: React.FC<MovieListProps> = ({
   onMediaClick,
   shouldBlur,
 }) => {
-  const [expandedDescriptions, setExpandedDescriptions] = useState<number[]>([]);
+  const [expandedDescriptions, setExpandedDescriptions] = useState<number[]>(
+    []
+  );
 
   const findUploaderIdx = (id: number) => {
     return uploaders.filter((uploader) => {
@@ -40,9 +42,9 @@ const MovieList: React.FC<MovieListProps> = ({
   };
 
   const toggleDescription = (mediaId: number) => {
-    setExpandedDescriptions(prev => 
-      prev.includes(mediaId) 
-        ? prev.filter(id => id !== mediaId)
+    setExpandedDescriptions((prev) =>
+      prev.includes(mediaId)
+        ? prev.filter((id) => id !== mediaId)
         : [...prev, mediaId]
     );
   };
@@ -126,7 +128,7 @@ const StyledQuillWrapper = styled.div<{ $isExpanded: boolean }>`
   position: relative;
 
   .quill-container {
-    max-height: ${props => props.$isExpanded ? 'none' : '4.8rem'};
+    max-height: ${(props) => (props.$isExpanded ? "none" : "4.8rem")};
     overflow: hidden;
   }
 
@@ -139,7 +141,7 @@ const StyledQuillWrapper = styled.div<{ $isExpanded: boolean }>`
     font-size: 1.2rem;
     line-height: 1.4;
     color: #000000;
-    padding-right: ${props => props.$isExpanded ? '0' : '4rem'};
+    padding-right: ${(props) => (props.$isExpanded ? "0" : "4rem")};
 
     p {
       margin: 0;
@@ -250,7 +252,7 @@ const MediaContent = styled.div`
   padding-top: 67.25%; // 16:9 Aspect Ratio (이미지 사이즈가 각기 다른 관계로 56.25 => 67.25 변경)
 `;
 
-const MediaThumbnail = styled.img<{$shouldBlur: boolean}>`
+const MediaThumbnail = styled.img<{ $shouldBlur: boolean }>`
   position: absolute;
   top: 0;
   left: 0;

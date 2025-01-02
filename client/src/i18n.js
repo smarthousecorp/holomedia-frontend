@@ -191,6 +191,9 @@ i18n.use(initReactI18next).init({
             button: "Try Again",
           },
         },
+        loading: {
+          message: "로딩중입니다...",
+        },
       },
     },
     ko: {
@@ -377,6 +380,9 @@ i18n.use(initReactI18next).init({
               "예상하지 못한 오류가 발생했습니다.\n서버의 일시적인 장애이거나 네트워크 문제일 수 있습니다.\n잠시 후에 다시 시도해 주세요.",
             button: "다시 시도",
           },
+        },
+        loading: {
+          message: "読み込み中...",
         },
       },
     },
@@ -565,6 +571,9 @@ i18n.use(initReactI18next).init({
               "予期せぬエラーが発生しました。\nサーバーの一時的な障害またはネットワークの問題の可能性があります。\n後ほど再度お試しください。",
             button: "再試行",
           },
+        },
+        loading: {
+          message: "加载中...",
         },
       },
     },
@@ -755,6 +764,9 @@ i18n.use(initReactI18next).init({
               "发生意外错误。\n可能是服务器暂时故障或网络问题。\n请稍后重试。",
             button: "重试",
           },
+        },
+        loading: {
+          message: "Loading...",
         },
       },
     },

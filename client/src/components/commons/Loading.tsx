@@ -1,12 +1,15 @@
 // src/components/commons/Loading.tsx
 import styled from "styled-components";
-import {Loader2} from "lucide-react";
+import { Loader2 } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 const Loading = () => {
+  const { t } = useTranslation();
+
   return (
     <LoadingContainer>
       <Loader2 size={48} className="spin" />
-      <LoadingText>로딩중입니다...</LoadingText>
+      <LoadingText>{t("loading.message")}</LoadingText>
     </LoadingContainer>
   );
 };
