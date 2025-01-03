@@ -6,11 +6,13 @@ const niceAuthController = {
     try {
       const niceAuth = new NiceAuth();
       const token = await niceAuth.getAccessToken();
+      console.log(token);
 
       const certResult = await niceAuth.requestCertification(token, {
         returnUrl: `${process.env.FRONTEND_URL}/nice/callback`,
         // 기타 필요한 설정
       });
+      console.log("토큰을 성공적으로 반환함");
 
       res.json({
         success: true,
@@ -30,7 +32,7 @@ const niceAuthController = {
       const niceAuth = new NiceAuth();
       const token = await niceAuth.getAccessToken();
 
-      const {token_version_id, enc_data, integrity_value} = req.body;
+      const { token_version_id, enc_data, integrity_value } = req.body;
 
       const result = await niceAuth.getCertificationResult(
         token,

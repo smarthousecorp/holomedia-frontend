@@ -1,7 +1,7 @@
 import axios from "axios";
-import {getCookie, removeCookie} from "./cookie";
+import { getCookie, removeCookie } from "./cookie";
 import store from "../store";
-import {logout} from "../store/slices/user";
+import { logout } from "../store/slices/user";
 
 export const api = axios.create({
   baseURL: import.meta.env.VITE_SERVER_DOMAIN,
