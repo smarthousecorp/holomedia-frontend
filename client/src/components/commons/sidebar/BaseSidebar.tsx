@@ -188,15 +188,15 @@ const SidebarContainer = styled.nav<{
   flex-direction: column;
   height: 100vh;
 
-  /* video 페이지 체크 */
-  ${({ $path }) => {
+  /* PC video 페이지 체크 */
+  /* ${({ $path }) => {
     const isVideoPath = /^\/video\/[^/]+$/.test($path || "");
     if (isVideoPath) {
       return css`
         display: none !important;
       `;
     }
-  }}
+  }} */
 
   ${({ $variant, $isOpen }) =>
     $variant === "mobile" &&

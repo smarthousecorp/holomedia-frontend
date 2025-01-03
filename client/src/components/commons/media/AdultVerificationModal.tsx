@@ -1,5 +1,20 @@
+import React, { useState, useCallback, useRef } from "react";
 import styled from "styled-components";
 import { api } from "../../../utils/api";
+
+interface AuthResponse {
+  success: boolean;
+  message?: string;
+  enc_data?: string;
+  integrity_value?: string;
+  token_version_id?: string;
+}
+
+interface VerifyResponse {
+  success: boolean;
+  message?: string;
+  age?: number;
+}
 
 interface AdultVerificationModalProps {
   isOpen: boolean;
@@ -7,53 +22,54 @@ interface AdultVerificationModalProps {
   onComplete: () => void;
 }
 
-const AdultVerificationModal = ({
+const AdultVerificationModal: React.FC<AdultVerificationModalProps> = ({
   isOpen,
   onClose,
   onComplete,
-}: AdultVerificationModalProps) => {
-  if (!isOpen) return null;
+}) => {
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const popupRef = useRef<Window | null>(null);
+  const formRef = useRef<HTMLFormElement>(null);
 
-  const handleVerification = async () => {
+  const handleVerification = useCallback(async () => {
+    setIsLoading(true);
+    setError(null);
+
     try {
+      // 팝업 창 위치 계산
       const left = window.screen.width / 2 - 500 / 2;
       const top = window.screen.height / 2 - 800 / 2;
-      const option = `status=no, menubar=no, toolbar=no, resizable=no, width=500, height=600, left=${left}, top=${top}`;
+      const popupOptions = `status=no, menubar=no, toolbar=no, resizable=no, width=500, height=600, left=${left}, top=${top}`;
 
-      // 1. 백엔드 API를 호출하여 인증 정보 받아오기
-      const response = await api.post(
-        "/api/nice/auth/request",
-        {},
-        {
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
+      // 1. 인증 정보 요청
+      const { data: authData } = await api.post<AuthResponse>(
+        "/api/nice/auth/request"
       );
 
-      const authData = await response.data;
       console.log(authData);
 
       if (!authData.success) {
-        throw new Error(authData.message);
+        throw new Error(authData.message || "인증 정보 요청 실패");
       }
 
       // 2. 팝업 창 열기
-      const popup = window.open("", "nicePopup", option);
+      popupRef.current = window.open("", "nicePopup", popupOptions);
 
-      // 3. 폼 생성 및 제출
-      const form = document.getElementById("niceAuthForm") as HTMLFormElement;
-      if (form && authData) {
+      // 3. 폼 데이터 설정 및 제출
+      if (formRef.current && authData) {
+        const form = formRef.current;
         const { enc_data, integrity_value, token_version_id } = authData;
-        form.target = "nicePopup";
+
         (form.querySelector('[name="enc_data"]') as HTMLInputElement).value =
-          enc_data;
+          enc_data || "";
         (
           form.querySelector('[name="token_version_id"]') as HTMLInputElement
-        ).value = token_version_id;
+        ).value = token_version_id || "";
         (
           form.querySelector('[name="integrity_value"]') as HTMLInputElement
-        ).value = integrity_value;
+        ).value = integrity_value || "";
+
         form.submit();
       }
 
@@ -61,55 +77,61 @@ const AdultVerificationModal = ({
       const handleMessage = async (event: MessageEvent) => {
         if (event.origin !== "https://nice.checkplus.co.kr") return;
 
-        const { success, data } = event.data;
+        try {
+          const { success, data } = event.data;
 
-        if (success) {
-          try {
-            const verifyResponse = await api.post(
+          if (success) {
+            const { data: verifyResult } = await api.post<VerifyResponse>(
               "/api/nice/auth/verify",
               data
             );
-            const verifyResult = await verifyResponse.data;
 
-            if (verifyResult.success) {
-              if (verifyResult.age >= 19) {
-                onComplete();
-              } else {
-                alert(
-                  "성인인증에 실패했습니다. 만 19세 이상만 이용 가능합니다."
-                );
-              }
+            if (
+              verifyResult.success &&
+              verifyResult.age &&
+              verifyResult.age >= 19
+            ) {
+              onComplete();
             } else {
-              throw new Error(verifyResult.message);
+              setError(
+                "성인인증에 실패했습니다. 만 19세 이상만 이용 가능합니다."
+              );
             }
-          } catch (error) {
-            console.error("인증 확인 중 오류 발생:", error);
-            alert("인증 처리 중 오류가 발생했습니다.");
+          } else {
+            setError("본인인증에 실패했습니다.");
           }
-        } else {
-          alert("본인인증에 실패했습니다.");
+        } catch (error) {
+          setError("인증 처리 중 오류가 발생했습니다.");
+          console.error("인증 확인 중 오류 발생:", error);
+        } finally {
+          window.removeEventListener("message", handleMessage);
+          popupRef.current?.close();
+          setIsLoading(false);
         }
-
-        window.removeEventListener("message", handleMessage);
-        popup?.close();
       };
 
       window.addEventListener("message", handleMessage);
     } catch (error) {
+      setError("본인인증 처리 중 오류가 발생했습니다.");
       console.error("본인인증 처리 중 오류 발생:", error);
-      alert("본인인증 처리 중 오류가 발생했습니다.");
+      setIsLoading(false);
     }
-  };
+  }, [onComplete]);
+
+  if (!isOpen) return null;
 
   return (
     <ModalOverlay>
       <ModalContent>
         <h2>성인인증이 필요한 서비스입니다.</h2>
         <p>서비스 이용을 위해 성인인증이 필요합니다.</p>
+
         <form
+          ref={formRef}
           id="niceAuthForm"
           name="niceAuthForm"
           method="post"
+          target="nicePopup"
           action="https://nice.checkplus.co.kr/CheckPlusSafeModel/checkplus.cb"
         >
           <input type="hidden" name="m" value="checkplusService" />
@@ -117,9 +139,14 @@ const AdultVerificationModal = ({
           <input type="hidden" name="enc_data" value="" />
           <input type="hidden" name="integrity_value" value="" />
         </form>
+
+        {error && <ErrorMessage>{error}</ErrorMessage>}
+
         <ButtonGroup>
-          <Button onClick={handleVerification}>성인인증 하기</Button>
-          <Button onClick={onClose} secondary>
+          <Button onClick={handleVerification} disabled={isLoading}>
+            {isLoading ? "처리중..." : "성인인증 하기"}
+          </Button>
+          <Button onClick={onClose} secondary disabled={isLoading}>
             취소
           </Button>
         </ButtonGroup>
@@ -127,6 +154,12 @@ const AdultVerificationModal = ({
     </ModalOverlay>
   );
 };
+
+const ErrorMessage = styled.div`
+  color: #ee3453;
+  margin-bottom: 1rem;
+  font-size: 0.9rem;
+`;
 
 const ModalOverlay = styled.div`
   position: fixed;

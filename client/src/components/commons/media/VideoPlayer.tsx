@@ -111,7 +111,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
         hls.attachMedia(video);
 
         // 에러 처리
-        hls.on(Hls.Events.ERROR, function (event, data) {
+        hls.on(Hls.Events.ERROR, (_event, data) => {
           if (data.fatal) {
             switch (data.type) {
               case Hls.ErrorTypes.NETWORK_ERROR:
