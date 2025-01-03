@@ -174,6 +174,7 @@ const Main = () => {
               setSelectedVideoId(null);
             }
           }}
+          isTestMode={true}
         />
       )}
     </MainContainer>

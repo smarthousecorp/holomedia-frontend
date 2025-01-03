@@ -2,78 +2,78 @@ import React, { useState, useCallback, useRef } from "react";
 import styled from "styled-components";
 import { api } from "../../../utils/api";
 
-interface AuthResponse {
-  success: boolean;
-  message?: string;
-  enc_data?: string;
-  integrity_value?: string;
-  token_version_id?: string;
-}
-
-interface VerifyResponse {
-  success: boolean;
-  message?: string;
-  age?: number;
-}
-
 interface AdultVerificationModalProps {
   isOpen: boolean;
   onClose: () => void;
   onComplete: () => void;
+  isTestMode?: boolean;
 }
 
 const AdultVerificationModal: React.FC<AdultVerificationModalProps> = ({
   isOpen,
   onClose,
   onComplete,
+  isTestMode = false,
 }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const popupRef = useRef<Window | null>(null);
   const formRef = useRef<HTMLFormElement>(null);
 
+  // 테스트용 더미 데이터
+  const TEST_AUTH_DATA = {
+    success: true,
+    enc_data:
+      "Wy0xLCAtNjEsIC01MCwgNSwgLTMsIDE2LCAtNjMsIC02LCA4NSwgLTI3LCAtNzgsIC0yMCwgMTMsIC03MiwgMzAsIDk0LCAtMTI0LCAxMjAsIC04MCwgLTgwLCAtOTksIC02NywgNzcsIC0zMCwgLTEwMywgNTYsIC00NSwgNzcsIC00NCwgLTQxLCAtODgsIDE3LCA1MywgMTI3LCAyNiwgLTEwMCwgODUsIC00NiwgMzAsIC0xMiwgLTE3LCA0NSwgOTUsIDEwNiwgNzYsIDEzLCAtNzcsIC0yLCAyNCwgMTIzLCAzMywgNzAsIC05NSwgNTcsIDE3LCAtMTI3LCA0NSwgLTk2LCAxMTcsIDUyLCA1MCwgMjMsIC0yOCwgMTIyLCAtMTAsIDM5LCAtMzIsIC02NSwgLTEsIDI2LCAtNDMsIC02OCwgLTEwMiwgNjYsIDQwLCAyMSwgLTEwNCwgLTQ5LCAtMzksIDcwLCA4MywgLTI0LCAtNTEsIC03OSwgMzAsIDU3LCA4NiwgMTE3LCAxMjYsIC02NiwgODQsIDgzLCAtNDMsIC04MSwgLTU1LCA4NSwgODEsIC0zMCwgNSwgMTYsIDExLCAtMTE0LCAtMTI0LCA4MSwgLTI4LCAtMTExLCA2NSwgLTEyNywgODQsIC0yLCAtNDUsIDExMiwgLTgsIC0xMDcsIC03MiwgLTQ3LCAtNTgsIDY4LCA2OCwgNDcsIDU4LCAtNjIsIDEwLCAtNTcsIDEyNCwgLTY5LCAzNSwgLTU3",
+    integrity_value:
+      "WzEwLCAxLCAtNjAsIC05NiwgLTQ2LCAxMjAsIDY1LCAxMDYsIDEyNiwgLTYzLCAtOSwgLTQsIC05LCAtNjgsIC00NywgODQsIDQxLCAtNTQsIDcwLCAtMTIsIDc1LCA4LCAtMjMsIDEwNiwgLTEwOSwgMTA5LCAtMTIzLCAtOSwgNjksIDY2LCAtNTYsIC02OV0=",
+    token_version_id: "202501031709094C-NCE5CF213-D13AC-38F3DH1C88",
+  };
+
   const handleVerification = useCallback(async () => {
     setIsLoading(true);
     setError(null);
 
     try {
-      // 팝업 창 위치 계산
+      // 실제 인증 로직
       const left = window.screen.width / 2 - 500 / 2;
       const top = window.screen.height / 2 - 800 / 2;
       const popupOptions = `status=no, menubar=no, toolbar=no, resizable=no, width=500, height=600, left=${left}, top=${top}`;
 
-      // 1. 인증 정보 요청
-      const { data: authData } = await api.post<AuthResponse>(
-        "/api/nice/auth/request"
-      );
-
-      console.log(authData);
+      // API 호출 또는 테스트 데이터 사용
+      const authData = isTestMode
+        ? TEST_AUTH_DATA
+        : (await api.post("/api/nice/auth/request")).data;
 
       if (!authData.success) {
         throw new Error(authData.message || "인증 정보 요청 실패");
       }
 
-      // 2. 팝업 창 열기
       popupRef.current = window.open("", "nicePopup", popupOptions);
 
-      // 3. 폼 데이터 설정 및 제출
       if (formRef.current && authData) {
         const form = formRef.current;
         const { enc_data, integrity_value, token_version_id } = authData;
 
+        // URL 인코딩 적용
         (form.querySelector('[name="enc_data"]') as HTMLInputElement).value =
-          enc_data || "";
+          encodeURIComponent(enc_data);
         (
           form.querySelector('[name="token_version_id"]') as HTMLInputElement
-        ).value = token_version_id || "";
+        ).value = token_version_id;
         (
           form.querySelector('[name="integrity_value"]') as HTMLInputElement
-        ).value = integrity_value || "";
+        ).value = encodeURIComponent(integrity_value);
+
+        console.log("인코딩된 폼 데이터:", {
+          enc_data: encodeURIComponent(enc_data),
+          token_version_id,
+          integrity_value: encodeURIComponent(integrity_value),
+        });
 
         form.submit();
       }
 
-      // 4. 팝업 창 결과 처리
       const handleMessage = async (event: MessageEvent) => {
         if (event.origin !== "https://nice.checkplus.co.kr") return;
 
@@ -81,7 +81,7 @@ const AdultVerificationModal: React.FC<AdultVerificationModalProps> = ({
           const { success, data } = event.data;
 
           if (success) {
-            const { data: verifyResult } = await api.post<VerifyResponse>(
+            const { data: verifyResult } = await api.post(
               "/api/nice/auth/verify",
               data
             );
@@ -116,7 +116,7 @@ const AdultVerificationModal: React.FC<AdultVerificationModalProps> = ({
       console.error("본인인증 처리 중 오류 발생:", error);
       setIsLoading(false);
     }
-  }, [onComplete]);
+  }, [onComplete, isTestMode]);
 
   if (!isOpen) return null;
 
@@ -125,7 +125,7 @@ const AdultVerificationModal: React.FC<AdultVerificationModalProps> = ({
       <ModalContent>
         <h2>성인인증이 필요한 서비스입니다.</h2>
         <p>서비스 이용을 위해 성인인증이 필요합니다.</p>
-
+        {isTestMode && <TestModeMessage>테스트 모드 활성화됨</TestModeMessage>}
         <form
           ref={formRef}
           id="niceAuthForm"
@@ -134,10 +134,20 @@ const AdultVerificationModal: React.FC<AdultVerificationModalProps> = ({
           target="nicePopup"
           action="https://nice.checkplus.co.kr/CheckPlusSafeModel/checkplus.cb"
         >
-          <input type="hidden" name="m" value="checkplusService" />
-          <input type="hidden" name="token_version_id" value="" />
-          <input type="hidden" name="enc_data" value="" />
-          <input type="hidden" name="integrity_value" value="" />
+          <input type="hidden" id="m" name="m" value="checkplusService" />
+          <input
+            type="hidden"
+            id="token_version_id"
+            name="token_version_id"
+            value=""
+          />
+          <input type="hidden" id="enc_data" name="enc_data" value="" />
+          <input
+            type="hidden"
+            id="integrity_value"
+            name="integrity_value"
+            value=""
+          />
         </form>
 
         {error && <ErrorMessage>{error}</ErrorMessage>}
@@ -146,7 +156,7 @@ const AdultVerificationModal: React.FC<AdultVerificationModalProps> = ({
           <Button onClick={handleVerification} disabled={isLoading}>
             {isLoading ? "처리중..." : "성인인증 하기"}
           </Button>
-          <Button onClick={onClose} secondary disabled={isLoading}>
+          <Button onClick={onClose} secondary>
             취소
           </Button>
         </ButtonGroup>
@@ -154,6 +164,15 @@ const AdultVerificationModal: React.FC<AdultVerificationModalProps> = ({
     </ModalOverlay>
   );
 };
+
+const TestModeMessage = styled.div`
+  background-color: #fff3cd;
+  color: #856404;
+  padding: 0.5rem;
+  margin-bottom: 1rem;
+  border-radius: 4px;
+  font-size: 0.9rem;
+`;
 
 const ErrorMessage = styled.div`
   color: #ee3453;
