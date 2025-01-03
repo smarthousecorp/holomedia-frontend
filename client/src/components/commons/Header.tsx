@@ -1,15 +1,16 @@
-import styled from "styled-components";
+import styled, { css } from "styled-components";
 import logo from "../../assets/logo_test.png";
-import {useNavigate} from "react-router-dom";
-import {getCookie} from "../../utils/cookie";
+import { useLocation, useNavigate } from "react-router-dom";
+import { getCookie } from "../../utils/cookie";
 
 const Header = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const isLogin = getCookie("accessToken");
 
   return (
     <>
-      <Container>
+      <Container $path={location.pathname}>
         <Logo>
           <img
             src={logo}
@@ -24,7 +25,7 @@ const Header = () => {
 
 export default Header;
 
-const Container = styled.header`
+const Container = styled.header<{ $path?: string }>`
   width: 100%;
   height: 7rem;
   background: #ffffff;
@@ -34,6 +35,16 @@ const Container = styled.header`
   display: none;
   justify-content: space-between;
   align-items: center;
+
+  /* video 페이지 체크 */
+  ${({ $path }) => {
+    const isVideoPath = /^\/video\/[^/]+$/.test($path || "");
+    if (isVideoPath) {
+      return css`
+        display: none !important;
+      `;
+    }
+  }}
 
   @media (max-width: 900px) {
     display: flex;

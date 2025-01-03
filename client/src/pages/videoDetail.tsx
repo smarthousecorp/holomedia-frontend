@@ -1,8 +1,7 @@
-import {useEffect, useState} from "react";
-import {useNavigate, useParams} from "react-router-dom";
+import { useEffect, useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
 import styled from "styled-components";
-import {media} from "../types/media";
-import ReactPlayer from "react-player";
+import { media } from "../types/media";
 import {
   Button,
   Dialog,
@@ -10,9 +9,10 @@ import {
   DialogContent,
   DialogActions,
 } from "@mui/material";
-import {api} from "../utils/api";
-import {useSelector} from "react-redux";
-import {RootState} from "../store";
+import { api } from "../utils/api";
+import { useSelector } from "react-redux";
+import { RootState } from "../store";
+import VideoPlayer from "../components/commons/media/VideoPlayer";
 
 interface PaymentStatus {
   message?: string;
@@ -27,46 +27,14 @@ const VideoDetail = () => {
   const isAdmin = useSelector((state: RootState) => state.user.is_admin);
 
   const [media, setMedia] = useState<media>();
-  const [isPlaying, setIsPlaying] = useState<boolean>(false);
   const [showPaymentDialog, setShowPaymentDialog] = useState<boolean>(false);
 
   const [paymentInfo, setPaymentInfo] = useState<PaymentStatus | null>(null);
-  const [played, setPlayed] = useState<number>(0);
-  console.log(played);
-
-  // 초기 볼륨을 0.8로 설정
-  const [volume, setVolume] = useState<number>(0.8);
-
-  const handlePlay = () => {
-    setIsPlaying(true);
-  };
-
-  const handlePause = () => {
-    setIsPlaying(false);
-  };
-
-  const handleProgress = (state: {played: number}) => {
-    setPlayed(state.played);
-  };
-
-  // 볼륨 변경 핸들러 수정
-  const handleVolumeChange = (event: any) => {
-    // 유효한 볼륨 값인지 확인하고 적용
-    const newVolume = parseFloat(event?.target?.value || event);
-    if (
-      !isNaN(newVolume) &&
-      isFinite(newVolume) &&
-      newVolume >= 0 &&
-      newVolume <= 1
-    ) {
-      setVolume(newVolume);
-    }
-  };
 
   const onClosePaymentDialog = () => {
     setShowPaymentDialog(false);
     setTimeout(() => {
-      navigate({pathname: "/main"});
+      navigate({ pathname: "/main" });
     }, 0);
   };
 
@@ -94,7 +62,7 @@ const VideoDetail = () => {
         setMedia(response.data);
       }
     } catch (error) {
-      const {response} = error as any;
+      const { response } = error as any;
       if (!isAdmin && response?.data?.requirePayment) {
         setPaymentInfo(response.data);
         setShowPaymentDialog(true);
@@ -106,41 +74,23 @@ const VideoDetail = () => {
     fetchMediaData();
   }, [id]);
 
-
   return (
     <VideoDetailContainer>
       <VideoPlayContainer>
-        <VideoPlayer>
+        <VideoPlayerDiv>
           {!showPaymentDialog && media?.url && (
-            <ReactPlayer
-              url={media.url}
-              width="100%"
-              height="100%"
-              playing={isPlaying}
-              controls={true}
-              light={media.thumbnail}
-              pip={false}
-              stopOnUnmount={true}
-              volume={volume}
-              onPlay={handlePlay}
-              onPause={handlePause}
-              onProgress={handleProgress}
-              onVolumeChange={handleVolumeChange}
-              config={{
-                file: {
-                  attributes: {
-                    controlsList: "nodownload",
-                    disablePictureInPicture: false,
-                  },
-                },
-              }}
-              style={{
-                objectFit: "contain",
-                background: "#000",
+            <VideoPlayer
+              src={media.url}
+              poster={media.thumbnail}
+              watermark={{
+                text: "192.168.0.1",
+                opacity: 0.1,
+                spacing: 200,
+                rotation: -45,
               }}
             />
           )}
-        </VideoPlayer>
+        </VideoPlayerDiv>
       </VideoPlayContainer>
 
       <CustomDialog open={showPaymentDialog} onClose={onClosePaymentDialog}>
@@ -154,7 +104,13 @@ const VideoDetail = () => {
           <Button onClick={handlePayment} variant="contained" color="primary">
             결제하기
           </Button> */}
-          <Button onClick={onClosePaymentDialog} variant="contained" color="primary">돌아가기</Button>
+          <Button
+            onClick={onClosePaymentDialog}
+            variant="contained"
+            color="primary"
+          >
+            돌아가기
+          </Button>
         </DialogActions>
       </CustomDialog>
     </VideoDetailContainer>
@@ -165,12 +121,17 @@ export default VideoDetail;
 
 const VideoDetailContainer = styled.section`
   width: 100%;
-  height: 100%;
+  height: 100vh;
   background-color: #000;
   overflow: hidden;
 
+  @media (min-width: 901px) {
+    min-height: calc(100vh - 13.5rem); // 헤더(7rem) + 푸터(6.5rem)
+    padding: 2rem;
+  }
+
   @media (max-width: 900px) {
-    height: calc(100vh - 13.5rem); // 헤더(7rem) + 푸터(6.5rem)
+    height: 100vh;
   }
 `;
 
@@ -182,18 +143,27 @@ const VideoPlayContainer = styled.div`
   align-items: center;
 
   @media (min-width: 901px) {
-    max-width: 540px;
+    max-width: 1200px;
     margin: 0 auto;
+  }
+
+  @media (max-width: 900px) {
+    height: 100vh;
   }
 `;
 
-const VideoPlayer = styled.div`
+const VideoPlayerDiv = styled.div`
   width: 100%;
   height: 100%;
   position: relative;
   display: flex;
   justify-content: center;
   align-items: center;
+  background-color: black;
+
+  @media (max-width: 900px) {
+    height: 100vh;
+  }
 `;
 
 const CustomDialog = styled(Dialog)`

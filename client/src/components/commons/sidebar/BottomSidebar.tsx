@@ -1,22 +1,23 @@
-import styled from "styled-components";
+import styled, { css } from "styled-components";
 import homeIcon from "../../../assets/home.png";
-import {useSelector} from "react-redux";
-import {RootState} from "../../../store";
-import {useNavigate} from "react-router-dom";
+import { useSelector } from "react-redux";
+import { RootState } from "../../../store";
+import { useLocation, useNavigate } from "react-router-dom";
 
 interface BottomSidebarProps {
   onProfileClick: () => void;
 }
 
-const BottomSidebar = ({onProfileClick}: BottomSidebarProps) => {
+const BottomSidebar = ({ onProfileClick }: BottomSidebarProps) => {
   const navigate = useNavigate();
+  const location = useLocation();
 
   const profileImage = useSelector(
     (state: RootState) => state.user.profile_image
   );
 
   return (
-    <Container>
+    <Container $path={location.pathname}>
       <Home
         onClick={() => {
           navigate("/main");
@@ -33,7 +34,9 @@ const BottomSidebar = ({onProfileClick}: BottomSidebarProps) => {
 
 export default BottomSidebar;
 
-const Container = styled.nav`
+const Container = styled.nav<{
+  $path?: string;
+}>`
   display: none;
   width: 100vw;
   height: 6.5rem;
@@ -42,7 +45,17 @@ const Container = styled.nav`
   background-color: #ffffff;
   z-index: 999;
   padding: 0 4rem;
-  box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1); // 상단에 부드러운 그림자 추가
+  box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+
+  /* video 페이지 체크 */
+  ${({ $path }) => {
+    const isVideoPath = /^\/video\/[^/]+$/.test($path || "");
+    if (isVideoPath) {
+      return css`
+        display: none !important;
+      `;
+    }
+  }}
 
   @media (max-width: 900px) {
     display: flex;

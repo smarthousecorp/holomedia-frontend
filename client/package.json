@@ -20,6 +20,7 @@
     "@types/redux-logger": "^3.0.13",
     "axios": "^1.7.7",
     "firebase": "^11.0.1",
+    "hls.js": "^1.5.18",
     "i18next": "^23.16.5",
     "i18next-browser-languagedetector": "^8.0.0",
     "lucide-react": "^0.456.0",

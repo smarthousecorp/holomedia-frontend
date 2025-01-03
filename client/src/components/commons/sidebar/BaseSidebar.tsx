@@ -10,7 +10,7 @@ import settingIcon from "../../../assets/setting.png";
 import { SvgIcon } from "@mui/material";
 import ClearIcon from "@mui/icons-material/Clear";
 import LanguageSwitcher from "../LanguageSwitcher";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { RootState } from "../../../store";
 import GgulImg from "../../../assets/Ggul.png";
@@ -34,6 +34,7 @@ const BaseSidebar = ({
 }: BaseSidebarProps) => {
   const { t, i18n } = useTranslation();
   const navigate = useNavigate();
+  const location = useLocation();
 
   const user = useSelector((state: RootState) => state.user);
   const isLogin = getCookie("accessToken");
@@ -62,6 +63,7 @@ const BaseSidebar = ({
         className={className}
         $variant={variant}
         $isOpen={isOpen}
+        $path={location.pathname}
         onClick={(e) => e.stopPropagation()}
       >
         <ContentWrapper $variant={variant}>
@@ -177,6 +179,7 @@ export default BaseSidebar;
 const SidebarContainer = styled.nav<{
   $variant: "default" | "mobile";
   $isOpen?: boolean;
+  $path?: string;
 }>`
   width: 35rem;
   background-color: #ffffff;
@@ -184,6 +187,16 @@ const SidebarContainer = styled.nav<{
   display: flex;
   flex-direction: column;
   height: 100vh;
+
+  /* video 페이지 체크 */
+  ${({ $path }) => {
+    const isVideoPath = /^\/video\/[^/]+$/.test($path || "");
+    if (isVideoPath) {
+      return css`
+        display: none !important;
+      `;
+    }
+  }}
 
   ${({ $variant, $isOpen }) =>
     $variant === "mobile" &&

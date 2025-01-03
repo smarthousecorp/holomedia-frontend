@@ -113,19 +113,27 @@ class NiceAuth {
         },
       };
 
-      const response = await axios({
-        method: "POST",
-        url: `${this.baseUrl}/digital/niceid/api/v1.0/common/crypto/token`,
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        data: requestBody,
-      });
+      // axios.post({}) 형태에서 axios.post(url, data, config) 형태로 수정
+      const response = await axios.post(
+        `${this.baseUrl}/digital/niceid/api/v1.0/common/crypto/token`,
+        requestBody,
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
 
+      console.log("NICE API Response:", response.data); // 응답 로깅 추가
       return response.data;
     } catch (error) {
-      console.error("requestCertification Error:", error);
+      // 에러 로깅 개선
+      console.error("requestCertification Error:", {
+        message: error.message,
+        response: error.response?.data,
+        config: error.config,
+      });
       throw error;
     }
   }

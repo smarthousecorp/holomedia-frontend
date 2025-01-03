@@ -12,11 +12,15 @@ const niceAuthController = {
         returnUrl: `${process.env.FRONTEND_URL}/nice/callback`,
         // 기타 필요한 설정
       });
-      console.log("토큰을 성공적으로 반환함");
+      console.log("토큰을 성공적으로 반환함", certResult);
 
       res.json({
         success: true,
-        ...certResult,
+        data: {
+          enc_data: certResult.enc_data,
+          integrity_value: certResult.integrity_value,
+          token_version_id: certResult.token_version_id,
+        },
       });
     } catch (error) {
       console.error("NICE Auth Request Error:", error);

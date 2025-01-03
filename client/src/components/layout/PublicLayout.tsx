@@ -1,6 +1,6 @@
 // PublicLayout.tsx
 import { Outlet } from "react-router";
-import { styled } from "styled-components";
+import { css, styled } from "styled-components";
 import Header from "../commons/Header";
 import DefaultSidebar from "../commons/sidebar/DefaultSidebar";
 import BottomSidebar from "../commons/sidebar/BottomSidebar";
@@ -49,7 +49,7 @@ const PublicLayout = () => {
   return (
     <Full>
       <Header />
-      <Inner>
+      <Inner $path={location.pathname}>
         <DefaultSidebarStyled onPaymentClick={handlePaymentModalOpen} />
         <Container $isSettingsPage={location.pathname === "/settings"}>
           <Outlet />
@@ -80,7 +80,7 @@ const Full = styled.div`
   justify-content: center;
 `;
 
-const Inner = styled.div`
+const Inner = styled.div<{ $path?: string }>`
   width: 100%;
   height: 100vh;
   overflow-x: hidden;
@@ -88,7 +88,15 @@ const Inner = styled.div`
   display: flex;
 
   @media (max-width: 900px) {
-    padding-top: 7rem;
+    ${({ $path }) => {
+      const isVideoPath = /^\/video\/[^/]+$/.test($path || "");
+      return (
+        !isVideoPath &&
+        css`
+          padding-top: 7rem;
+        `
+      );
+    }}
   }
 `;
 
