@@ -22,6 +22,7 @@ import { useEffect } from "react";
 import { preventDevTools } from "./utils/preventDevTools";
 import DevToolsAlert from "./pages/devToolsAlert";
 import NotificationPage from "./pages/Alarm";
+import { logger } from "./utils/logger";
 // import UploaderRoute from "./components/layout/UploaderRoute";
 
 interface ErrorMessageProps {
@@ -35,6 +36,10 @@ const ErrorMessage: React.FC<ErrorMessageProps> = ({
 function App() {
   const { countryInfo, error, loading } = useCountryDetection();
   const location = useLocation();
+
+  useEffect(() => {
+    logger.log("Application started");
+  }, []);
 
   useEffect(() => {
     if (
