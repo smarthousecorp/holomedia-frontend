@@ -22,7 +22,6 @@ import NotificationPage from "./pages/Alarm";
 import { logger } from "./utils/logger";
 import ProfileSetting from "./pages/ProfileSetting";
 import PasswordChange from "./pages/PasswordChange";
-
 interface ErrorMessageProps {
   message?: string;
 }

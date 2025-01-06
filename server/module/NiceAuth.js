@@ -6,11 +6,40 @@ const NiceCrypto = require("./NiceCrypto");
 const niceConfig = require("../config/niceConfig");
 
 class NiceAuth {
-  constructor(config) {
-    this.clientId = config.clientId;
-    this.clientSecret = config.clientSecret;
-    this.productId = config.productId;
-    this.baseUrl = config.baseUrl;
+  constructor() {
+    this.clientId = niceConfig.clientId;
+    this.clientSecret = niceConfig.clientSecret;
+    this.productId = niceConfig.productId;
+    this.baseUrl = niceConfig.baseUrl;
+  }
+
+  // module/NiceAuth.js의 클래스에 추가
+  async getAccessToken() {
+    try {
+      const authorization = Buffer.from(
+        this.clientId + ":" + this.clientSecret
+      ).toString("base64");
+
+      const dataBody = {
+        scope: "default",
+        grant_type: "client_credentials",
+      };
+
+      const response = await axios({
+        method: "POST",
+        url: `${this.baseUrl}/digital/niceid/oauth/oauth/token`,
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded",
+          Authorization: `Basic ${authorization}`,
+        },
+        data: qs.stringify(dataBody),
+      });
+
+      return response.data.dataBody.access_token;
+    } catch (error) {
+      console.error("getAccessToken Error:", error);
+      throw error;
+    }
   }
 
   async requestCertification(token, reqData) {
@@ -75,22 +104,24 @@ class NiceAuth {
 
       // 대칭키 생성
       const value = `${req_dtim.trim()}${req_no.trim()}${token_val.trim()}`;
-      console.log("[Debug] Combined value for hash:", value);
 
       // SHA-256 해시 생성
       const hash = crypto.createHash("sha256").update(value).digest();
 
-      // Base64 인코딩
-      const base64Hash = hash.toString("base64");
+      // key는 앞에서부터 32바이트 (AES-256-CBC용)
+      const key = hash.slice(0, 32);
 
-      // key: 앞에서부터 16byte
-      const key = Buffer.from(base64Hash.substring(0, 22), "base64");
+      // iv는 뒤에서부터 16바이트
+      const iv = hash.slice(-16);
 
-      // iv: 뒤에서부터 16byte
-      const iv = Buffer.from(base64Hash.slice(-22), "base64");
+      // hmac_key는 전체 해시값 사용
+      const hmacKey = hash;
 
-      // hmac_key: 앞에서부터 32byte
-      const hmacKey = Buffer.from(base64Hash.substring(0, 43), "base64");
+      console.log("[Debug] Crypto values:", {
+        keyLength: key.length,
+        ivLength: iv.length,
+        hmacKeyLength: hmacKey.length,
+      });
 
       // 데이터 암호화
       const cipher = crypto.createCipheriv("aes-256-cbc", key, iv);
@@ -107,16 +138,9 @@ class NiceAuth {
 
       const result = {
         ...tokenResponse.data,
-        encryptedData,
-        integrityValue,
+        enc_data: encryptedData,
+        integrity_value: integrityValue,
       };
-
-      console.log("[Debug] Final result:", {
-        success: true,
-        tokenVersionId: result.dataBody.token_version_id,
-        hasEncryptedData: !!result.encryptedData,
-        hasIntegrityValue: !!result.integrityValue,
-      });
 
       return result;
     } catch (error) {

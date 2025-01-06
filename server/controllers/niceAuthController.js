@@ -15,8 +15,6 @@ const niceAuthController = {
         returnUrl: `${process.env.FRONTEND_URL}/nice/callback`,
       });
 
-      console.log(certResult);
-
       // 에러 응답 확인
       if (certResult.dataHeader.GW_RSLT_CD !== "1200") {
         throw new Error(`NICE API 오류: ${certResult.dataHeader.GW_RSLT_MSG}`);
@@ -28,13 +26,12 @@ const niceAuthController = {
 
       const responseData = {
         success: true,
-        site_code: certResult.dataBody.site_code,
         token_version_id: certResult.dataBody.token_version_id,
-        encrypted_data: certResult.encryptedData,
-        integrity_value: certResult.integrityValue,
-        token_val: certResult.dataBody.token_val,
-        period: certResult.dataBody.period,
+        enc_data: certResult.enc_data,
+        integrity_value: certResult.integrity_value,
       };
+
+      console.log("응답될값", responseData);
 
       res.json(responseData);
     } catch (error) {
