@@ -17,7 +17,6 @@ const AdultVerificationModal: React.FC<AdultVerificationModalProps> = ({
 }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const popupRef = useRef<Window | null>(null);
   const formRef = useRef<HTMLFormElement>(null);
 
   // 테스트용 더미 데이터
@@ -35,11 +34,6 @@ const AdultVerificationModal: React.FC<AdultVerificationModalProps> = ({
     setError(null);
 
     try {
-      // 실제 인증 로직
-      const left = window.screen.width / 2 - 500 / 2;
-      const top = window.screen.height / 2 - 800 / 2;
-      const popupOptions = `status=no, menubar=no, toolbar=no, resizable=no, width=500, height=600, left=${left}, top=${top}`;
-
       // API 호출 또는 테스트 데이터 사용
       const authData = isTestMode
         ? TEST_AUTH_DATA
@@ -49,68 +43,79 @@ const AdultVerificationModal: React.FC<AdultVerificationModalProps> = ({
         throw new Error(authData.message || "인증 정보 요청 실패");
       }
 
-      popupRef.current = window.open("", "nicePopup", popupOptions);
+      const width = 500;
+      const height = 600;
+      const left = window.screen.width / 2 - width / 2;
+      const top = window.screen.height / 2 - height / 2;
 
       if (formRef.current && authData) {
         const form = formRef.current;
         const { enc_data, integrity_value, token_version_id } = authData;
 
-        // URL 인코딩 적용
         (form.querySelector('[name="enc_data"]') as HTMLInputElement).value =
-          encodeURIComponent(enc_data);
+          enc_data;
         (
           form.querySelector('[name="token_version_id"]') as HTMLInputElement
         ).value = token_version_id;
         (
           form.querySelector('[name="integrity_value"]') as HTMLInputElement
-        ).value = encodeURIComponent(integrity_value);
+        ).value = integrity_value;
 
-        console.log("인코딩된 폼 데이터:", {
-          enc_data: encodeURIComponent(enc_data),
-          token_version_id,
-          integrity_value: encodeURIComponent(integrity_value),
-        });
+        // window.open() 호출 전에 팝업 차단 여부 확인
+        const popup = window.open(
+          "about:blank",
+          "nicePopup",
+          `width=${width},height=${height},left=${left},top=${top},scrollbars=yes,status=yes,resizable=no`
+        );
 
+        if (!popup || popup.closed || typeof popup.closed === "undefined") {
+          setError("팝업이 차단되었습니다. 팝업 차단을 해제해주세요.");
+          setIsLoading(false);
+          return;
+        }
+
+        // 메시지 이벤트 리스너 등록
+        const handleMessage = async (event: MessageEvent) => {
+          if (event.origin !== "https://nice.checkplus.co.kr") return;
+
+          try {
+            const { success, data } = event.data;
+
+            if (success) {
+              const { data: verifyResult } = await api.post(
+                "/api/nice/auth/verify",
+                data
+              );
+
+              if (
+                verifyResult.success &&
+                verifyResult.age &&
+                verifyResult.age >= 19
+              ) {
+                onComplete();
+              } else {
+                setError(
+                  "성인인증에 실패했습니다. 만 19세 이상만 이용 가능합니다."
+                );
+              }
+            } else {
+              setError("본인인증에 실패했습니다.");
+            }
+          } catch (error) {
+            console.error("인증 확인 중 오류 발생:", error);
+            setError("인증 처리 중 오류가 발생했습니다.");
+          } finally {
+            window.removeEventListener("message", handleMessage);
+            popup.close();
+            setIsLoading(false);
+          }
+        };
+
+        window.addEventListener("message", handleMessage);
+
+        // 폼 제출
         form.submit();
       }
-
-      const handleMessage = async (event: MessageEvent) => {
-        if (event.origin !== "https://nice.checkplus.co.kr") return;
-
-        try {
-          const { success, data } = event.data;
-
-          if (success) {
-            const { data: verifyResult } = await api.post(
-              "/api/nice/auth/verify",
-              data
-            );
-
-            if (
-              verifyResult.success &&
-              verifyResult.age &&
-              verifyResult.age >= 19
-            ) {
-              onComplete();
-            } else {
-              setError(
-                "성인인증에 실패했습니다. 만 19세 이상만 이용 가능합니다."
-              );
-            }
-          } else {
-            setError("본인인증에 실패했습니다.");
-          }
-        } catch (error) {
-          setError("인증 처리 중 오류가 발생했습니다.");
-          console.error("인증 확인 중 오류 발생:", error);
-        } finally {
-          window.removeEventListener("message", handleMessage);
-          popupRef.current?.close();
-          setIsLoading(false);
-        }
-      };
-
-      window.addEventListener("message", handleMessage);
     } catch (error) {
       setError("본인인증 처리 중 오류가 발생했습니다.");
       console.error("본인인증 처리 중 오류 발생:", error);
