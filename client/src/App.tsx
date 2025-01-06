@@ -2,8 +2,6 @@ import { Routes, Route, useLocation } from "react-router-dom";
 import Main from "./pages/main";
 import MainLayout from "./components/layout/MainLayout";
 import "./index.css";
-// import ProtectedRoute from "./components/layout/ProtectedRoute";
-// import VideoDetail from "./pages/videoDetail";
 import PublicLayout from "./components/layout/PublicLayout";
 import { ToastContainer } from "react-toastify";
 import UploadForm from "./pages/uploadVideo";
@@ -13,7 +11,6 @@ import Loading from "./components/commons/Loading";
 import ErrorPage from "./pages/Error";
 import Login from "./pages/Login";
 import SignUp from "./pages/Signup";
-import PreparePage from "./pages/Prepare";
 import User from "./pages/User";
 import ProtectedRoute from "./components/layout/ProtectedRoute";
 import VideoDetail from "./pages/videoDetail";
@@ -23,7 +20,7 @@ import { preventDevTools } from "./utils/preventDevTools";
 import DevToolsAlert from "./pages/devToolsAlert";
 import NotificationPage from "./pages/Alarm";
 import { logger } from "./utils/logger";
-// import UploaderRoute from "./components/layout/UploaderRoute";
+import ProfileSetting from "./pages/ProfileSetting";
 
 interface ErrorMessageProps {
   message?: string;
@@ -93,10 +90,7 @@ function App() {
             element={<PreparePage pageName="멤버십" />}
           /> */}
           <Route path="/settings" element={<Settings />} />
-          <Route
-            path="/settings/profile"
-            element={<PreparePage pageName="프로필 설정" />}
-          />
+          <Route path="/settings/profile" element={<ProfileSetting />} />
         </Route>
       </Routes>
       <ToastContainer style={{ fontSize: "1.4rem" }} limit={1} />

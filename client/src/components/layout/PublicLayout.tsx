@@ -51,7 +51,7 @@ const PublicLayout = () => {
       <Header />
       <Inner $path={location.pathname}>
         <DefaultSidebarStyled onPaymentClick={handlePaymentModalOpen} />
-        <Container $isSettingsPage={location.pathname === "/settings"}>
+        <Container $isSettingsPage={location.pathname.startsWith("/settings")}>
           <Outlet />
         </Container>
         <BottomSidebar onProfileClick={toggleBottomSidebar} />

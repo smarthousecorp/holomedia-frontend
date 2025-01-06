@@ -84,7 +84,7 @@ const Settings = () => {
 export default Settings;
 
 const Container = styled.section`
-  max-width: 768px;
+  max-width: 468px;
   padding: 20px;
 `;
 
