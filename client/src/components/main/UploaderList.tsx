@@ -1,6 +1,6 @@
-import React, {useRef, useState, useEffect} from "react";
+import React, { useRef, useState, useEffect } from "react";
 import styled from "styled-components";
-import {Uploader} from "../../types/user";
+import { Uploader } from "../../types/user";
 
 interface UploaderListProps {
   uploaders: Uploader[];
@@ -32,14 +32,15 @@ const UploaderList: React.FC<UploaderListProps> = ({
 
   const checkScrollable = () => {
     if (scrollContainerRef.current) {
-      const {scrollWidth, clientWidth} = scrollContainerRef.current;
+      const { scrollWidth, clientWidth } = scrollContainerRef.current;
       setIsScrollable(scrollWidth > clientWidth);
     }
   };
 
   const updateScrollProgress = () => {
     if (scrollContainerRef.current) {
-      const {scrollLeft, scrollWidth, clientWidth} = scrollContainerRef.current;
+      const { scrollLeft, scrollWidth, clientWidth } =
+        scrollContainerRef.current;
       const scrollableWidth = scrollWidth - clientWidth;
       const progress = (scrollLeft / scrollableWidth) * 100;
       setScrollProgress(progress);
@@ -88,7 +89,7 @@ const UploaderList: React.FC<UploaderListProps> = ({
 
   const handleProgressBarClick = (e: React.MouseEvent<HTMLDivElement>) => {
     if (scrollContainerRef.current) {
-      const {left, width} = e.currentTarget.getBoundingClientRect();
+      const { left, width } = e.currentTarget.getBoundingClientRect();
       const clickPosition = (e.clientX - left) / width;
       const scrollableWidth =
         scrollContainerRef.current.scrollWidth -
@@ -136,13 +137,13 @@ const Container = styled.div`
   max-width: 100%;
 `;
 
-const UploaderLists = styled.ul<{$isDragging: boolean}>`
+const UploaderLists = styled.ul<{ $isDragging: boolean }>`
   width: 100%;
   display: grid;
   justify-content: space-around;
   grid-auto-flow: column;
   grid-auto-columns: 8.5rem;
-  padding: 0 0 1rem 0;
+  padding: 1rem 4rem;
   border-radius: 0 0 17px 17px;
   background-color: #ffffff;
   overflow-x: auto;
@@ -164,12 +165,11 @@ const UploaderLists = styled.ul<{$isDragging: boolean}>`
     width: min(100%, calc(8.5rem * 7 + 1.2rem * 6 + 10rem));
     margin: 0 auto;
     border-radius: 17px;
-    padding: 1rem 4rem;
     gap: 1.2rem;
   }
 `;
 
-const UploaderItem = styled.li<{$isDragging: boolean}>`
+const UploaderItem = styled.li<{ $isDragging: boolean }>`
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -223,7 +223,7 @@ const ProgressBarContainer = styled.div`
   }
 `;
 
-const ProgressBar = styled.div<{$progress: number}>`
+const ProgressBar = styled.div<{ $progress: number }>`
   width: ${(props) => props.$progress}%;
   height: 100%;
   background-color: #333333;

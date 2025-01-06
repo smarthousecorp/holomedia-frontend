@@ -142,7 +142,7 @@ const Title = styled.h1`
 const FormContainer = styled.div`
   display: flex;
   flex-direction: column;
-  gap: 1.5rem;
+  gap: 2.5rem;
   margin-left: 12px;
 `;
 
@@ -156,11 +156,12 @@ const InputTitle = styled.label`
   font-size: 14px;
   font-weight: 500;
   color: #333;
+  margin-bottom: 0.5rem;
 `;
 
 const StyledInput = styled.input`
   width: 100%;
-  padding: 12px 16px;
+  padding: 10px 12px;
   border: 1px solid #e5e7eb;
   border-radius: 8px;
   font-size: 14px;

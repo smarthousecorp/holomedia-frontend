@@ -21,6 +21,7 @@ import DevToolsAlert from "./pages/devToolsAlert";
 import NotificationPage from "./pages/Alarm";
 import { logger } from "./utils/logger";
 import ProfileSetting from "./pages/ProfileSetting";
+import PasswordChange from "./pages/PasswordChange";
 
 interface ErrorMessageProps {
   message?: string;
@@ -91,6 +92,10 @@ function App() {
           /> */}
           <Route path="/settings" element={<Settings />} />
           <Route path="/settings/profile" element={<ProfileSetting />} />
+          <Route
+            path="/settings/password-change"
+            element={<PasswordChange />}
+          />
         </Route>
       </Routes>
       <ToastContainer style={{ fontSize: "1.4rem" }} limit={1} />
