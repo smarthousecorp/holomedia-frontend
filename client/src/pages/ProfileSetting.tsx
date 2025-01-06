@@ -213,7 +213,7 @@ const QuillWrapper = styled.div`
 const SaveButton = styled.button`
   width: 100%;
   padding: 14px;
-  background-color: #6d28d9;
+  background-color: #eb3553;
   color: white;
   border: none;
   border-radius: 8px;
@@ -223,6 +223,6 @@ const SaveButton = styled.button`
   margin-top: 1rem;
 
   &:hover {
-    background-color: #5b21b6;
+    background-color: #eb566f;
   }
 `;
