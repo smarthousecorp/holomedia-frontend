@@ -2,12 +2,77 @@ const express = require("express");
 const session = require("express-session");
 const authenticateToken = require("../module/authJWT");
 const router = express.Router();
+const NiceAuth = require("../module/NiceAuth");
 
 const db = require("../db/holomedia");
 const tokenService = require("../module/jwt");
 const {detectCountry} = require("../module/detectCountry");
 
 const uuid4 = require("uuid4");
+
+router.get('/nice/callback', async (req, res) => {
+  const { token_version_id, enc_data, integrity_value } = req.query;
+  const clientOrigin = process.env.FRONTEND_URL;
+  
+  try {
+    const niceAuth = new NiceAuth();
+    const accessToken = await niceAuth.getAccessToken();
+    
+    const result = await niceAuth.getCertificationResult(
+      accessToken,
+      token_version_id,
+      enc_data, 
+      integrity_value
+    );
+
+    const safeResult = {
+      success: true,
+      authStatus: result.dataHeader.GW_RSLT_CD,
+      userInfo: {
+        name: result.dataBody.name,
+        birthDate: result.dataBody.birthdate,
+        gender: result.dataBody.gender,
+        nationality: result.dataBody.nationality
+      }
+    };
+
+    res.send(`
+      <!DOCTYPE html>
+      <html>
+        <head>
+          <meta charset="utf-8">
+          <title>인증 처리 중</title>
+          <script>
+            window.opener.postMessage(${JSON.stringify(safeResult)}, "${clientOrigin}");
+            setTimeout(() => window.close(), 1000);
+          </script>
+        </head>
+        <body>
+          <p>인증이 완료되었습니다. 잠시만 기다려주세요...</p>
+        </body>
+      </html>
+    `);
+    
+  } catch (error) {
+    console.error('NICE 인증 실패:', error);
+    
+    res.send(`
+      <!DOCTYPE html>
+      <html>
+        <head>
+          <meta charset="utf-8">
+        </head>
+        <body>
+          <script>
+            window.opener.postMessage({ success: false, error: "인증 실패" }, "${clientOrigin}");
+            setTimeout(() => window.close(), 1000);
+          </script>
+          <p>인증에 실패했습니다. 창이 곧 닫힙니다...</p>
+        </body>
+      </html>
+    `);
+  }
+});
 
 // 로그인 프로세스
 router.post("/login", function (request, response) {

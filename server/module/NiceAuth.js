@@ -13,18 +13,30 @@ class NiceAuth {
     this.baseUrl = niceConfig.baseUrl;
   }
 
-  // module/NiceAuth.js의 클래스에 추가
   async getAccessToken() {
     try {
       const authorization = Buffer.from(
         this.clientId + ":" + this.clientSecret
       ).toString("base64");
-
+  
+      console.log("Debug - Config values:", {
+        clientId: this.clientId,
+        clientSecret: this.clientSecret,
+        productId: this.productId,
+        baseUrl: this.baseUrl
+      });
+  
       const dataBody = {
         scope: "default",
         grant_type: "client_credentials",
       };
-
+  
+      console.log("Debug - Request details:", {
+        url: `${this.baseUrl}/digital/niceid/oauth/oauth/token`,
+        authorization: `Basic ${authorization}`,
+        dataBody
+      });
+  
       const response = await axios({
         method: "POST",
         url: `${this.baseUrl}/digital/niceid/oauth/oauth/token`,
@@ -34,20 +46,20 @@ class NiceAuth {
         },
         data: qs.stringify(dataBody),
       });
-
+  
       return response.data.dataBody.access_token;
     } catch (error) {
-      console.error("getAccessToken Error:", error);
+      console.error("getAccessToken Error details:", {
+        message: error.message,
+        response: error.response?.data,
+        status: error.response?.status
+      });
       throw error;
     }
   }
 
   async requestCertification(token, reqData) {
     try {
-      const nowDate = new Date();
-      const tomorrow = new Date();
-      tomorrow.setDate(tomorrow.getDate() + 1);
-
       const formatDate = (date) => {
         const year = date.getFullYear();
         const month = String(date.getMonth() + 1).padStart(2, "0");
@@ -57,23 +69,16 @@ class NiceAuth {
         const seconds = String(date.getSeconds()).padStart(2, "0");
         return `${year}${month}${day}${hours}${minutes}${seconds}`;
       };
-
-      const req_dtim = formatDate(tomorrow);
+  
+      const nowDate = new Date();
+      const req_dtim = formatDate(nowDate);
       const req_no = crypto.randomBytes(16).toString("hex").slice(0, 30);
       const current_timestamp = Math.floor(nowDate.getTime() / 1000);
-
+  
       // Authorization 헤더 구성
       const authString = `${token}:${current_timestamp}:${this.clientId}`;
-      const authorization = `bearer ${Buffer.from(authString).toString(
-        "base64"
-      )}`;
-
-      console.log("[Debug] Request payload:", {
-        req_dtim,
-        req_no,
-        enc_mode: "1",
-      });
-
+      const authorization = `bearer ${Buffer.from(authString).toString("base64")}`;
+  
       const tokenResponse = await axios.post(
         `${this.baseUrl}/digital/niceid/api/v1.0/common/crypto/token`,
         {
@@ -88,61 +93,48 @@ class NiceAuth {
           },
         }
       );
-
-      console.log("[Debug] Token Response:", tokenResponse.data);
-
+  
+      // tokenResponse에서 site_code 추출
+      const site_code = tokenResponse.data.dataBody.site_code;
       const { token_val } = tokenResponse.data.dataBody;
-
-      if (!req_dtim || !req_no || !token_val) {
-        throw new Error(
-          "Required values are missing: " +
-            `req_dtim: ${!!req_dtim}, ` +
-            `req_no: ${!!req_no}, ` +
-            `token_val: ${!!token_val}`
-        );
-      }
-
+  
+      // reqData 재구성
+      const finalReqData = {
+        requestno: req_no,
+        returnurl: "http://localhost:4000/nice/callback",  // 클라이언트에서 전달받은 returnurl 사용
+        sitecode: site_code,           // token 응답에서 받은 site_code 사용
+        methodtype: "get",
+        popupyn: "Y",
+        receivedata: ""                // 필요한 경우 클라이언트에서 전달받은 값 사용
+      };
+  
+      console.log("Debug - Request Data:", finalReqData);  // 디버깅용
+  
       // 대칭키 생성
-      const value = `${req_dtim.trim()}${req_no.trim()}${token_val.trim()}`;
-
-      // SHA-256 해시 생성
-      const hash = crypto.createHash("sha256").update(value).digest();
-
-      // key는 앞에서부터 32바이트 (AES-256-CBC용)
-      const key = hash.slice(0, 32);
-
-      // iv는 뒤에서부터 16바이트
-      const iv = hash.slice(-16);
-
-      // hmac_key는 전체 해시값 사용
-      const hmacKey = hash;
-
-      console.log("[Debug] Crypto values:", {
-        keyLength: key.length,
-        ivLength: iv.length,
-        hmacKeyLength: hmacKey.length,
-      });
-
+      const value = `${req_dtim}${req_no}${token_val}`;
+      const resultVal = crypto.createHash('sha256').update(value).digest('base64');
+      
+      const key = resultVal.substr(0, 16);
+      const iv = resultVal.substr(resultVal.length-16, resultVal.length-1);
+      const hmacKey = resultVal.substr(0, 32);
+  
       // 데이터 암호화
-      const cipher = crypto.createCipheriv("aes-256-cbc", key, iv);
+      const cipher = crypto.createCipheriv("aes-128-cbc", key, iv);
       cipher.setAutoPadding(true);
-
-      const encryptedData =
-        cipher.update(JSON.stringify(reqData), "utf8", "base64") +
+  
+      const encryptedData = cipher.update(JSON.stringify(finalReqData), "utf8", "base64") +
         cipher.final("base64");
-
+  
       // 무결성 값 생성
       const hmac = crypto.createHmac("sha256", hmacKey);
       hmac.update(encryptedData);
       const integrityValue = hmac.digest("base64");
-
-      const result = {
+  
+      return {
         ...tokenResponse.data,
         enc_data: encryptedData,
         integrity_value: integrityValue,
       };
-
-      return result;
     } catch (error) {
       console.error("[Debug] Full error:", error);
       throw error;
