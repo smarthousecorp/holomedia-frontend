@@ -53,14 +53,8 @@ const AdultVerificationModal: React.FC<AdultVerificationModalProps> = ({
         throw new Error("필수 인증 정보가 누락되었습니다.");
       }
 
-      // 인증 데이터를 localStorage에 저장 (세션 스토리지 대신)
-      sessionStorage.setItem(
-        "niceAuthData",
-        JSON.stringify({
-          ...authData,
-          timestamp: new Date().getTime(), // 보안을 위한 타임스탬프 추가
-        })
-      );
+      // 객체를 JSON 문자열로 변환하여 저장
+      sessionStorage.setItem("auth_data", JSON.stringify(authData));
 
       // if (!authData.success) {
       //   throw new Error(authData.message || "인증 정보 요청 실패");
@@ -119,6 +113,27 @@ const AdultVerificationModal: React.FC<AdultVerificationModalProps> = ({
           return;
         }
 
+        // form.submit();
+
+        // NICE 페이지 로드 완료 후 메시지 전송을 위한 타이머 설정
+        const messageTimer = setInterval(() => {
+          try {
+            if (popup.location.origin === "https://nice.checkplus.co.kr") {
+              clearInterval(messageTimer);
+              // targetOrigin을 NICE 도메인으로 변경
+              popup.postMessage(
+                {
+                  type: "SESSION_DATA",
+                  data: sessionStorage.getItem("auth_data"),
+                },
+                "https://nice.checkplus.co.kr"
+              );
+            }
+          } catch (e) {
+            console.log("Polling error:", e);
+          }
+        }, 100);
+
         const popupMonitor = setInterval(() => {
           if (popup.closed) {
             clearInterval(popupMonitor);
@@ -135,7 +150,7 @@ const AdultVerificationModal: React.FC<AdultVerificationModalProps> = ({
           try {
             const { success, data } = event.data;
 
-            console.log(success, data);
+            console.log("인증 후", success, data);
 
             if (success) {
               const { data: verifyResult } = await api.post(
