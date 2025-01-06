@@ -6,27 +6,43 @@ const niceAuthController = {
     try {
       const niceAuth = new NiceAuth();
       const token = await niceAuth.getAccessToken();
-      console.log(token);
+
+      if (!token) {
+        throw new Error("액세스 토큰을 얻지 못했습니다");
+      }
 
       const certResult = await niceAuth.requestCertification(token, {
         returnUrl: `${process.env.FRONTEND_URL}/nice/callback`,
-        // 기타 필요한 설정
       });
-      console.log("토큰을 성공적으로 반환함", certResult);
 
-      res.json({
+      console.log(certResult);
+
+      // 에러 응답 확인
+      if (certResult.dataHeader.GW_RSLT_CD !== "1200") {
+        throw new Error(`NICE API 오류: ${certResult.dataHeader.GW_RSLT_MSG}`);
+      }
+
+      if (certResult.dataBody.result_cd !== "0000") {
+        throw new Error(`NICE API 결과 오류: ${certResult.dataBody.result_cd}`);
+      }
+
+      const responseData = {
         success: true,
-        data: {
-          enc_data: certResult.enc_data,
-          integrity_value: certResult.integrity_value,
-          token_version_id: certResult.token_version_id,
-        },
-      });
+        site_code: certResult.dataBody.site_code,
+        token_version_id: certResult.dataBody.token_version_id,
+        encrypted_data: certResult.encryptedData,
+        integrity_value: certResult.integrityValue,
+        token_val: certResult.dataBody.token_val,
+        period: certResult.dataBody.period,
+      };
+
+      res.json(responseData);
     } catch (error) {
-      console.error("NICE Auth Request Error:", error);
-      res.status(500).json({
+      console.error("NICE 인증 요청 오류:", error);
+      res.status(error.response?.status || 500).json({
         success: false,
-        message: "인증 요청 처리 중 오류가 발생했습니다.",
+        message: error.message || "인증 요청 처리 중 오류가 발생했습니다.",
+        error: process.env.NODE_ENV === "development" ? error.stack : undefined,
       });
     }
   },

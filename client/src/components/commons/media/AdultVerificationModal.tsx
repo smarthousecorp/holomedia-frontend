@@ -1,5 +1,7 @@
 import React, { useState, useCallback, useRef } from "react";
 import styled from "styled-components";
+// import { api } from "../../../utils/api";
+// import axios from "axios";
 import { api } from "../../../utils/api";
 
 interface AdultVerificationModalProps {
@@ -19,14 +21,14 @@ const AdultVerificationModal: React.FC<AdultVerificationModalProps> = ({
   const [error, setError] = useState<string | null>(null);
   const formRef = useRef<HTMLFormElement>(null);
 
-  // 테스트용 더미 데이터
+  // 테스트용 더미 데이터 (테스트 할 때 마다 변경)
   const TEST_AUTH_DATA = {
     success: true,
     enc_data:
-      "Wy0xLCAtNjEsIC01MCwgNSwgLTMsIDE2LCAtNjMsIC02LCA4NSwgLTI3LCAtNzgsIC0yMCwgMTMsIC03MiwgMzAsIDk0LCAtMTI0LCAxMjAsIC04MCwgLTgwLCAtOTksIC02NywgNzcsIC0zMCwgLTEwMywgNTYsIC00NSwgNzcsIC00NCwgLTQxLCAtODgsIDE3LCA1MywgMTI3LCAyNiwgLTEwMCwgODUsIC00NiwgMzAsIC0xMiwgLTE3LCA0NSwgOTUsIDEwNiwgNzYsIDEzLCAtNzcsIC0yLCAyNCwgMTIzLCAzMywgNzAsIC05NSwgNTcsIDE3LCAtMTI3LCA0NSwgLTk2LCAxMTcsIDUyLCA1MCwgMjMsIC0yOCwgMTIyLCAtMTAsIDM5LCAtMzIsIC02NSwgLTEsIDI2LCAtNDMsIC02OCwgLTEwMiwgNjYsIDQwLCAyMSwgLTEwNCwgLTQ5LCAtMzksIDcwLCA4MywgLTI0LCAtNTEsIC03OSwgMzAsIDU3LCA4NiwgMTE3LCAxMjYsIC02NiwgODQsIDgzLCAtNDMsIC04MSwgLTU1LCA4NSwgODEsIC0zMCwgNSwgMTYsIDExLCAtMTE0LCAtMTI0LCA4MSwgLTI4LCAtMTExLCA2NSwgLTEyNywgODQsIC0yLCAtNDUsIDExMiwgLTgsIC0xMDcsIC03MiwgLTQ3LCAtNTgsIDY4LCA2OCwgNDcsIDU4LCAtNjIsIDEwLCAtNTcsIDEyNCwgLTY5LCAzNSwgLTU3",
+      "WzcyLCA0MCwgMjksIC04NCwgNzcsIDQyLCAtMiwgLTY5LCAyNSwgMTA1LCA3LCAtNzAsIDY5LCAtNDMsIC0yMywgOTEsIC0xMDksIC04NywgMzMsIC02MiwgMjYsIC02MiwgLTEwMiwgLTkwLCAtNCwgNjEsIC0xLCAtNTAsIDEyMCwgLTQ1LCAtMTUsIC0xMTUsIC02MiwgMTQsIDEwNiwgMzIsIC00OSwgNzcsIC02NywgLTEwNiwgLTY4LCAxMTksIC0xOCwgLTUwLCAxMTAsIDg5LCAyLCAtOTksIC04NCwgNDAsIDg2LCA2OSwgMTE2LCAxOSwgLTY1LCAtNjcsIDExNCwgMTE5LCA2MiwgLTExNSwgLTY1LCAxMDEsIDUsIC02MywgLTMxLCAtMjcsIC04NywgNjIsIC00NCwgLTEwLCA3MywgLTEzLCAxMjUsIC00NywgLTY0LCA2NywgNiwgLTEyNSwgLTcwLCAtOTAsIC0xMTIsIDEyNywgMjcsIC05MCwgMzQsIC04NywgLTc4LCAtNTksIC00LCAtMTAsIDg3LCAxMjQsIC0yOSwgLTIxLCAtMjksIDk4LCA3MSwgNTksIC01MiwgOTcsIDIxLCAtNTYsIDU0LCAxMTQsIC0xMDksIDEyMSwgLTExOSwgMTE0LCA2OSwgLTMzLCA4OSwgNjVd",
     integrity_value:
-      "WzEwLCAxLCAtNjAsIC05NiwgLTQ2LCAxMjAsIDY1LCAxMDYsIDEyNiwgLTYzLCAtOSwgLTQsIC05LCAtNjgsIC00NywgODQsIDQxLCAtNTQsIDcwLCAtMTIsIDc1LCA4LCAtMjMsIDEwNiwgLTEwOSwgMTA5LCAtMTIzLCAtOSwgNjksIDY2LCAtNTYsIC02OV0=",
-    token_version_id: "202501031709094C-NCE5CF213-D13AC-38F3DH1C88",
+      "WzE0LCAyMSwgLTc0LCAtODYsIC01MywgLTg2LCAtNDgsIC0xMCwgMTE0LCAtOTEsIDg2LCAtMzMsIC0xNiwgNzksIDQyLCAxMCwgLTIxLCA1NSwgLTEwMywgMTE3LCAtNywgMTIzLCA1MywgLTc2LCAtMzcsIC0xMTgsIC0xMjEsIDgzLCAxMjMsIC01NSwgOTMsIDEwOV0=",
+    token_version_id: "2025010612142858-NCHHCF213-E2FB7-1E829D90DD",
   };
 
   const handleVerification = useCallback(async () => {
@@ -34,39 +36,62 @@ const AdultVerificationModal: React.FC<AdultVerificationModalProps> = ({
     setError(null);
 
     try {
-      // API 호출 또는 테스트 데이터 사용
+      // 디버깅을 위한 로그 추가
+      console.log("테스트 모드:", isTestMode);
+
       const authData = isTestMode
         ? TEST_AUTH_DATA
-        : (await api.post("/api/nice/auth/request")).data;
+        : (await api.post(`/api/nice/auth/request`, {})).data;
+      console.log("인증 데이터:", authData);
 
-      if (!authData.success) {
-        throw new Error(authData.message || "인증 정보 요청 실패");
-      }
+      // if (!authData.success) {
+      //   throw new Error(authData.message || "인증 정보 요청 실패");
+      // }
 
       const width = 500;
       const height = 600;
       const left = window.screen.width / 2 - width / 2;
       const top = window.screen.height / 2 - height / 2;
+      const option = `width=${width},height=${height},left=${left},top=${top},toolbar=no,scrollbars=no,status=no,menubar=no`;
+
+      // form 요소 디버깅
+      if (!formRef.current) {
+        throw new Error("폼 요소를 찾을 수 없습니다.");
+      }
 
       if (formRef.current && authData) {
         const form = formRef.current;
         const { enc_data, integrity_value, token_version_id } = authData;
 
-        (form.querySelector('[name="enc_data"]') as HTMLInputElement).value =
-          enc_data;
-        (
-          form.querySelector('[name="token_version_id"]') as HTMLInputElement
-        ).value = token_version_id;
-        (
-          form.querySelector('[name="integrity_value"]') as HTMLInputElement
-        ).value = integrity_value;
+        // 폼 데이터 설정 전 로그
+        console.log("설정할 폼 데이터:", {
+          enc_data,
+          integrity_value,
+          token_version_id,
+        });
+
+        // 폼 입력 요소 존재 여부 확인
+        const encDataInput = form.querySelector(
+          '[name="enc_data"]'
+        ) as HTMLInputElement;
+        const tokenInput = form.querySelector(
+          '[name="token_version_id"]'
+        ) as HTMLInputElement;
+        const integrityInput = form.querySelector(
+          '[name="integrity_value"]'
+        ) as HTMLInputElement;
+
+        if (!encDataInput || !tokenInput || !integrityInput) {
+          throw new Error("필수 폼 입력 요소가 없습니다.");
+        }
+
+        // 폼 데이터 설정
+        encDataInput.value = enc_data;
+        tokenInput.value = token_version_id;
+        integrityInput.value = integrity_value;
 
         // window.open() 호출 전에 팝업 차단 여부 확인
-        const popup = window.open(
-          "about:blank",
-          "nicePopup",
-          `width=${width},height=${height},left=${left},top=${top},scrollbars=yes,status=yes,resizable=no`
-        );
+        const popup = window.open("", "nicePopup", option);
 
         if (!popup || popup.closed || typeof popup.closed === "undefined") {
           setError("팝업이 차단되었습니다. 팝업 차단을 해제해주세요.");
@@ -81,26 +106,28 @@ const AdultVerificationModal: React.FC<AdultVerificationModalProps> = ({
           try {
             const { success, data } = event.data;
 
-            if (success) {
-              const { data: verifyResult } = await api.post(
-                "/api/nice/auth/verify",
-                data
-              );
+            console.log(success, data);
 
-              if (
-                verifyResult.success &&
-                verifyResult.age &&
-                verifyResult.age >= 19
-              ) {
-                onComplete();
-              } else {
-                setError(
-                  "성인인증에 실패했습니다. 만 19세 이상만 이용 가능합니다."
-                );
-              }
-            } else {
-              setError("본인인증에 실패했습니다.");
-            }
+            // if (success) {
+            //   const { data: verifyResult } = await api.post(
+            //     "/api/nice/auth/verify",
+            //     data
+            //   );
+
+            //   if (
+            //     verifyResult.success &&
+            //     verifyResult.age &&
+            //     verifyResult.age >= 19
+            //   ) {
+            //     onComplete();
+            //   } else {
+            //     setError(
+            //       "성인인증에 실패했습니다. 만 19세 이상만 이용 가능합니다."
+            //     );
+            //   }
+            // } else {
+            //   setError("본인인증에 실패했습니다.");
+            // }
           } catch (error) {
             console.error("인증 확인 중 오류 발생:", error);
             setError("인증 처리 중 오류가 발생했습니다.");
@@ -135,11 +162,11 @@ const AdultVerificationModal: React.FC<AdultVerificationModalProps> = ({
           ref={formRef}
           id="niceAuthForm"
           name="niceAuthForm"
-          method="post"
+          method="get"
           target="nicePopup"
-          action="https://nice.checkplus.co.kr/CheckPlusSafeModel/checkplus.cb"
+          action="https://nice.checkplus.co.kr/CheckPlusSafeModel/service.cb"
         >
-          <input type="hidden" id="m" name="m" value="checkplusService" />
+          <input type="hidden" id="m" name="m" value="service" />
           <input
             type="hidden"
             id="token_version_id"

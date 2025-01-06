@@ -1,139 +1,126 @@
+// module/NiceAuth.js
 const crypto = require("crypto");
 const axios = require("axios");
 const qs = require("querystring");
+const NiceCrypto = require("./NiceCrypto");
 const niceConfig = require("../config/niceConfig");
 
 class NiceAuth {
-  constructor() {
-    this.clientId = niceConfig.clientId;
-    this.clientSecret = niceConfig.clientSecret;
-    this.productId = niceConfig.productId;
-    this.baseUrl = niceConfig.baseUrl;
+  constructor(config) {
+    this.clientId = config.clientId;
+    this.clientSecret = config.clientSecret;
+    this.productId = config.productId;
+    this.baseUrl = config.baseUrl;
   }
 
-  // Access Token 발급
-  async getAccessToken() {
+  async requestCertification(token, reqData) {
     try {
-      const authorization = Buffer.from(
-        this.clientId + ":" + this.clientSecret
-      ).toString("base64");
+      const nowDate = new Date();
+      const tomorrow = new Date();
+      tomorrow.setDate(tomorrow.getDate() + 1);
 
-      const dataBody = {
-        scope: "default",
-        grant_type: "client_credentials",
+      const formatDate = (date) => {
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, "0");
+        const day = String(date.getDate()).padStart(2, "0");
+        const hours = String(date.getHours()).padStart(2, "0");
+        const minutes = String(date.getMinutes()).padStart(2, "0");
+        const seconds = String(date.getSeconds()).padStart(2, "0");
+        return `${year}${month}${day}${hours}${minutes}${seconds}`;
       };
 
-      const response = await axios({
-        method: "POST",
-        url: `${this.baseUrl}/digital/niceid/oauth/oauth/token`,
-        headers: {
-          "Content-Type": "application/x-www-form-urlencoded",
-          Authorization: `Basic ${authorization}`,
-        },
-        data: qs.stringify(dataBody),
-      });
-      console.log(response.data);
-      return response.data.dataBody.access_token;
-    } catch (error) {
-      console.error("getAccessToken Error:", error);
-      throw error;
-    }
-  }
+      const req_dtim = formatDate(tomorrow);
+      const req_no = crypto.randomBytes(16).toString("hex").slice(0, 30);
+      const current_timestamp = Math.floor(nowDate.getTime() / 1000);
 
-  // 암호화 데이터 생성
-  generateCryptData(reqData) {
-    try {
-      // 암호화 키 생성 (32byte)
-      const key = crypto.randomBytes(32);
-      const iv = crypto.randomBytes(16);
+      // Authorization 헤더 구성
+      const authString = `${token}:${current_timestamp}:${this.clientId}`;
+      const authorization = `bearer ${Buffer.from(authString).toString(
+        "base64"
+      )}`;
+
+      console.log("[Debug] Request payload:", {
+        req_dtim,
+        req_no,
+        enc_mode: "1",
+      });
+
+      const tokenResponse = await axios.post(
+        `${this.baseUrl}/digital/niceid/api/v1.0/common/crypto/token`,
+        {
+          dataHeader: { CNTY_CD: "ko" },
+          dataBody: { req_dtim, req_no, enc_mode: "1" },
+        },
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: authorization,
+            ProductID: this.productId,
+          },
+        }
+      );
+
+      console.log("[Debug] Token Response:", tokenResponse.data);
+
+      const { token_val } = tokenResponse.data.dataBody;
+
+      if (!req_dtim || !req_no || !token_val) {
+        throw new Error(
+          "Required values are missing: " +
+            `req_dtim: ${!!req_dtim}, ` +
+            `req_no: ${!!req_no}, ` +
+            `token_val: ${!!token_val}`
+        );
+      }
+
+      // 대칭키 생성
+      const value = `${req_dtim.trim()}${req_no.trim()}${token_val.trim()}`;
+      console.log("[Debug] Combined value for hash:", value);
+
+      // SHA-256 해시 생성
+      const hash = crypto.createHash("sha256").update(value).digest();
+
+      // Base64 인코딩
+      const base64Hash = hash.toString("base64");
+
+      // key: 앞에서부터 16byte
+      const key = Buffer.from(base64Hash.substring(0, 22), "base64");
+
+      // iv: 뒤에서부터 16byte
+      const iv = Buffer.from(base64Hash.slice(-22), "base64");
+
+      // hmac_key: 앞에서부터 32byte
+      const hmacKey = Buffer.from(base64Hash.substring(0, 43), "base64");
 
       // 데이터 암호화
       const cipher = crypto.createCipheriv("aes-256-cbc", key, iv);
       cipher.setAutoPadding(true);
 
-      let encrypted = cipher.update(JSON.stringify(reqData), "utf8", "base64");
-      encrypted += cipher.final("base64");
+      const encryptedData =
+        cipher.update(JSON.stringify(reqData), "utf8", "base64") +
+        cipher.final("base64");
 
-      // integrity value 생성
-      const hmac = crypto.createHmac("sha256", key);
-      hmac.update(encrypted);
+      // 무결성 값 생성
+      const hmac = crypto.createHmac("sha256", hmacKey);
+      hmac.update(encryptedData);
       const integrityValue = hmac.digest("base64");
 
-      return {
-        key: key.toString("base64"),
-        iv: iv.toString("base64"),
-        encrypted,
+      const result = {
+        ...tokenResponse.data,
+        encryptedData,
         integrityValue,
       };
-    } catch (error) {
-      console.error("generateCryptData Error:", error);
-      throw error;
-    }
-  }
 
-  // 암호화 데이터 복호화
-  decryptData(encryptedData, key, iv) {
-    try {
-      const decipher = crypto.createDecipheriv(
-        "aes-256-cbc",
-        Buffer.from(key, "base64"),
-        Buffer.from(iv, "base64")
-      );
-
-      let decrypted = decipher.update(encryptedData, "base64", "utf8");
-      decrypted += decipher.final("utf8");
-
-      return JSON.parse(decrypted);
-    } catch (error) {
-      console.error("decryptData Error:", error);
-      throw error;
-    }
-  }
-
-  // 본인인증 요청
-  async requestCertification(token, reqData) {
-    try {
-      const cryptData = this.generateCryptData(reqData);
-
-      const requestBody = {
-        dataHeader: {
-          CNTY_CD: "ko",
-        },
-        dataBody: {
-          req_dtim: new Date().toISOString(),
-          req_no: crypto.randomBytes(16).toString("hex"),
-          enc_mode: "1",
-          productId: this.productId,
-          key: cryptData.key,
-          iv: cryptData.iv,
-          crypto_cert_url: reqData.returnUrl, // 인증 완료 후 리턴될 URL
-          integrity_value: cryptData.integrityValue,
-          token_version_id: crypto.randomBytes(16).toString("hex"),
-          enc_data: cryptData.encrypted,
-        },
-      };
-
-      // axios.post({}) 형태에서 axios.post(url, data, config) 형태로 수정
-      const response = await axios.post(
-        `${this.baseUrl}/digital/niceid/api/v1.0/common/crypto/token`,
-        requestBody,
-        {
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-
-      console.log("NICE API Response:", response.data); // 응답 로깅 추가
-      return response.data;
-    } catch (error) {
-      // 에러 로깅 개선
-      console.error("requestCertification Error:", {
-        message: error.message,
-        response: error.response?.data,
-        config: error.config,
+      console.log("[Debug] Final result:", {
+        success: true,
+        tokenVersionId: result.dataBody.token_version_id,
+        hasEncryptedData: !!result.encryptedData,
+        hasIntegrityValue: !!result.integrityValue,
       });
+
+      return result;
+    } catch (error) {
+      console.error("[Debug] Full error:", error);
       throw error;
     }
   }
