@@ -22,7 +22,11 @@ app.use(
 
 app.use(
   cors({
-    origin: "http://localhost:5173",
+    origin: [
+      "http://localhost:5173",
+      "http://holomedia.co.kr",
+      "https://holomedia.co.kr",
+    ],
     // credentials: true,
   })
 );
