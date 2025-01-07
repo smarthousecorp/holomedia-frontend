@@ -43,7 +43,7 @@ router.get("/nice/callback", async (req, res) => {
           <title>인증 처리 중</title>
           <script>
             window.opener.postMessage(${JSON.stringify(
-              decryptedResult
+              safeResult
             )}, "${clientOrigin}");
             setTimeout(() => window.close(), 1000);
           </script>
