@@ -1,9 +1,7 @@
 import React, { useState, useCallback, useRef } from "react";
 import styled from "styled-components";
-// import { api } from "../../../utils/api";
-// import axios from "axios";
 import { api } from "../../../utils/api";
-// import axios from "axios";
+import axios from "axios";
 
 interface AdultVerificationModalProps {
   isOpen: boolean;
@@ -41,16 +39,16 @@ const AdultVerificationModal: React.FC<AdultVerificationModalProps> = ({
       console.log("테스트 모드:", isTestMode);
 
       // JAVA 서버 API
+      const authData = isTestMode
+        ? TEST_AUTH_DATA
+        : (await axios.post(`http://192.168.0.22:8080/nice`, {})).data;
+
       // const authData = isTestMode
       //   ? TEST_AUTH_DATA
-      //   : (await axios.post(`http://192.168.0.16:8080/nice`, {})).data;
+      //   : (await api.post(`/api/nice/auth/request`, {})).data;
 
-        const authData = isTestMode
-        ? TEST_AUTH_DATA
-        : (await api.post(`/api/nice/auth/request`, {})).data;
-
-        // Store auth data in session storage
-    sessionStorage.setItem("auth_data", JSON.stringify(authData));
+      // Store auth data in session storage
+      sessionStorage.setItem("auth_data", JSON.stringify(authData));
 
       // 응답 데이터 검증
       if (
@@ -71,11 +69,19 @@ const AdultVerificationModal: React.FC<AdultVerificationModalProps> = ({
       const top = window.screen.height / 2 - height / 2;
       const option = `width=${width},height=${height},left=${left},top=${top},toolbar=no,scrollbars=no,status=no,menubar=no`;
 
-
       const popup = window.open("", "nicePopup", option);
+
       if (!popup) {
         throw new Error("팝업이 차단되었습니다.");
       }
+
+      // 팝업이 열린 후 메시지 전달
+      popup.postMessage(
+        {
+          sessionData: sessionStorage.getItem("auth_data"),
+        },
+        "https://nice.checkplus.co.kr"
+      );
 
       // form 요소 디버깅
       if (!formRef.current) {
@@ -113,8 +119,6 @@ const AdultVerificationModal: React.FC<AdultVerificationModalProps> = ({
         tokenInput.value = token_version_id;
         integrityInput.value = integrity_value;
 
-        form.submit();
-
         const popupMonitor = setInterval(() => {
           if (popup.closed) {
             clearInterval(popupMonitor);
@@ -127,40 +131,43 @@ const AdultVerificationModal: React.FC<AdultVerificationModalProps> = ({
         // 메시지 이벤트 리스너 등록
         const handleMessage = async (event: MessageEvent) => {
           // 전체 이벤트 객체 로깅
-          if (event.data.source === 'react-devtools-bridge') {
+          if (event.data.source === "react-devtools-bridge") {
             return;
           }
-          console.log('수신된 메시지 이벤트:', event);
-          console.log('인증 데이터:', event.data);
-        
+          console.log("수신된 메시지 이벤트:", event);
+          console.log("인증 데이터:", event.data);
+
           try {
             const { success, authStatus, userInfo } = event.data;
-            
+
             // 인증 상태 로깅
-            console.log('인증 성공 여부:', success);
-            console.log('인증 상태 코드:', authStatus);
-            console.log('사용자 정보:', userInfo);
-        
-            if (success && authStatus === '0000') {
-              const { data: verifyResult } = await api.post('/api/nice/auth/verify', {
-                authStatus,
-                userInfo
-              });
-              
+            console.log("인증 성공 여부:", success);
+            console.log("인증 상태 코드:", authStatus);
+            console.log("사용자 정보:", userInfo);
+
+            if (success && authStatus === "0000") {
+              const { data: verifyResult } = await api.post(
+                "/api/nice/auth/verify",
+                {
+                  authStatus,
+                  userInfo,
+                }
+              );
+
               // 검증 결과 로깅
-              console.log('서버 검증 결과:', verifyResult);
-        
+              console.log("서버 검증 결과:", verifyResult);
+
               if (verifyResult.success && verifyResult.age >= 19) {
                 onComplete();
               } else {
-                setError('성인인증에 실패했습니다.');
+                setError("성인인증에 실패했습니다.");
               }
             } else {
-              setError('본인인증에 실패했습니다.');
+              setError("본인인증에 실패했습니다.");
             }
           } catch (error) {
-            console.error('인증 오류:', error);
-            setError('인증 처리 중 오류가 발생했습니다.');
+            console.error("인증 오류:", error);
+            setError("인증 처리 중 오류가 발생했습니다.");
           }
         };
 
@@ -168,9 +175,8 @@ const AdultVerificationModal: React.FC<AdultVerificationModalProps> = ({
 
         // 폼 제출
         // 팝업 로드 완료 대기
-        popup.onload = () => {
-          form.submit();
-        };
+
+        form.submit();
       }
     } catch (error) {
       setError("본인인증 처리 중 오류가 발생했습니다.");

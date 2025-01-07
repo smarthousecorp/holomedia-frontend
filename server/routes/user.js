@@ -3,37 +3,48 @@ const session = require("express-session");
 const authenticateToken = require("../module/authJWT");
 const router = express.Router();
 const NiceAuth = require("../module/NiceAuth");
+const crypto = require("crypto");
 
 const db = require("../db/holomedia");
 const tokenService = require("../module/jwt");
-const {detectCountry} = require("../module/detectCountry");
+const { detectCountry } = require("../module/detectCountry");
 
 const uuid4 = require("uuid4");
 
-router.get('/nice/callback', async (req, res) => {
+router.get("/nice/callback", async (req, res) => {
   const { token_version_id, enc_data, integrity_value } = req.query;
+  const { key, iv } = session.niceAuthValues;
   const clientOrigin = process.env.FRONTEND_URL;
-  
+
   try {
     const niceAuth = new NiceAuth();
     const accessToken = await niceAuth.getAccessToken();
-    
+
     const result = await niceAuth.getCertificationResult(
       accessToken,
       token_version_id,
-      enc_data, 
+      enc_data,
       integrity_value
     );
 
+    // 복호화
+    const decipher = crypto.createDecipheriv("aes-128-cbc", key, iv);
+    const decryptedData =
+      decipher.update(enc_data, "base64", "utf8") + decipher.final("utf8");
+
+    const decryptedResult = JSON.parse(decryptedData);
+
+    console.log(decryptedResult);
+
     const safeResult = {
       success: true,
-      authStatus: result.dataHeader.GW_RSLT_CD,
+      authStatus: decryptedResult.dataHeader.GW_RSLT_CD,
       userInfo: {
-        name: result.dataBody.name,
-        birthDate: result.dataBody.birthdate,
-        gender: result.dataBody.gender,
-        nationality: result.dataBody.nationality
-      }
+        name: decryptedResult.dataBody.name,
+        birthDate: decryptedResult.dataBody.birthdate,
+        gender: decryptedResult.dataBody.gender,
+        nationality: decryptedResult.dataBody.nationality,
+      },
     };
 
     res.send(`
@@ -43,7 +54,9 @@ router.get('/nice/callback', async (req, res) => {
           <meta charset="utf-8">
           <title>인증 처리 중</title>
           <script>
-            window.opener.postMessage(${JSON.stringify(safeResult)}, "${clientOrigin}");
+            window.opener.postMessage(${JSON.stringify(
+              safeResult
+            )}, "${clientOrigin}");
             setTimeout(() => window.close(), 1000);
           </script>
         </head>
@@ -52,10 +65,9 @@ router.get('/nice/callback', async (req, res) => {
         </body>
       </html>
     `);
-    
   } catch (error) {
-    console.error('NICE 인증 실패:', error);
-    
+    console.error("NICE 인증 실패:", error);
+
     res.send(`
       <!DOCTYPE html>
       <html>
@@ -92,7 +104,7 @@ router.post("/login", function (request, response) {
           // user_id가 존재하지 않을 때
           return response
             .status(404)
-            .send({message: "해당 아이디가 존재하지 않습니다.", status: 404});
+            .send({ message: "해당 아이디가 존재하지 않습니다.", status: 404 });
         }
 
         // user_id가 존재할 경우 비밀번호 확인
@@ -102,7 +114,7 @@ router.post("/login", function (request, response) {
           // 비밀번호가 틀릴 때
           return response
             .status(400)
-            .send({message: "비밀번호가 틀립니다.", status: 400});
+            .send({ message: "비밀번호가 틀립니다.", status: 400 });
         }
         // 로그인 성공
         request.session.is_logined = true; // 세션 정보 갱신
@@ -132,7 +144,7 @@ router.post("/login", function (request, response) {
   } else {
     response
       .status(400)
-      .send({message: "아이디와 비밀번호를 입력하세요.", status: 400});
+      .send({ message: "아이디와 비밀번호를 입력하세요.", status: 400 });
   }
 });
 
@@ -142,9 +154,9 @@ router.post("/logout", function (request, response) {
     if (err) {
       return response
         .status(500)
-        .send({message: "로그아웃 중 오류가 발생했습니다."});
+        .send({ message: "로그아웃 중 오류가 발생했습니다." });
     }
-    response.status(200).send({message: "로그아웃되었습니다."});
+    response.status(200).send({ message: "로그아웃되었습니다." });
   });
 });
 
@@ -270,7 +282,7 @@ router.get("/user/:id", (req, res) => {
   db.query(sql, [userId], (err, results) => {
     if (err) {
       console.error("사용자 정보 조회 실패:", err);
-      return res.status(500).send({message: "서버 오류가 발생했습니다."});
+      return res.status(500).send({ message: "서버 오류가 발생했습니다." });
     }
 
     // 결과가 없는 경우
