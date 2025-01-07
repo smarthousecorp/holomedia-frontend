@@ -1,12 +1,11 @@
+// types/country.ts
 export interface CountryInfo {
-  countryCode: string;
+  country: string;
   language: string;
-  region: string;
   timezone: string;
 }
 
 export interface CountryResponse {
   success: boolean;
   data: CountryInfo;
-  error?: string;
 }

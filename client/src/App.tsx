@@ -22,16 +22,16 @@ import NotificationPage from "./pages/Alarm";
 import { logger } from "./utils/logger";
 import ProfileSetting from "./pages/ProfileSetting";
 import PasswordChange from "./pages/PasswordChange";
-interface ErrorMessageProps {
-  message?: string;
-}
+// interface ErrorMessageProps {
+//   message?: string;
+// }
 
-const ErrorMessage: React.FC<ErrorMessageProps> = ({
-  message = "Error detecting country",
-}) => <div>{message}</div>;
+// const ErrorMessage: React.FC<ErrorMessageProps> = ({
+//   message = "Error detecting country",
+// }) => <div>{message}</div>;
 
 function App() {
-  const { countryInfo, error, loading } = useCountryDetection();
+  const { countryInfo, loading } = useCountryDetection();
   const location = useLocation();
 
   useEffect(() => {
@@ -49,10 +49,6 @@ function App() {
 
   if (countryInfo && loading) {
     return <Loading />;
-  }
-
-  if (error) {
-    return <ErrorMessage />;
   }
 
   return (

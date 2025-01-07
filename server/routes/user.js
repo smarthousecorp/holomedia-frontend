@@ -627,20 +627,10 @@ router.get("/user-country", detectCountry, (req, res) => {
       },
     });
   } catch (error) {
-    res.status(200).json({
-      success: true,
-      data: {
-        ip: "192.168.0.1",
-        countryCode: null,
-        language: null,
-        region: geoInfo?.region || "",
-        timezone: geoInfo?.timezone || "",
-      },
+    res.status(500).json({
+      success: false,
+      error: "Failed to detect country",
     });
-    // res.status(500).json({
-    //   success: false,
-    //   error: "Failed to detect country",
-    // });
   }
 });
 
