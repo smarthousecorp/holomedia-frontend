@@ -44,10 +44,16 @@ class NiceAuth {
 
       return response.data.dataBody.access_token;
     } catch (error) {
-      console.error("getAccessToken Error details:", {
-        message: error.message,
-        response: error.response?.data,
-        status: error.response?.status,
+      console.error("getAccessToken 상세 에러:", {
+        에러메시지: error.message,
+        응답데이터: error.response?.data,
+        상태코드: error.response?.status,
+        설정값체크: {
+          baseUrl: this.baseUrl,
+          clientId존재: !!this.clientId,
+          clientSecret존재: !!this.clientSecret,
+          productId존재: !!this.productId,
+        },
       });
       throw error;
     }
