@@ -11,6 +11,8 @@ import { checkId, checkPassword, checkUsername } from "../utils/validCheck";
 import { showToast } from "../store/slices/toast";
 import { ToastType } from "../types/toast";
 import Toast from "../components/commons/Toast";
+import { useAdultVerification } from "../hooks/useAdultVerification";
+import AdultVerificationModal from "../components/commons/media/AdultVerificationModal";
 
 interface SignUp {
   [key: string]: any;
@@ -50,6 +52,14 @@ const SignUp: React.FC = () => {
   const [showPasswordCheck, setShowPasswordCheck] = useState(false);
 
   const validationResults = useSignUpValidation(inputVal);
+
+  const {
+    isVerificationModalOpen,
+    isVerified,
+    openVerificationModal,
+    closeVerificationModal,
+    handleVerificationComplete,
+  } = useAdultVerification();
 
   const onChangeValues = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -141,98 +151,120 @@ const SignUp: React.FC = () => {
   };
 
   return (
-    <Container>
-      <SignUpBox>
-        <Logo onClick={() => navigate("/")}>
-          <img src={logo} alt={t("auth.social.signupTitle")} />
-        </Logo>
-        <Title>{t("auth.modal.title.signup")}</Title>
-        <Form onSubmit={onSubmitSignUp}>
-          <InputWrapper>
-            <Input
-              name="user_id"
-              placeholder={t("auth.signup.idPlaceholder")}
-              value={inputVal.user_id}
-              onChange={onChangeValues}
-              onBlur={onBlurIdInput}
-            />
-          </InputWrapper>
-          {errorMsg.user_id && <ErrorMessage>{errorMsg.user_id}</ErrorMessage>}
+    <>
+      <Container>
+        <SignUpBox>
+          <Logo onClick={() => navigate("/")}>
+            <img src={logo} alt={t("auth.social.signupTitle")} />
+          </Logo>
+          <Title>{t("auth.modal.title.signup")}</Title>
+          <Form onSubmit={onSubmitSignUp}>
+            <InputWrapper>
+              <Input
+                name="user_id"
+                placeholder={t("auth.signup.idPlaceholder")}
+                value={inputVal.user_id}
+                onChange={onChangeValues}
+                onBlur={onBlurIdInput}
+              />
+            </InputWrapper>
+            {errorMsg.user_id && (
+              <ErrorMessage>{errorMsg.user_id}</ErrorMessage>
+            )}
 
-          <InputWrapper>
-            <Input
-              type={showPassword ? "text" : "password"}
-              name="password"
-              placeholder={t("auth.signup.passwordPlaceholder")}
-              value={inputVal.password}
-              onChange={onChangeValues}
-              onBlur={onBlurPwdInputs}
-            />
-            <PasswordToggle
+            <InputWrapper>
+              <Input
+                type={showPassword ? "text" : "password"}
+                name="password"
+                placeholder={t("auth.signup.passwordPlaceholder")}
+                value={inputVal.password}
+                onChange={onChangeValues}
+                onBlur={onBlurPwdInputs}
+              />
+              <PasswordToggle
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+              >
+                {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+              </PasswordToggle>
+            </InputWrapper>
+            {errorMsg.password && (
+              <ErrorMessage>{errorMsg.password}</ErrorMessage>
+            )}
+
+            <InputWrapper>
+              <Input
+                type={showPasswordCheck ? "text" : "password"}
+                name="passwordCheck"
+                placeholder={t("auth.signup.passwordCheckPlaceholder")}
+                value={inputVal.passwordCheck}
+                onChange={onChangeValues}
+                onBlur={onBlurPwdInputs}
+              />
+              <PasswordToggle
+                type="button"
+                onClick={() => setShowPasswordCheck(!showPasswordCheck)}
+              >
+                {showPasswordCheck ? <EyeOff size={18} /> : <Eye size={18} />}
+              </PasswordToggle>
+            </InputWrapper>
+            {errorMsg.passwordCheck && (
+              <ErrorMessage>{errorMsg.passwordCheck}</ErrorMessage>
+            )}
+
+            <InputWrapper>
+              <Input
+                name="username"
+                placeholder={t("auth.signup.usernamePlaceholder")}
+                value={inputVal.username}
+                onChange={onChangeValues}
+                onBlur={onBlurNameInput}
+              />
+            </InputWrapper>
+            {errorMsg.username && (
+              <ErrorMessage>{errorMsg.username}</ErrorMessage>
+            )}
+
+            <VerificationButton
               type="button"
-              onClick={() => setShowPassword(!showPassword)}
+              onClick={openVerificationModal}
+              // disabled={!inputVal.user_id || isVerified}
             >
-              {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
-            </PasswordToggle>
-          </InputWrapper>
-          {errorMsg.password && (
-            <ErrorMessage>{errorMsg.password}</ErrorMessage>
-          )}
+              {isVerified ? "인증완료" : "본인인증"}
+              <VerificationStatus verified={isVerified}>
+                {isVerified && "✓"}
+              </VerificationStatus>
+            </VerificationButton>
 
-          <InputWrapper>
-            <Input
-              type={showPasswordCheck ? "text" : "password"}
-              name="passwordCheck"
-              placeholder={t("auth.signup.passwordCheckPlaceholder")}
-              value={inputVal.passwordCheck}
-              onChange={onChangeValues}
-              onBlur={onBlurPwdInputs}
-            />
-            <PasswordToggle
-              type="button"
-              onClick={() => setShowPasswordCheck(!showPasswordCheck)}
+            <SignUpButton
+              type="submit"
+              disabled={
+                !validationResults.idValid ||
+                !validationResults.passwordValid ||
+                !validationResults.passwordsMatch ||
+                !validationResults.usernameValid
+              }
             >
-              {showPasswordCheck ? <EyeOff size={18} /> : <Eye size={18} />}
-            </PasswordToggle>
-          </InputWrapper>
-          {errorMsg.passwordCheck && (
-            <ErrorMessage>{errorMsg.passwordCheck}</ErrorMessage>
-          )}
-
-          <InputWrapper>
-            <Input
-              name="username"
-              placeholder={t("auth.signup.usernamePlaceholder")}
-              value={inputVal.username}
-              onChange={onChangeValues}
-              onBlur={onBlurNameInput}
-            />
-          </InputWrapper>
-          {errorMsg.username && (
-            <ErrorMessage>{errorMsg.username}</ErrorMessage>
-          )}
-
-          <SignUpButton
-            type="submit"
-            disabled={
-              !validationResults.idValid ||
-              !validationResults.passwordValid ||
-              !validationResults.passwordsMatch ||
-              !validationResults.usernameValid
-            }
-          >
-            {t("auth.signup.button")}
-          </SignUpButton>
-          <About>
-            <p onClick={() => navigate("/")}>
-              {t("auth.signup.alreadyMember")}{" "}
-              <span className="strong">{t("auth.modal.title.login")}</span>{" "}
-              {/* {t("auth.signup.goToLogin")} */}
-            </p>
-          </About>
-        </Form>
-      </SignUpBox>
-    </Container>
+              {t("auth.signup.button")}
+            </SignUpButton>
+            <About>
+              <p onClick={() => navigate("/")}>
+                {t("auth.signup.alreadyMember")}{" "}
+                <span className="strong">{t("auth.modal.title.login")}</span>{" "}
+                {/* {t("auth.signup.goToLogin")} */}
+              </p>
+            </About>
+          </Form>
+        </SignUpBox>
+      </Container>
+      {/* 모달 컴포넌트 추가 */}
+      <AdultVerificationModal
+        isOpen={isVerificationModalOpen}
+        onClose={closeVerificationModal}
+        onComplete={handleVerificationComplete}
+        isTestMode={false}
+      />
+    </>
   );
 };
 
@@ -381,4 +413,31 @@ const ErrorMessage = styled.div`
   margin-top: -1.5rem;
   margin-bottom: 0.5rem;
   text-align: left;
+`;
+
+// 버튼 스타일 컴포넌트
+const VerificationButton = styled(Button)`
+  background-color: white;
+  color: ${(props) => (props.disabled ? "#cccccc" : "#eb3553")};
+  border: 2px solid ${(props) => (props.disabled ? "#cccccc" : "#eb3553")};
+  font-size: 1.2rem;
+  padding: 0.5rem 1rem;
+  transition: all 0.2s ease-in-out;
+  width: auto;
+  min-width: 100px;
+
+  &:hover:not(:disabled) {
+    background-color: #eb3553;
+    color: white;
+  }
+
+  &:disabled {
+    border-color: #cccccc;
+    cursor: not-allowed;
+  }
+`;
+// 확인 표시 아이콘 컴포넌트
+const VerificationStatus = styled.span<{ verified: boolean }>`
+  margin-left: 8px;
+  color: ${(props) => (props.verified ? "#4CAF50" : "#cccccc")};
 `;

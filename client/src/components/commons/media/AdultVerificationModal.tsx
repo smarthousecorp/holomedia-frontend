@@ -41,7 +41,7 @@ const AdultVerificationModal: React.FC<AdultVerificationModalProps> = ({
       // JAVA 서버 API
       const authData = isTestMode
         ? TEST_AUTH_DATA
-        : (await axios.post(`http://192.168.0.22:8080/nice`, {})).data;
+        : (await axios.post(`http://192.168.0.16:8080/nice`, {})).data;
 
       // const authData = isTestMode
       //   ? TEST_AUTH_DATA

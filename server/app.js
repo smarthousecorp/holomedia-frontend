@@ -8,22 +8,22 @@ const niceAuthRouter = require("./routes/niceAuthRoute");
 
 const app = express();
 
-app.use(
-  session({
-    secret: "your-secret-key", // 비밀 키
-    resave: false,
-    saveUninitialized: true,
-    cookie: { secure: true }, // HTTPS를 사용할 경우 true로 설정
-    cookie: {
-      secure: process.env.NODE_ENV === "production", // Only use secure in production
-    },
-  })
-);
+// app.use(
+//   session({
+//     secret: "your-secret-key", // 비밀 키
+//     resave: false,
+//     saveUninitialized: true,
+//     cookie: { secure: true }, // HTTPS를 사용할 경우 true로 설정
+//     cookie: {
+//       secure: process.env.NODE_ENV === "production", // Only use secure in production
+//     },
+//   })
+// );
 
 app.use(
   cors({
     origin: "http://localhost:5173",
-    credentials: true,
+    // credentials: true,
   })
 );
 app.use(express.json());
