@@ -35,18 +35,6 @@ router.get("/nice/callback", async (req, res) => {
     const decryptedResult = JSON.parse(decryptedData);
 
     console.log(decryptedResult);
-
-    const safeResult = {
-      success: true,
-      authStatus: decryptedResult.dataHeader.GW_RSLT_CD,
-      userInfo: {
-        name: decryptedResult.dataBody.name,
-        birthDate: decryptedResult.dataBody.birthdate,
-        gender: decryptedResult.dataBody.gender,
-        nationality: decryptedResult.dataBody.nationality,
-      },
-    };
-
     res.send(`
       <!DOCTYPE html>
       <html>
@@ -55,7 +43,7 @@ router.get("/nice/callback", async (req, res) => {
           <title>인증 처리 중</title>
           <script>
             window.opener.postMessage(${JSON.stringify(
-              safeResult
+              decryptedResult
             )}, "${clientOrigin}");
             setTimeout(() => window.close(), 1000);
           </script>
