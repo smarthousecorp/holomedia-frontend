@@ -32,6 +32,12 @@ class NiceAuth {
         grant_type: "client_credentials",
       };
 
+      console.log("Debug - 요청 전:", {
+        url: `${this.baseUrl}/digital/niceid/oauth/oauth/token`,
+        authorization: `Basic ${authorization}`,
+        dataBody,
+      });
+
       const response = await axios({
         method: "POST",
         url: `${this.baseUrl}/digital/niceid/oauth/oauth/token`,
@@ -41,6 +47,8 @@ class NiceAuth {
         },
         data: qs.stringify(dataBody),
       });
+
+      console.log("Debug - API 응답:", response.data);
 
       return response.data.dataBody.access_token;
     } catch (error) {
