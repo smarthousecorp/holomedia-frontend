@@ -1,7 +1,7 @@
 import React, { useState, useCallback, useRef } from "react";
 import styled from "styled-components";
 import { api } from "../../../utils/api";
-import axios from "axios";
+// import axios from "axios";
 
 interface AdultVerificationModalProps {
   isOpen: boolean;
@@ -38,14 +38,14 @@ const AdultVerificationModal: React.FC<AdultVerificationModalProps> = ({
       // 디버깅을 위한 로그 추가
       console.log("테스트 모드:", isTestMode);
 
-      // JAVA 서버 API
-      const authData = isTestMode
-        ? TEST_AUTH_DATA
-        : (await axios.post(`https://api.holomedia.co.kr/nice`, {})).data;
-
+      // // JAVA 서버 API
       // const authData = isTestMode
       //   ? TEST_AUTH_DATA
-      //   : (await api.post(`/api/nice/auth/request`, {})).data;
+      //   : (await axios.post(`http://192.168.0.16:8080/nice`, {})).data;
+
+      const authData = isTestMode
+        ? TEST_AUTH_DATA
+        : (await api.post(`/api/nice/auth/request`, {})).data;
 
       // Store auth data in session storage
       sessionStorage.setItem("auth_data", JSON.stringify(authData));

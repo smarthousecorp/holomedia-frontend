@@ -4,10 +4,10 @@ import store from "../store";
 import { logout } from "../store/slices/user";
 
 export const api = axios.create({
-  baseURL: import.meta.env.VITE_SERVER_DOMAIN,
+  baseURL: "/api",
   headers: {
     "Content-Type": "application/json",
-    "Access-Control-Allow-Origin": "*",
+    // "Access-Control-Allow-Origin": "*",
   },
 });
 

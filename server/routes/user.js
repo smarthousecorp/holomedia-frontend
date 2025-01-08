@@ -33,8 +33,8 @@ router.get("/nice/callback", async (req, res) => {
       decipher.update(enc_data, "base64", "utf8") + decipher.final("utf8");
 
     const decryptedResult = JSON.parse(decryptedData);
+    console.log("복호화 후 값", decryptedResult);
 
-    console.log(decryptedResult);
     res.send(`
       <!DOCTYPE html>
       <html>
@@ -43,9 +43,9 @@ router.get("/nice/callback", async (req, res) => {
           <title>인증 처리 중</title>
           <script>
             window.opener.postMessage(${JSON.stringify(
-              safeResult
+              decryptedResult
             )}, "${clientOrigin}");
-            setTimeout(() => window.close(), 1000);
+            setTimeout(() => window.close(), 50000);
           </script>
         </head>
         <body>
