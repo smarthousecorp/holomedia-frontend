@@ -6,8 +6,8 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
-    "deploy": "tsc -b && vite build && aws s3 sync ./dist s3://holomedia.co.kr --profile=holomedia-s3",
-    "deploy_dev": "tsc -b && vite build && aws s3 sync ./dist s3://dev.holomedia.co.kr --profile=holomedia-s3",
+    "deploy": "tsc -b && vite build --mode production && aws s3 sync ./dist s3://holomedia.co.kr --profile=holomedia-s3",
+    "deploy_dev": "tsc -b && vite build --mode staging && aws s3 sync ./dist s3://dev.holomedia.co.kr --profile=holomedia-s3",
     "lint": "eslint .",
     "preview": "vite preview"
   },
