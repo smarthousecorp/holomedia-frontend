@@ -41,7 +41,7 @@ function App() {
   useEffect(() => {
     if (
       import.meta.env.VITE_NODE_ENV === "production" &&
-      !["/dev-tools-alert", "/"].includes(location.pathname)
+      !["/dev-tools-alert", "/", "/signup"].includes(location.pathname)
     ) {
       preventDevTools();
     }
