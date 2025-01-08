@@ -112,7 +112,7 @@ class NiceAuth {
       // reqData 재구성
       const finalReqData = {
         requestno: req_no,
-        returnurl: "http://localhost:4000/nice/callback", // 클라이언트에서 전달받은 returnurl 사용
+        returnurl: "https://15.165.57.43.nip.io/nice/callback",
         sitecode: site_code, // token 응답에서 받은 site_code 사용
         methodtype: "get",
         popupyn: "Y",
