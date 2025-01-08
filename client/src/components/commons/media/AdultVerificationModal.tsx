@@ -47,8 +47,8 @@ const AdultVerificationModal: React.FC<AdultVerificationModalProps> = ({
         ? TEST_AUTH_DATA
         : (await api.post(`/api/nice/auth/request`, {})).data;
 
-      // Store auth data in session storage
-      sessionStorage.setItem("auth_data", JSON.stringify(authData));
+      // // Store auth data in session storage
+      // sessionStorage.setItem("auth_data", JSON.stringify(authData));
 
       // 응답 데이터 검증
       if (
@@ -75,13 +75,13 @@ const AdultVerificationModal: React.FC<AdultVerificationModalProps> = ({
         throw new Error("팝업이 차단되었습니다.");
       }
 
-      // 팝업이 열린 후 메시지 전달
-      popup.postMessage(
-        {
-          sessionData: sessionStorage.getItem("auth_data"),
-        },
-        "https://nice.checkplus.co.kr"
-      );
+      // // 팝업이 열린 후 메시지 전달
+      // popup.postMessage(
+      //   {
+      //     sessionData: sessionStorage.getItem("auth_data"),
+      //   },
+      //   "https://nice.checkplus.co.kr"
+      // );
 
       // form 요소 디버깅
       if (!formRef.current) {
