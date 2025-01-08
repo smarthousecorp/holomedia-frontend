@@ -9,6 +9,8 @@ import {
   DialogContent,
   DialogActions,
 } from "@mui/material";
+import { IconButton } from "@mui/material";
+import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import { api } from "../utils/api";
 import { useSelector } from "react-redux";
 import { RootState } from "../store";
@@ -30,6 +32,10 @@ const VideoDetail = () => {
   const [showPaymentDialog, setShowPaymentDialog] = useState<boolean>(false);
 
   const [paymentInfo, setPaymentInfo] = useState<PaymentStatus | null>(null);
+
+  const handleGoBack = () => {
+    navigate(-1);
+  };
 
   const onClosePaymentDialog = () => {
     setShowPaymentDialog(false);
@@ -76,6 +82,20 @@ const VideoDetail = () => {
 
   return (
     <VideoDetailContainer>
+      <BackButtonContainer>
+        <IconButton
+          onClick={handleGoBack}
+          sx={{
+            color: "white",
+            padding: "12px", // 버튼 패딩 증가
+            "&:hover": {
+              backgroundColor: "rgba(255, 255, 255, 0.1)", // 호버 효과
+            },
+          }}
+        >
+          <ArrowBackIcon sx={{ fontSize: "2.4rem" }} />
+        </IconButton>
+      </BackButtonContainer>
       <VideoPlayContainer>
         <VideoPlayerDiv>
           {!showPaymentDialog && media?.url && (
@@ -132,6 +152,18 @@ const VideoDetailContainer = styled.section`
 
   @media (max-width: 900px) {
     height: 100vh;
+  }
+`;
+
+const BackButtonContainer = styled.div`
+  display: none;
+  position: absolute;
+  top: 1rem;
+  left: 1rem;
+  z-index: 1000;
+
+  @media (max-width: 900px) {
+    display: block;
   }
 `;
 
