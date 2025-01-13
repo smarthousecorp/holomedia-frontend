@@ -26,6 +26,7 @@ app.use(
       "http://localhost:5173",
       "http://holomedia.co.kr",
       "https://holomedia.co.kr",
+      "https://dev.holomedia.co.kr",
     ],
     // credentials: true,
   })
