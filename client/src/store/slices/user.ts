@@ -1,10 +1,10 @@
-import {createSlice} from "@reduxjs/toolkit";
+import { createSlice } from "@reduxjs/toolkit";
 
 const userSlice = createSlice({
   name: "user",
   initialState: {
     isLoggedIn: false,
-    user_id: "",
+    id: "",
     username: "",
     profile_image: "",
     background_image: "",
@@ -16,7 +16,7 @@ const userSlice = createSlice({
   reducers: {
     login: (state, actions) => {
       state.isLoggedIn = true;
-      state.user_id = actions.payload.user_id;
+      state.id = actions.payload.id;
       state.username = actions.payload.username;
       state.profile_image = actions.payload.profile_image;
       state.background_image = actions.payload.background_image;
@@ -27,7 +27,7 @@ const userSlice = createSlice({
     },
     logout: (state) => {
       state.isLoggedIn = false;
-      state.user_id = "";
+      state.id = "";
       state.username = "";
       state.profile_image = "";
       state.background_image = "";
@@ -42,6 +42,6 @@ const userSlice = createSlice({
   },
 });
 
-export const {login, logout, verifyAdult} = userSlice.actions;
+export const { login, logout, verifyAdult } = userSlice.actions;
 
 export default userSlice.reducer;

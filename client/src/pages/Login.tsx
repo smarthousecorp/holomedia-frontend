@@ -5,13 +5,33 @@ import { Check, Eye, EyeOff } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { useTranslation } from "react-i18next";
-import axios from "axios";
-import { setCookie } from "../utils/cookie";
+// import { setCookie } from "../utils/cookie";
 import { login } from "../store/slices/user";
+import { api } from "../utils/api";
 
 interface LoginCredentials {
-  user_id: string;
+  id: string;
   password: string;
+}
+
+interface ErrorMsg {
+  id: string;
+  password: string;
+}
+
+interface Apiresponse {
+  code: number;
+  data: {
+    id: string;
+    nickname: string;
+    // profile_image: string;
+    // is_adult_verified: boolean;
+    // is_admin: boolean;
+    // is_uploader: boolean;
+    // bloom: number;
+  } | null;
+  message: string;
+  timestamp: string;
 }
 
 const Login: React.FC = () => {
@@ -20,71 +40,25 @@ const Login: React.FC = () => {
   const dispatch = useDispatch();
 
   const [inputVal, setInputVal] = useState<LoginCredentials>({
-    user_id: "",
+    id: "",
     password: "",
   });
 
-  const [errorMsg, setErrorMsg] = useState<LoginCredentials>({
-    user_id: "",
+  const [errorMsg, setErrorMsg] = useState<ErrorMsg>({
+    id: "",
     password: "",
   });
 
   const [showPassword, setShowPassword] = useState(false);
   const [rememberID, setRememberID] = useState(false);
-  const [autoLogin, setAutoLogin] = useState(false);
 
   useEffect(() => {
-    const savedUserId = localStorage.getItem("remembered_user_id");
+    const savedUserId = localStorage.getItem("remembered_id");
     if (savedUserId) {
-      setInputVal((prev) => ({ ...prev, user_id: savedUserId }));
+      setInputVal((prev) => ({ ...prev, id: savedUserId }));
       setRememberID(true);
     }
-
-    const autoLoginEnabled = localStorage.getItem("auto_login") === "true";
-    setAutoLogin(autoLoginEnabled);
-
-    if (autoLoginEnabled) {
-      const savedToken = localStorage.getItem("accessToken");
-      if (savedToken) {
-        handleAutoLogin(savedToken);
-      }
-    }
   }, []);
-
-  const handleAutoLogin = async (token: string) => {
-    try {
-      const response = await axios.get(
-        `${import.meta.env.VITE_SERVER_DOMAIN}/validate-token`,
-        {
-          headers: {
-            Authorization: `${token}`,
-          },
-        }
-      );
-
-      if (response.data.valid) {
-        dispatch(
-          login({
-            isLoggedIn: true,
-            user_id: response.data.user_id,
-            username: response.data.username,
-            profile_image: response.data.profile_image,
-            background_image: response.data.background_image,
-            is_adult_verified: response.data.is_adult_verified,
-            is_admin: response.data.is_admin,
-            is_uploader: response.data.is_uploader,
-            bloom: response.data.bloom,
-          })
-        );
-        navigate("/main");
-      }
-    } catch (error) {
-      console.error("Auto login failed:", error);
-      localStorage.removeItem("accessToken");
-      localStorage.removeItem("auto_login");
-      setAutoLogin(false);
-    }
-  };
 
   const onChangeValues = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -100,84 +74,93 @@ const Login: React.FC = () => {
     e.preventDefault();
 
     try {
-      const res = await axios.post(
-        `${import.meta.env.VITE_SERVER_DOMAIN}/login`,
-        inputVal
-      );
+      const res = await api.post<Apiresponse>(`/login`, inputVal);
 
       if (rememberID) {
-        localStorage.setItem("remembered_user_id", inputVal.user_id);
+        localStorage.setItem("remembered_id", inputVal.id);
       } else {
-        localStorage.removeItem("remembered_user_id");
+        localStorage.removeItem("remembered_id");
       }
 
-      localStorage.setItem("auto_login", autoLogin.toString());
-
-      const current = new Date();
-      current.setMinutes(current.getMinutes() + 1440);
-
-      setCookie("accessToken", res.data.accessToken, {
-        path: "/",
-        expires: current,
-      });
-      localStorage.setItem("accessToken", res.data.accessToken);
-
-      dispatch(
-        login({
-          isLoggedIn: true,
-          user_id: res.data.user_id,
-          username: res.data.username,
-          profile_image: res.data.profile_image,
-          is_adult_verified: res.data.is_adult_verified,
-          is_admin: res.data.is_admin,
-          is_uploader: res.data.is_uploader,
-          bloom: res.data.bloom,
-        })
-      );
-
-      navigate("/main");
-    } catch (error: any) {
-      if (error.response) {
-        let errorMessage = "";
-        switch (error.response.data.status) {
-          case 404:
+      // 에러 코드에 따른 처리
+      if (res.data.code !== 0) {
+        switch (res.data.code) {
+          case 1: // 아이디가 없는 경우
             setErrorMsg((prev) => ({
               ...prev,
-              user_id: t("auth.login.errors.userNotFound"),
+              id: t("auth.login.errors.userNotFound"),
             }));
-            break;
-          case 400:
-            errorMessage = error.response.data.message;
-            if (errorMessage === "비밀번호가 틀립니다.") {
-              setErrorMsg((prev) => ({
-                ...prev,
-                password: t("auth.login.errors.wrongPassword"),
-              }));
-            } else {
-              setErrorMsg((prev) => ({
-                ...prev,
-                password: t("auth.login.errors.requiredFields"),
-              }));
-            }
-            break;
+            return;
+          case 2: // 비밀번호가 틀린 경우
+            setErrorMsg((prev) => ({
+              ...prev,
+              password: t("auth.login.errors.wrongPassword"),
+            }));
+            return;
           default:
-            console.error("Login error:", error);
+            setErrorMsg((prev) => ({
+              ...prev,
+              password: res.data.message,
+            }));
+            return;
         }
       }
+
+      // 로그인 성공 처리
+      if (res.data.code === 0 && res.data.data) {
+        if (rememberID) {
+          localStorage.setItem("remembered_id", inputVal.id);
+        } else {
+          localStorage.removeItem("remembered_id");
+        }
+
+        dispatch(
+          login({
+            isLoggedIn: true,
+            id: res.data.data.id,
+            nickname: res.data.data.nickname,
+          })
+        );
+
+        navigate("/main");
+      }
+    } catch (error: any) {
+      console.log(error);
+
+      // if (error.response) {
+      //   let errorMessage = "";
+      //   switch (error.res.data.status) {
+      //     case 404:
+      //       setErrorMsg((prev) => ({
+      //         ...prev,
+      //         id: t("auth.login.errors.userNotFound"),
+      //       }));
+      //       break;
+      //     case 400:
+      //       errorMessage = error.res.data.message;
+      //       if (errorMessage === "비밀번호가 틀립니다.") {
+      //         setErrorMsg((prev) => ({
+      //           ...prev,
+      //           password: t("auth.login.errors.wrongPassword"),
+      //         }));
+      //       } else {
+      //         setErrorMsg((prev) => ({
+      //           ...prev,
+      //           password: t("auth.login.errors.requiredFields"),
+      //         }));
+      //       }
+      //       break;
+      //     default:
+      //       console.error("Login error:", error);
+      //   }
+      // }
     }
   };
 
   const handleRememberIDChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setRememberID(e.target.checked);
     if (!e.target.checked) {
-      localStorage.removeItem("remembered_user_id");
-    }
-  };
-
-  const handleAutoLoginChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setAutoLogin(e.target.checked);
-    if (!e.target.checked) {
-      localStorage.removeItem("auto_login");
+      localStorage.removeItem("remembered_id");
     }
   };
 
@@ -191,9 +174,9 @@ const Login: React.FC = () => {
         <Form onSubmit={onClickLoginBtn}>
           <InputWrapper>
             <Input
-              name="user_id"
+              name="id"
               placeholder={t("auth.login.idPlaceholder")}
-              value={inputVal.user_id}
+              value={inputVal.id}
               onChange={onChangeValues}
             />
             <CustomCheckboxLabel>
@@ -220,22 +203,9 @@ const Login: React.FC = () => {
               {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
             </PasswordToggle>
           </InputWrapper>
-          {(errorMsg.user_id || errorMsg.password) && (
-            <ErrorMessage>{errorMsg.user_id || errorMsg.password}</ErrorMessage>
+          {(errorMsg.id || errorMsg.password) && (
+            <ErrorMessage>{errorMsg.id || errorMsg.password}</ErrorMessage>
           )}
-          <AutoLoginWrapper>
-            <AutoCheckboxLabel>
-              <CheckboxInput
-                type="checkbox"
-                checked={autoLogin}
-                onChange={handleAutoLoginChange}
-              />
-              <CheckboxControl>
-                <Check size={12} />
-              </CheckboxControl>
-              <span>{t("auth.login.autoLogin")}</span>
-            </AutoCheckboxLabel>
-          </AutoLoginWrapper>
           <LoginButton type="submit">{t("auth.login.button")}</LoginButton>
           <About>
             <a onClick={() => navigate("/signup")}>
@@ -323,13 +293,6 @@ const PasswordToggle = styled.button`
     color: #eb3553;
   }
 `;
-const AutoLoginWrapper = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  font-size: 1.2rem;
-  color: #707070;
-`;
 
 const checkboxAppear = keyframes`
   0% {
@@ -360,10 +323,6 @@ const CustomCheckboxLabel = styled.label`
   span {
     transition: color 0.2s;
   }
-`;
-
-const AutoCheckboxLabel = styled(CustomCheckboxLabel)`
-  position: relative;
 `;
 
 const CheckboxInput = styled.input`

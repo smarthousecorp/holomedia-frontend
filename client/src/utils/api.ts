@@ -1,50 +1,28 @@
 import axios from "axios";
-// import { getCookie, removeCookie } from "./cookie";
-// import store from "../store";
-// import { logout } from "../store/slices/user";
+import store from "../store";
+import { logout } from "../store/slices/user";
 
 export const api = axios.create({
   baseURL: import.meta.env.VITE_SERVER_DOMAIN,
-  headers: {
-    "Content-Type": "application/json",
-    "Access-Control-Allow-Origin": "*",
-  },
+  withCredentials: true, // 쿠키를 주고받기 위한 설정
 });
 
-// // 요청이 전송되기 전 실행할 로직
-// api.interceptors.request.use(
-//   (config) => {
-//     const accessToken = getCookie("accessToken");
-//     if (accessToken) {
-//       config.headers.Authorization = `${accessToken}`;
-//     }
-//     return config;
-//   },
-//   async (error) => {
-//     await Promise.reject(error);
-//   }
-// );
+// 헤더에는 기본적인 설정만 필요
+api.defaults.headers.common["Content-Type"] = "application/json";
 
-// // 서버로부터 응답 받은 뒤 실행할 로직
-// api.interceptors.response.use(
-//   (response) => {
-//     // 2xx 응답코드에 대한 트리거
-//     return response;
-//   },
-//   async (error) => {
-//     // 2xx이 아닌 응답코드에 대한 트리거
-//     // const {response: errorResponse} = error;
-
-//     // 인증 에러 발생시 (refreshToken 발급 시 주석 해제 및 로직 작성)
-//     // if (errorResponse.status === 401) {
-//     //   return await resetTokenAndReattemptRequest(error);
-//     // }
-//     if (error.response.status === 401) {
-//       localStorage.removeItem("accessToken");
-//       removeCookie("accessToken");
-//       store.dispatch(logout());
-//       window.location.href = "/";
-//     }
-//     return await Promise.reject(error);
-//   }
-// );
+// 응답 인터셉터 - 세션 만료 등의 인증 에러 처리
+api.interceptors.response.use(
+  (response) => {
+    return response;
+  },
+  async (error) => {
+    // 인증 에러 발생시
+    if (error.response?.status === 401) {
+      // Redux 상태 초기화
+      store.dispatch(logout());
+      // 로그인 페이지로 리다이렉트
+      window.location.href = "/";
+    }
+    return Promise.reject(error);
+  }
+);
