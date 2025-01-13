@@ -10,7 +10,7 @@ export const checkPassword = (password: string): boolean => {
   return pwdRegex.test(password);
 };
 
-export const checkUsername = (username: string): boolean => {
+export const checkNickname = (username: string): boolean => {
   // 2~12자, 한글, 영문, 숫자 포함
   const nicknameRegex = /^[가-힣A-Za-z0-9]{2,12}$/;
   return nicknameRegex.test(username);

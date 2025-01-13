@@ -7,8 +7,6 @@ import { ToastContainer } from "react-toastify";
 // 업로드 어드민페이지로 이동하여 라우터 제거
 // import UploadForm from "./pages/uploadVideo";
 import "./i18n"; // i18n 설정 import
-import { useCountryDetection } from "./hooks/useCountryDetection";
-import Loading from "./components/commons/Loading";
 import ErrorPage from "./pages/Error";
 import Login from "./pages/Login";
 import SignUp from "./pages/Signup";
@@ -33,7 +31,6 @@ import PaymentReturn from "./pages/PaymentReturn";
 // }) => <div>{message}</div>;
 
 function App() {
-  const { countryInfo, loading } = useCountryDetection();
   const location = useLocation();
 
   useEffect(() => {
@@ -48,10 +45,6 @@ function App() {
       preventDevTools();
     }
   }, [location.pathname]);
-
-  if (countryInfo && loading) {
-    return <Loading />;
-  }
 
   return (
     <>

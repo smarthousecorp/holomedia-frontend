@@ -2,18 +2,22 @@ import styled from "styled-components";
 import Social from "./Social";
 import Input from "../Input";
 import Button from "../Button";
-import React, {useState} from "react";
-import axios, {AxiosError} from "axios";
-import {useTranslation} from "react-i18next";
-import {useSignUpValidation} from "../../../utils/SignUpValid";
-import {checkId, checkPassword, checkUsername} from "../../../utils/validCheck";
-import {useDispatch} from "react-redux";
-import {off} from "../../../store/slices/modal";
-import {showToast} from "../../../store/slices/toast";
+import React, { useState } from "react";
+import axios, { AxiosError } from "axios";
+import { useTranslation } from "react-i18next";
+import { useSignUpValidation } from "../../../utils/SignUpValid";
+import {
+  checkId,
+  checkPassword,
+  checkUsername,
+} from "../../../utils/validCheck";
+import { useDispatch } from "react-redux";
+import { off } from "../../../store/slices/modal";
+import { showToast } from "../../../store/slices/toast";
 import Toast from "../Toast";
-import {ToastType} from "../../../types/toast";
+import { ToastType } from "../../../types/toast";
 
-export interface SignUp {
+interface SignUp {
   [key: string]: any;
   user_id: string;
   password: string;
@@ -29,7 +33,7 @@ interface ErrorMsg {
 }
 
 const SignUp = () => {
-  const {t} = useTranslation();
+  const { t } = useTranslation();
   const dispatch = useDispatch();
 
   const [inputVal, setInputVal] = useState<SignUp>({
@@ -49,13 +53,13 @@ const SignUp = () => {
   const validationResults = useSignUpValidation(inputVal);
 
   const onChangeValues = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const {name, value} = e.target;
-    setInputVal({...inputVal, [name]: value});
+    const { name, value } = e.target;
+    setInputVal({ ...inputVal, [name]: value });
 
     switch (name) {
       case "passwordCheck":
         if (inputVal.password === value) {
-          setErrorMsg({...errorMsg, [name]: ""});
+          setErrorMsg({ ...errorMsg, [name]: "" });
         } else {
           setErrorMsg({
             ...errorMsg,
@@ -66,45 +70,45 @@ const SignUp = () => {
   };
 
   const onBlurIdInput = () => {
-    const msg = {user_id: ""};
-    const {user_id} = inputVal;
+    const msg = { user_id: "" };
+    const { user_id } = inputVal;
 
     if (!checkId(user_id)) {
       msg.user_id = t("auth.signup.errors.idFormat");
     }
 
-    setErrorMsg({...errorMsg, ...msg});
+    setErrorMsg({ ...errorMsg, ...msg });
   };
 
   const onBlurPwdInputs = () => {
-    const msg = {password: "", passwordCheck: ""};
-    const {password, passwordCheck} = inputVal;
+    const msg = { password: "", passwordCheck: "" };
+    const { password, passwordCheck } = inputVal;
 
     if (!checkPassword(password)) {
       msg.password = t("auth.signup.errors.passwordFormat");
       if (passwordCheck !== "" && password !== passwordCheck) {
         msg.passwordCheck = t("auth.signup.errors.passwordMismatch");
-        setErrorMsg({...errorMsg, ...msg});
+        setErrorMsg({ ...errorMsg, ...msg });
       } else {
-        setErrorMsg({...errorMsg, ...msg});
+        setErrorMsg({ ...errorMsg, ...msg });
       }
     } else if (passwordCheck !== "" && password !== passwordCheck) {
       msg.passwordCheck = t("auth.signup.errors.passwordMismatch");
-      setErrorMsg({...errorMsg, ...msg});
+      setErrorMsg({ ...errorMsg, ...msg });
     } else {
-      setErrorMsg({...errorMsg, ...msg});
+      setErrorMsg({ ...errorMsg, ...msg });
     }
   };
 
   const onBlurNameInput = () => {
-    const msg = {username: ""};
-    const {username} = inputVal;
+    const msg = { username: "" };
+    const { username } = inputVal;
 
     if (!checkUsername(username)) {
       msg.username = t("auth.signup.errors.usernameFormat");
     }
 
-    setErrorMsg({...errorMsg, ...msg});
+    setErrorMsg({ ...errorMsg, ...msg });
   };
 
   const onClickSignUpBtn = () => {
@@ -121,7 +125,7 @@ const SignUp = () => {
         );
       })
       .catch((error) => {
-        const msg = {user_id: "", username: ""};
+        const msg = { user_id: "", username: "" };
         const axiosError = error as AxiosError;
         if (axiosError.response?.status === 409) {
           const errorMessage = axiosError.response?.data;
@@ -131,7 +135,7 @@ const SignUp = () => {
           } else if (errorMessage === "이미 존재하는 닉네임 입니다.") {
             msg.username = t("auth.signup.errors.duplicateUsername");
           }
-          setErrorMsg({...errorMsg, ...msg});
+          setErrorMsg({ ...errorMsg, ...msg });
         }
       });
   };

@@ -4,29 +4,37 @@ import logo from "../assets/holomedia-logo.png";
 import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { useTranslation } from "react-i18next";
-import axios, { AxiosError } from "axios";
+// import axios, { AxiosError } from "axios";
+import axios from "axios";
 import { useSignUpValidation } from "../utils/SignUpValid";
 import { Eye, EyeOff } from "lucide-react";
-import { checkId, checkPassword, checkUsername } from "../utils/validCheck";
+import { checkId, checkPassword, checkNickname } from "../utils/validCheck";
 import { showToast } from "../store/slices/toast";
 import { ToastType } from "../types/toast";
 import Toast from "../components/commons/Toast";
 import { useAdultVerification } from "../hooks/useAdultVerification";
 import AdultVerificationModal from "../components/commons/media/AdultVerificationModal";
 
-interface SignUp {
+export interface SignUp {
   [key: string]: any;
-  user_id: string;
+  id: string;
   password: string;
   passwordCheck: string;
-  username: string;
+  nickname: string;
 }
 
 interface ErrorMsg {
-  user_id: string;
+  id: string;
   password: string;
   passwordCheck: string;
-  username: string;
+  nickname: string;
+}
+
+interface ApiResponse {
+  code: number;
+  data: null;
+  message: string;
+  timestamp: string;
 }
 
 const SignUp: React.FC = () => {
@@ -35,17 +43,17 @@ const SignUp: React.FC = () => {
   const dispatch = useDispatch();
 
   const [inputVal, setInputVal] = useState<SignUp>({
-    user_id: "",
+    id: "",
     password: "",
     passwordCheck: "",
-    username: "",
+    nickname: "",
   });
 
   const [errorMsg, setErrorMsg] = useState<ErrorMsg>({
-    user_id: "",
+    id: "",
     password: "",
     passwordCheck: "",
-    username: "",
+    nickname: "",
   });
 
   const [showPassword, setShowPassword] = useState(false);
@@ -61,22 +69,22 @@ const SignUp: React.FC = () => {
     handleVerificationComplete,
   } = useAdultVerification();
 
-  const handleClickPaymentBtn = () => {
-    axios
-      .post(
-        "https://apiholomedia.duckdns.org/board/pg",
-        {},
-        {
-          withCredentials: true,
-        }
-      )
-      .then((res) => {
-        console.log(res.data.online_url);
-        const options =
-          "toolbar=no,scrollbars=no,resizable=yes,status=no,menubar=no,width=1200, height=800, top=0,left=0";
-        window.open(res.data.online_url, "_blank", options);
-      });
-  };
+  // const handleClickPaymentBtn = () => {
+  //   axios
+  //     .post(
+  //       "https://apiholomedia.duckdns.org/board/pg",
+  //       {},
+  //       {
+  //         withCredentials: true,
+  //       }
+  //     )
+  //     .then((res) => {
+  //       console.log(res.data.online_url);
+  //       const options =
+  //         "toolbar=no,scrollbars=no,resizable=yes,status=no,menubar=no,width=1200, height=800, top=0,left=0";
+  //       window.open(res.data.online_url, "_blank", options);
+  //     });
+  // };
 
   const onChangeValues = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -96,11 +104,11 @@ const SignUp: React.FC = () => {
   };
 
   const onBlurIdInput = () => {
-    const msg = { user_id: "" };
-    const { user_id } = inputVal;
+    const msg = { id: "" };
+    const { id } = inputVal;
 
-    if (!checkId(user_id)) {
-      msg.user_id = t("auth.signup.errors.idFormat");
+    if (!checkId(id)) {
+      msg.id = t("auth.signup.errors.idFormat");
     }
     setErrorMsg({ ...errorMsg, ...msg });
   };
@@ -126,11 +134,11 @@ const SignUp: React.FC = () => {
   };
 
   const onBlurNameInput = () => {
-    const msg = { username: "" };
-    const { username } = inputVal;
+    const msg = { nickname: "" };
+    const { nickname } = inputVal;
 
-    if (!checkUsername(username)) {
-      msg.username = t("auth.signup.errors.usernameFormat");
+    if (!checkNickname(nickname)) {
+      msg.nickname = t("auth.signup.errors.usernameFormat");
     }
     setErrorMsg({ ...errorMsg, ...msg });
   };
@@ -138,32 +146,67 @@ const SignUp: React.FC = () => {
   const onSubmitSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
 
+    // API 요청을 위한 데이터 준비
+    const signupData = {
+      id: inputVal.id,
+      password: inputVal.password,
+      nickname: inputVal.nickname,
+    };
+
     try {
-      await axios.post(
-        `${import.meta.env.VITE_SERVER_DOMAIN}/signup`,
-        inputVal
+      const response = await axios.post<ApiResponse>(
+        `${import.meta.env.VITE_SERVER_DOMAIN}/singup`,
+        signupData
       );
-      Toast(ToastType.success, t("auth.signup.success"));
+      // 성공적인 회원가입 (code가 0이라고 가정)
+      if (response.data.code === 0) {
+        Toast(ToastType.success, t("auth.signup.success"));
+        dispatch(
+          showToast({
+            message: t("auth.signup.success"),
+            type: "success",
+          })
+        );
+        navigate("/");
+        return;
+      }
+
+      // 에러 처리
+      const msg = { id: "", nickname: "" };
+
+      switch (response.data.code) {
+        case 1: // 중복 아이디
+          msg.id = t("auth.signup.errors.duplicateId");
+          break;
+        case 2: // 중복 닉네임
+          msg.nickname = t("auth.signup.errors.duplicateUsername");
+          break;
+      }
+
+      setErrorMsg({ ...errorMsg, ...msg });
+    } catch (error) {
+      // const msg = { id: "", nickname: "" };
+      // const axiosError = error as AxiosError;
+      // if (axiosError.response?.status === 409) {
+      //   const errorMessage = axiosError.response?.data;
+
+      //   if (errorMessage === "이미 존재하는 아이디 입니다.") {
+      //     msg.id = t("auth.signup.errors.duplicateId");
+      //   } else if (errorMessage === "이미 존재하는 닉네임 입니다.") {
+      //     msg.nickname = t("auth.signup.errors.duplicateUsername");
+      //   }
+      //   setErrorMsg({ ...errorMsg, ...msg });
+      // }
+      // 네트워크 에러 등 예외적인 에러 처리
+      console.log(error);
+
+      Toast(ToastType.error, t("common.errors.unknown"));
       dispatch(
         showToast({
-          message: t("auth.signup.success"),
-          type: "success",
+          message: t("common.errors.unknown"),
+          type: "error",
         })
       );
-      navigate("/");
-    } catch (error) {
-      const msg = { user_id: "", username: "" };
-      const axiosError = error as AxiosError;
-      if (axiosError.response?.status === 409) {
-        const errorMessage = axiosError.response?.data;
-
-        if (errorMessage === "이미 존재하는 아이디 입니다.") {
-          msg.user_id = t("auth.signup.errors.duplicateId");
-        } else if (errorMessage === "이미 존재하는 닉네임 입니다.") {
-          msg.username = t("auth.signup.errors.duplicateUsername");
-        }
-        setErrorMsg({ ...errorMsg, ...msg });
-      }
     }
   };
 
@@ -178,16 +221,14 @@ const SignUp: React.FC = () => {
           <Form onSubmit={onSubmitSignUp}>
             <InputWrapper>
               <Input
-                name="user_id"
+                name="id"
                 placeholder={t("auth.signup.idPlaceholder")}
-                value={inputVal.user_id}
+                value={inputVal.id}
                 onChange={onChangeValues}
                 onBlur={onBlurIdInput}
               />
             </InputWrapper>
-            {errorMsg.user_id && (
-              <ErrorMessage>{errorMsg.user_id}</ErrorMessage>
-            )}
+            {errorMsg.id && <ErrorMessage>{errorMsg.id}</ErrorMessage>}
 
             <InputWrapper>
               <Input
@@ -231,21 +272,21 @@ const SignUp: React.FC = () => {
 
             <InputWrapper>
               <Input
-                name="username"
+                name="nickname"
                 placeholder={t("auth.signup.usernamePlaceholder")}
-                value={inputVal.username}
+                value={inputVal.nickname}
                 onChange={onChangeValues}
                 onBlur={onBlurNameInput}
               />
             </InputWrapper>
-            {errorMsg.username && (
-              <ErrorMessage>{errorMsg.username}</ErrorMessage>
+            {errorMsg.nickname && (
+              <ErrorMessage>{errorMsg.nickname}</ErrorMessage>
             )}
 
             <VerificationButton
               type="button"
               onClick={openVerificationModal}
-              // disabled={!inputVal.user_id || isVerified}
+              // disabled={!inputVal.id || isVerified}
             >
               {isVerified ? "인증완료" : "본인인증"}
               <VerificationStatus verified={isVerified}>
@@ -253,9 +294,9 @@ const SignUp: React.FC = () => {
               </VerificationStatus>
             </VerificationButton>
 
-            <VerificationButton type="button" onClick={handleClickPaymentBtn}>
+            {/* <VerificationButton type="button" onClick={handleClickPaymentBtn}>
               결제하기
-            </VerificationButton>
+            </VerificationButton> */}
 
             <SignUpButton
               type="submit"
@@ -263,7 +304,7 @@ const SignUp: React.FC = () => {
                 !validationResults.idValid ||
                 !validationResults.passwordValid ||
                 !validationResults.passwordsMatch ||
-                !validationResults.usernameValid
+                !validationResults.nicknameValid
               }
             >
               {t("auth.signup.button")}
