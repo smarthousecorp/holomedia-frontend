@@ -38,8 +38,8 @@ const MainPopup = ({ imageUrl, onClose }: MainPopupProps) => {
   if (!isVisible) return null;
 
   return (
-    <Overlay>
-      <PopupContainer>
+    <Overlay onClick={handleClose}>
+      <PopupContainer onClick={(e) => e.stopPropagation()}>
         <CloseButton onClick={handleClose} aria-label="Close popup">
           <X size={24} />
         </CloseButton>
@@ -69,6 +69,7 @@ const Overlay = styled.div`
   align-items: center;
   justify-content: center;
   z-index: 50;
+  padding: 1rem;
 `;
 
 const PopupContainer = styled.div`
@@ -77,6 +78,8 @@ const PopupContainer = styled.div`
   position: relative;
   box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1),
     0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  width: 500px;
+  max-width: 100%;
 `;
 
 const CloseButton = styled.button`
@@ -87,15 +90,27 @@ const CloseButton = styled.button`
   border-radius: 9999px;
   color: #ffffff;
   transition: background-color 0.2s;
+  z-index: 1;
 
   &:hover {
     background-color: rgba(0, 0, 0, 0.05);
+  }
+
+  @media (max-width: 900px) {
+    right: 0.25rem;
+    top: 0.25rem;
   }
 `;
 
 const ImageContainer = styled.div`
   width: 500px;
   height: 500px;
+
+  @media (max-width: 900px) {
+    width: 100%;
+    height: auto;
+    aspect-ratio: 1;
+  }
 
   img {
     width: 100%;
@@ -107,24 +122,37 @@ const ImageContainer = styled.div`
 `;
 
 const ButtonContainer = styled.div`
-  padding: 1rem;
+  padding: 1rem 1rem 1rem 1.5rem;
   display: flex;
   justify-content: space-between;
   align-items: center;
   border-top: 1px solid #e5e7eb;
+
+  @media (max-width: 900px) {
+    padding: 1rem;
+    flex-direction: column-reverse;
+    gap: 1rem;
+  }
 `;
 
 const HideDayButton = styled.button`
-  font-size: 0.875rem;
+  font-size: 1.3rem;
   color: #4b5563;
   transition: color 0.2s;
 
   &:hover {
     color: #1f2937;
   }
+
+  @media (max-width: 900px) {
+    font-size: 1.1rem;
+    width: 100%;
+    padding: 0.5rem;
+  }
 `;
 
 const CloseNormalButton = styled.button`
+  font-size: 1.3rem;
   padding: 0.5rem 1rem;
   background-color: #eb3553;
   color: white;
@@ -132,6 +160,12 @@ const CloseNormalButton = styled.button`
   transition: background-color 0.2s;
 
   &:hover {
-    background-color: #374151;
+    background-color: #f55e77;
+  }
+
+  @media (max-width: 900px) {
+    font-size: 1.1rem;
+    width: 100%;
+    padding: 0.75rem;
   }
 `;
