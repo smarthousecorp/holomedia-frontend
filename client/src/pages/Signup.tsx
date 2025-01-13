@@ -61,6 +61,23 @@ const SignUp: React.FC = () => {
     handleVerificationComplete,
   } = useAdultVerification();
 
+  const handleClickPaymentBtn = () => {
+    axios
+      .post(
+        "https://apiholomedia.duckdns.org/board/pg",
+        {},
+        {
+          withCredentials: true,
+        }
+      )
+      .then((res) => {
+        console.log(res.data.online_url);
+        const options =
+          "toolbar=no,scrollbars=no,resizable=yes,status=no,menubar=no,width=1200, height=800, top=0,left=0";
+        window.open(res.data.online_url, "_blank", options);
+      });
+  };
+
   const onChangeValues = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setInputVal({ ...inputVal, [name]: value });
@@ -234,6 +251,10 @@ const SignUp: React.FC = () => {
               <VerificationStatus verified={isVerified}>
                 {isVerified && "✓"}
               </VerificationStatus>
+            </VerificationButton>
+
+            <VerificationButton type="button" onClick={handleClickPaymentBtn}>
+              결제하기
             </VerificationButton>
 
             <SignUpButton

@@ -25,6 +25,9 @@ import UploaderList from "../components/main/UploaderList";
 import MovieList from "../components/main/MovieList";
 import { RecommendedUploaders } from "../components/main/RecommendList";
 import { useTranslation } from "react-i18next";
+import { Helmet } from "react-helmet-async";
+import MainPopup from "../components/commons/MainPopup";
+import mainPopupImage from "../assets/main-popup.jpg";
 // import SideBannder from "../assets/side-banner.png";
 
 type LoadingState = "loading" | "error" | "success";
@@ -101,6 +104,10 @@ const Main = () => {
     navigate(`/video/${media.id}`);
   };
 
+  const handlePopupClose = () => {
+    console.log("팝업이 닫혔습니다.");
+  };
+
   if (loadingState === "loading") {
     return <Loading />;
   }
@@ -116,68 +123,111 @@ const Main = () => {
   }
 
   return (
-    <MainContainer>
-      <MovieContainer>
-        <MovieTopSection>
-          <MovieTitle>{t("main.home")}</MovieTitle>
-          <InputWrapper>
-            <SearchContainer placeholder={t("main.search.placeholder")} />
-            <SvgIcon
-              className="searchIcon"
-              component={SearchOutlinedIcon}
-              // sx={{stroke: "#6d46cc", strokeWidth: 1}}
-            />
-          </InputWrapper>
-        </MovieTopSection>
-        {/* <hr /> */}
-        {medias.length === 0 ? (
-          // <EmptyState message={`홈에 등록된 영상이 없습니다`} />
-          <></>
-        ) : (
-          <MovieMainContainer>
-            <UploaderList
-              uploaders={uploaders}
-              onUploaderClick={handleUploaderClick}
-            />
-            {/* 241211 출석체크 기능 주석처리 */}
-            {/* <ScoreProgress currentScore={10} /> */}
-            <MovieList
-              medias={medias}
-              uploaders={uploaders}
-              onUploaderClick={handleUploaderClick}
-              onMediaClick={handleMediaClick}
-              shouldBlur={shouldBlur}
-            />
-          </MovieMainContainer>
-        )}
-      </MovieContainer>
-      <SideContainer>
-        <RecommendedUploaders />
-        <img
-          src="https://firebasestorage.googleapis.com/v0/b/quill-image-store.appspot.com/o/HOLOMEDIA%2FMask%20group.png?alt=media&token=8c8f852f-e813-45f6-bd00-83c0a8accd60"
-          alt="광고 배너"
+    <>
+      <Helmet>
+        <title>메인 - HOLOMEDIA</title>
+        <link rel="canonical" href="https://holomedia.co.kr/" />
+        <meta charSet="UTF-8" />
+        <link rel="icon" type="image/svg+xml" href="/favicon.ico" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta
+          http-equiv="Content-Security-Policy"
+          content="upgrade-insecure-requests"
         />
-      </SideContainer>
-      {/* 성인인증 모달 */}
-      {showModal && (
-        <AdultVerificationModal
-          isOpen={showModal}
-          onClose={() => {
-            setShowModal(false);
-            setSelectedVideoId(null);
-          }}
-          onComplete={() => {
-            setShowModal(false);
-            dispatch(verifyAdult());
-            if (selectedVideoId) {
-              navigate(`/video/${selectedVideoId}`);
+        <meta
+          name="description"
+          content="홀로미디어 - 크리에이터와 팬이 만나는 최적의 공간."
+        />
+        <meta
+          name="keywords"
+          content="미디어, 기술, 크리에이터, 홀로미디어, MMD"
+        />
+        <meta name="author" content="홀로미디어" />
+        <meta name="robots" content="index, follow" />
+
+        <meta property="og:title" content="홀로미디어" />
+        <meta
+          property="og:description"
+          content="홀로미디어 - 크리에이터와 팬이 만나는 최적의 공간."
+        />
+        <meta property="og:image" content="/holomedia_og_image.png" />
+        <meta property="og:url" content="http://holomedia.co.kr" />
+        <meta property="og:type" content="website" />
+        <meta property="og:site_name" content="홀로미디어" />
+
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content="홀로미디어" />
+        <meta
+          name="twitter:description"
+          content="홀로미디어 - 크리에이터와 팬이 만나는 최적의 공간."
+        />
+        <meta name="twitter:image" content="./public/holomedia_og_image.png" />
+        <meta name="twitter:site" content="@holomedia" />
+      </Helmet>
+      <MainContainer>
+        <MovieContainer>
+          <MovieTopSection>
+            <MovieTitle>{t("main.home")}</MovieTitle>
+            <InputWrapper>
+              <SearchContainer placeholder={t("main.search.placeholder")} />
+              <SvgIcon
+                className="searchIcon"
+                component={SearchOutlinedIcon}
+                // sx={{stroke: "#6d46cc", strokeWidth: 1}}
+              />
+            </InputWrapper>
+          </MovieTopSection>
+          {/* <hr /> */}
+          {medias.length === 0 ? (
+            // <EmptyState message={`홈에 등록된 영상이 없습니다`} />
+            <></>
+          ) : (
+            <MovieMainContainer>
+              <UploaderList
+                uploaders={uploaders}
+                onUploaderClick={handleUploaderClick}
+              />
+              {/* 241211 출석체크 기능 주석처리 */}
+              {/* <ScoreProgress currentScore={10} /> */}
+              <MovieList
+                medias={medias}
+                uploaders={uploaders}
+                onUploaderClick={handleUploaderClick}
+                onMediaClick={handleMediaClick}
+                shouldBlur={shouldBlur}
+              />
+            </MovieMainContainer>
+          )}
+        </MovieContainer>
+        <SideContainer>
+          <RecommendedUploaders />
+          <img
+            src="https://firebasestorage.googleapis.com/v0/b/quill-image-store.appspot.com/o/HOLOMEDIA%2FMask%20group.png?alt=media&token=8c8f852f-e813-45f6-bd00-83c0a8accd60"
+            alt="광고 배너"
+          />
+        </SideContainer>
+        {/* 성인인증 모달 */}
+        {showModal && (
+          <AdultVerificationModal
+            isOpen={showModal}
+            onClose={() => {
+              setShowModal(false);
               setSelectedVideoId(null);
-            }
-          }}
-          isTestMode={false}
-        />
-      )}
-    </MainContainer>
+            }}
+            onComplete={() => {
+              setShowModal(false);
+              dispatch(verifyAdult());
+              if (selectedVideoId) {
+                navigate(`/video/${selectedVideoId}`);
+                setSelectedVideoId(null);
+              }
+            }}
+            isTestMode={false}
+          />
+        )}
+      </MainContainer>
+      <MainPopup imageUrl={mainPopupImage} onClose={handlePopupClose} />
+    </>
   );
 };
 export default Main;

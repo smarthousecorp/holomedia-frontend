@@ -4,7 +4,8 @@ import MainLayout from "./components/layout/MainLayout";
 import "./index.css";
 import PublicLayout from "./components/layout/PublicLayout";
 import { ToastContainer } from "react-toastify";
-import UploadForm from "./pages/uploadVideo";
+// 업로드 어드민페이지로 이동하여 라우터 제거
+// import UploadForm from "./pages/uploadVideo";
 import "./i18n"; // i18n 설정 import
 import { useCountryDetection } from "./hooks/useCountryDetection";
 import Loading from "./components/commons/Loading";
@@ -22,6 +23,7 @@ import NotificationPage from "./pages/Alarm";
 import { logger } from "./utils/logger";
 import ProfileSetting from "./pages/ProfileSetting";
 import PasswordChange from "./pages/PasswordChange";
+import PaymentReturn from "./pages/PaymentReturn";
 // interface ErrorMessageProps {
 //   message?: string;
 // }
@@ -57,6 +59,7 @@ function App() {
         <Route element={<MainLayout />}>
           <Route path="/" element={<Login />} />
           <Route path="/signup" element={<SignUp />} />
+          <Route path="/payment" element={<PaymentReturn />} />
           <Route path="/*" element={<ErrorPage error="404" />} />
           <Route path="/error" element={<ErrorPage error="500" />} />
           <Route path="/dev-tools-alert" element={<DevToolsAlert />} />
@@ -72,14 +75,14 @@ function App() {
             }
           />
           <Route path="/user/:id" element={<User />} />
-          <Route
+          {/* <Route
             path="/upload"
             element={
               // <UploaderRoute>
               <UploadForm />
               // </UploaderRoute>
             }
-          />
+          /> */}
           <Route path="/alarm" element={<NotificationPage />} />
           {/* <Route
             path="/membership"

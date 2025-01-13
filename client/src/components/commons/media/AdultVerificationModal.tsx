@@ -1,7 +1,7 @@
 import React, { useState, useCallback, useRef } from "react";
 import styled from "styled-components";
 import { api } from "../../../utils/api";
-// import axios from "axios";
+import axios from "axios";
 
 interface AdultVerificationModalProps {
   isOpen: boolean;
@@ -23,11 +23,9 @@ const AdultVerificationModal: React.FC<AdultVerificationModalProps> = ({
   // 테스트용 더미 데이터 (테스트 할 때 마다 변경)
   const TEST_AUTH_DATA = {
     success: true,
-    enc_data:
-      "WzcyLCA0MCwgMjksIC04NCwgNzcsIDQyLCAtMiwgLTY5LCAyNSwgMTA1LCA3LCAtNzAsIDY5LCAtNDMsIC0yMywgOTEsIC0xMDksIC04NywgMzMsIC02MiwgMjYsIC02MiwgLTEwMiwgLTkwLCAtNCwgNjEsIC0xLCAtNTAsIDEyMCwgLTQ1LCAtMTUsIC0xMTUsIC02MiwgMTQsIDEwNiwgMzIsIC00OSwgNzcsIC02NywgLTEwNiwgLTY4LCAxMTksIC0xOCwgLTUwLCAxMTAsIDg5LCAyLCAtOTksIC04NCwgNDAsIDg2LCA2OSwgMTE2LCAxOSwgLTY1LCAtNjcsIDExNCwgMTE5LCA2MiwgLTExNSwgLTY1LCAxMDEsIDUsIC02MywgLTMxLCAtMjcsIC04NywgNjIsIC00NCwgLTEwLCA3MywgLTEzLCAxMjUsIC00NywgLTY0LCA2NywgNiwgLTEyNSwgLTcwLCAtOTAsIC0xMTIsIDEyNywgMjcsIC05MCwgMzQsIC04NywgLTc4LCAtNTksIC00LCAtMTAsIDg3LCAxMjQsIC0yOSwgLTIxLCAtMjksIDk4LCA3MSwgNTksIC01MiwgOTcsIDIxLCAtNTYsIDU0LCAxMTQsIC0xMDksIDEyMSwgLTExOSwgMTE0LCA2OSwgLTMzLCA4OSwgNjVd",
-    integrity_value:
-      "WzE0LCAyMSwgLTc0LCAtODYsIC01MywgLTg2LCAtNDgsIC0xMCwgMTE0LCAtOTEsIDg2LCAtMzMsIC0xNiwgNzksIDQyLCAxMCwgLTIxLCA1NSwgLTEwMywgMTE3LCAtNywgMTIzLCA1MywgLTc2LCAtMzcsIC0xMTgsIC0xMjEsIDgzLCAxMjMsIC01NSwgOTMsIDEwOV0=",
-    token_version_id: "2025010612142858-NCHHCF213-E2FB7-1E829D90DD",
+    enc_data: "1",
+    integrity_value: "2=",
+    token_version_id: "3",
   };
 
   const handleVerification = useCallback(async () => {
@@ -38,14 +36,49 @@ const AdultVerificationModal: React.FC<AdultVerificationModalProps> = ({
       // 디버깅을 위한 로그 추가
       console.log("테스트 모드:", isTestMode);
 
-      // // JAVA 서버 API
-      // const authData = isTestMode
-      //   ? TEST_AUTH_DATA
-      //   : (await axios.post(`http://192.168.0.16:8080/nice`, {})).data;
+      // 현재 쿠키 상태 로깅
+      console.log("Current cookies:", document.cookie);
 
+      // JAVA 서버 API 요청 전 로깅
+      console.log("Sending request to nice API...");
+      // JAVA 서버 API
       const authData = isTestMode
         ? TEST_AUTH_DATA
-        : (await api.post(`/api/nice/auth/request`, {})).data;
+        : await axios
+            .post(
+              `https://apiholomedia.duckdns.org/nice`,
+              {},
+              {
+                withCredentials: true,
+                headers: {
+                  "Content-Type": "application/json",
+                },
+                // 요청과 응답 인터셉터 추가
+                onUploadProgress: (progressEvent) => {
+                  console.log("Upload progress:", progressEvent);
+                },
+              }
+            )
+            .then((response) => {
+              // 응답 헤더 로깅
+              console.log("Response headers:", response.headers);
+              // 쿠키 확인
+              console.log("Cookies after response:", document.cookie);
+              return response.data;
+            })
+            .catch((error) => {
+              // 에러 상세 정보 로깅
+              console.error("Request failed:", {
+                config: error.config,
+                response: error.response,
+                message: error.message,
+              });
+              throw error;
+            });
+
+      // const authData = isTestMode
+      //   ? TEST_AUTH_DATA
+      //   : (await api.post(`/api/nice/auth/request`, {})).data;
 
       // // Store auth data in session storage
       // sessionStorage.setItem("auth_data", JSON.stringify(authData));
