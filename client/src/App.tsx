@@ -22,6 +22,7 @@ import NotificationPage from "./pages/Alarm";
 import { logger } from "./utils/logger";
 import ProfileSetting from "./pages/ProfileSetting";
 import PasswordChange from "./pages/PasswordChange";
+import PaymentReturn from "./pages/PaymentReturn";
 // interface ErrorMessageProps {
 //   message?: string;
 // }
@@ -57,6 +58,7 @@ function App() {
         <Route element={<MainLayout />}>
           <Route path="/" element={<Login />} />
           <Route path="/signup" element={<SignUp />} />
+          <Route path="/payment" element={<PaymentReturn />} />
           <Route path="/*" element={<ErrorPage error="404" />} />
           <Route path="/error" element={<ErrorPage error="500" />} />
           <Route path="/dev-tools-alert" element={<DevToolsAlert />} />
