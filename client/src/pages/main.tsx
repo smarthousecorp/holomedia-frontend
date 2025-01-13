@@ -26,6 +26,8 @@ import MovieList from "../components/main/MovieList";
 import { RecommendedUploaders } from "../components/main/RecommendList";
 import { useTranslation } from "react-i18next";
 import { Helmet } from "react-helmet-async";
+import MainPopup from "../components/commons/MainPopup";
+import mainPopupImage from "../assets/main-popup.jpg";
 // import SideBannder from "../assets/side-banner.png";
 
 type LoadingState = "loading" | "error" | "success";
@@ -100,6 +102,10 @@ const Main = () => {
     }
 
     navigate(`/video/${media.id}`);
+  };
+
+  const handlePopupClose = () => {
+    console.log("팝업이 닫혔습니다.");
   };
 
   if (loadingState === "loading") {
@@ -220,6 +226,7 @@ const Main = () => {
           />
         )}
       </MainContainer>
+      <MainPopup imageUrl={mainPopupImage} onClose={handlePopupClose} />
     </>
   );
 };
