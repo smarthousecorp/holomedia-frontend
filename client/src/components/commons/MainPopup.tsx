@@ -11,10 +11,15 @@ const MainPopup = ({ imageUrl, onClose }: MainPopupProps) => {
   const [isVisible, setIsVisible] = useState<boolean>(false);
 
   useEffect(() => {
-    const hideUntil = localStorage.getItem("popupHideUntil");
-    const shouldShow = !hideUntil || new Date(hideUntil) < new Date();
-    setIsVisible(shouldShow);
-  }, []);
+    // 현재 URL이 메인 페이지인지 확인
+    const isMainPage = window.location.pathname === "/main";
+
+    if (isMainPage) {
+      const hideUntil = localStorage.getItem("popupHideUntil");
+      const shouldShow = !hideUntil || new Date(hideUntil) < new Date();
+      setIsVisible(shouldShow);
+    }
+  }, [window.location.pathname]); // URL 변경 감지
 
   const handleClose = () => {
     setIsVisible(false);
