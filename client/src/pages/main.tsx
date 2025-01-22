@@ -303,7 +303,7 @@ const MainContainer = styled.section`
 
   /* 웹킷 기반 브라우저용 스크롤바 스타일링 */
   &::-webkit-scrollbar {
-    width: 10px;
+    width: 5px;
   }
 
   &::-webkit-scrollbar-track {

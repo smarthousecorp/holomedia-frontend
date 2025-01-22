@@ -1,10 +1,10 @@
-import {createGlobalStyle} from "styled-components";
+import { createGlobalStyle } from "styled-components";
 
 const GlobalStyle = createGlobalStyle`
 
   /* 웹킷 기반 브라우저용 스크롤바 */
   *::-webkit-scrollbar {
-    width: 10px;
+    width: 5px;
   }
 
   *::-webkit-scrollbar-track {

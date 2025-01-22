@@ -1,26 +1,26 @@
 // src/pages/User.tsx
-import {useEffect, useState} from "react";
+import { useEffect, useState } from "react";
 import styled from "styled-components";
 // import VisibilityIcon from "@mui/icons-material/Visibility";
-import {useNavigate, useParams} from "react-router-dom";
-import {media} from "../types/media";
+import { useNavigate, useParams } from "react-router-dom";
+import { media } from "../types/media";
 // import {SkeletonImage} from "../components/commons/media/Skeleton";
-import {api} from "../utils/api";
-import {RootState} from "../store";
-import {useSelector, useDispatch} from "react-redux";
-import {logout, verifyAdult} from "../store/slices/user";
+import { api } from "../utils/api";
+import { RootState } from "../store";
+import { useSelector, useDispatch } from "react-redux";
+import { logout, verifyAdult } from "../store/slices/user";
 import AdultVerificationModal from "../components/commons/media/AdultVerificationModal";
 import Toast from "../components/commons/Toast";
-import {ToastType} from "../types/toast";
-import {getCookie} from "../utils/cookie";
-import {Settings} from "lucide-react";
+import { ToastType } from "../types/toast";
+import { getCookie } from "../utils/cookie";
+import { Settings } from "lucide-react";
 import Loading from "../components/commons/Loading";
 import EmptyState from "../components/commons/EmptyState";
 // import searchIcon from "../assets/search.png";
-import {Uploader} from "../types/user";
+import { Uploader } from "../types/user";
 
 import MovieList from "../components/main/MovieList";
-import {RecommendedUploaders} from "../components/main/RecommendList";
+import { RecommendedUploaders } from "../components/main/RecommendList";
 import ReactQuill from "react-quill";
 // import SideBannder from "../assets/side-banner.png";
 
@@ -90,7 +90,7 @@ const User = () => {
       console.error("Error fetching data:", error);
       setLoadingState("error");
       Toast(ToastType.error, "데이터를 불러오는데 실패했습니다.");
-      navigate("/error", {state: 500});
+      navigate("/error", { state: 500 });
     }
   };
 
@@ -262,7 +262,7 @@ const MainContainer = styled.section`
 
   /* 웹킷 기반 브라우저용 스크롤바 스타일링 */
   &::-webkit-scrollbar {
-    width: 10px;
+    width: 5px;
   }
 
   &::-webkit-scrollbar-track {
@@ -313,7 +313,7 @@ const ProfileHeader = styled.div`
   padding: 2rem;
 `;
 
-const ProfileBackground = styled.div<{$image: string}>`
+const ProfileBackground = styled.div<{ $image: string }>`
   position: relative;
   background-image: url(${(props) => props.$image});
   background-size: cover;
