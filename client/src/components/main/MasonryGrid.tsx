@@ -48,25 +48,41 @@ const MasonryGrid: React.FC<MasonryGridProps> = ({
 }) => {
   const createMixedContent = (): MixedContent[] => {
     const mixed: MixedContent[] = [];
-    const totalItems = medias.length + uploaders.length;
     let mediaIndex = 0;
     let uploaderIndex = 0;
+    let position = 0;
 
-    for (let i = 0; i < totalItems; i++) {
-      if (i % 4 === 2 && uploaderIndex < uploaders.length) {
+    // 남은 미디어나 업로더가 있는 동안 계속
+    while (mediaIndex < medias.length || uploaderIndex < uploaders.length) {
+      // 업로더를 추가할 위치이고, 아직 추가할 업로더가 있는 경우
+      if (position % 4 === 2 && uploaderIndex < uploaders.length) {
         mixed.push({
           type: "uploader",
           content: uploaders[uploaderIndex++],
         });
-      } else if (mediaIndex < medias.length) {
+      }
+      // 아직 추가할 미디어가 있는 경우
+      else if (mediaIndex < medias.length) {
         mixed.push({
           type: "media",
           content: medias[mediaIndex++],
         });
       }
+      // 남은 업로더가 있다면 마지막에 추가
+      else if (uploaderIndex < uploaders.length) {
+        mixed.push({
+          type: "uploader",
+          content: uploaders[uploaderIndex++],
+        });
+      }
+      position++;
     }
+    console.log("mixed", mixed);
+
     return mixed;
   };
+
+  console.log("props", medias, uploaders);
 
   const findUploader = (uploaderId: number): Uploader | undefined => {
     return uploaders.find((uploader) => uploader.id === uploaderId);
@@ -191,12 +207,12 @@ const GridContainer = styled.div`
   /* grid-auto-rows: 1fr; */
   gap: 1rem;
 
-  @media (max-width: 768px) {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-
   @media (max-width: 1364px) {
     grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  @media (max-width: 768px) {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 `;
 
