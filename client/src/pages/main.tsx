@@ -20,14 +20,15 @@ import Loading from "../components/commons/Loading";
 // import searchIcon from "../assets/search.png";
 import SearchOutlinedIcon from "@mui/icons-material/SearchOutlined";
 import { Uploader } from "../types/user";
-import UploaderList from "../components/main/UploaderList";
+// import UploaderList from "../components/main/UploaderList";
+// import MovieList from "../components/main/MovieList";
 // import ScoreProgress from "../components/main/ScoreProgress";
-import MovieList from "../components/main/MovieList";
 import { RecommendedUploaders } from "../components/main/RecommendList";
 import { useTranslation } from "react-i18next";
 import { Helmet } from "react-helmet-async";
 import MainPopup from "../components/commons/MainPopup";
 import mainPopupImage from "../assets/main-popup.jpg";
+import MasonryGrid from "../components/main/MasonryGrid";
 // import SideBannder from "../assets/side-banner.png";
 
 type LoadingState = "loading" | "error" | "success";
@@ -183,19 +184,26 @@ const Main = () => {
             <></>
           ) : (
             <MovieMainContainer>
-              <UploaderList
-                uploaders={uploaders}
-                onUploaderClick={handleUploaderClick}
-              />
-              {/* 241211 출석체크 기능 주석처리 */}
-              {/* <ScoreProgress currentScore={10} /> */}
-              <MovieList
+              <MasonryGrid
                 medias={medias}
                 uploaders={uploaders}
                 onUploaderClick={handleUploaderClick}
                 onMediaClick={handleMediaClick}
                 shouldBlur={shouldBlur}
               />
+              {/* <UploaderList
+                uploaders={uploaders}
+                onUploaderClick={handleUploaderClick}
+              /> */}
+              {/* 241211 출석체크 기능 주석처리 */}
+              {/* <ScoreProgress currentScore={10} /> */}
+              {/* <MovieList
+                medias={medias}
+                uploaders={uploaders}
+                onUploaderClick={handleUploaderClick}
+                onMediaClick={handleMediaClick}
+                shouldBlur={shouldBlur}
+              /> */}
             </MovieMainContainer>
           )}
         </MovieContainer>
@@ -319,13 +327,14 @@ const MainContainer = styled.section`
 `;
 
 const MovieContainer = styled.div`
-  max-width: 750px;
+  width: 100%;
+  max-width: 950px;
   flex: 1;
   color: #000000;
   margin: 0 4rem;
 
   @media (max-width: 900px) {
-    max-width: 900px;
+    max-width: 100%;
     margin: 0;
   }
 `;
