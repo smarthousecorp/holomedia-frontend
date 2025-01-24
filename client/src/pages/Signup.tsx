@@ -155,7 +155,7 @@ const SignUp: React.FC = () => {
 
     try {
       const response = await axios.post<ApiResponse>(
-        `${import.meta.env.VITE_SERVER_DOMAIN}/singup`,
+        `${import.meta.env.VITE_SERVER_DOMAIN}/signup`,
         signupData
       );
       // 성공적인 회원가입 (code가 0이라고 가정)
