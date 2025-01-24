@@ -24,7 +24,7 @@ const AdultVerificationModal: React.FC<AdultVerificationModalProps> = ({
   const TEST_AUTH_DATA = {
     success: true,
     enc_data: "1",
-    integrity_value: "2=",
+    integrity_value: "2",
     token_version_id: "3",
   };
 
@@ -45,20 +45,18 @@ const AdultVerificationModal: React.FC<AdultVerificationModalProps> = ({
       const authData = isTestMode
         ? TEST_AUTH_DATA
         : await axios
-            .post(
-              `https://apiholomedia.duckdns.org/nice`,
-              {},
-              {
-                withCredentials: true,
-                headers: {
-                  "Content-Type": "application/json",
-                },
-                // 요청과 응답 인터셉터 추가
-                onUploadProgress: (progressEvent) => {
-                  console.log("Upload progress:", progressEvent);
-                },
-              }
-            )
+            .get(`https://api.holomedia.co.kr/nice`, {
+              params: {
+                type: 1,
+              },
+              withCredentials: true,
+              headers: {
+                "Content-Type": "application/json",
+              },
+              onDownloadProgress: (progressEvent) => {
+                console.log("Download progress:", progressEvent);
+              },
+            })
             .then((response) => {
               // 응답 헤더 로깅
               console.log("Response headers:", response.headers);
@@ -76,18 +74,13 @@ const AdultVerificationModal: React.FC<AdultVerificationModalProps> = ({
               throw error;
             });
 
-      // const authData = isTestMode
-      //   ? TEST_AUTH_DATA
-      //   : (await api.post(`/api/nice/auth/request`, {})).data;
-
-      // // Store auth data in session storage
-      // sessionStorage.setItem("auth_data", JSON.stringify(authData));
-
       // 응답 데이터 검증
+      console.log("응답 데이터 검증 시작");
+
       if (
-        !authData.enc_data ||
-        !authData.integrity_value ||
-        !authData.token_version_id
+        !authData.data.enc_data ||
+        !authData.data.integrity_value ||
+        !authData.data.token_version_id
       ) {
         throw new Error("필수 인증 정보가 누락되었습니다.");
       }
@@ -123,7 +116,7 @@ const AdultVerificationModal: React.FC<AdultVerificationModalProps> = ({
 
       if (formRef.current && authData) {
         const form = formRef.current;
-        const { enc_data, integrity_value, token_version_id } = authData;
+        const { enc_data, integrity_value, token_version_id } = authData.data;
 
         // 폼 데이터 설정 전 로그
         console.log("설정할 폼 데이터:", {
