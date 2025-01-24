@@ -15,7 +15,7 @@ import ProtectedRoute from "./components/layout/ProtectedRoute";
 import VideoDetail from "./pages/videoDetail";
 import Settings from "./pages/setting";
 import { useEffect } from "react";
-import { preventDevTools } from "./utils/preventDevTools";
+// import { preventDevTools } from "./utils/preventDevTools";
 import DevToolsAlert from "./pages/devToolsAlert";
 import NotificationPage from "./pages/Alarm";
 import { logger } from "./utils/logger";
@@ -32,19 +32,20 @@ import PaymentReturn from "./pages/PaymentReturn";
 
 function App() {
   const location = useLocation();
+  console.log(location.pathname);
 
   useEffect(() => {
     logger.log("Application started");
   }, []);
 
-  useEffect(() => {
-    if (
-      import.meta.env.VITE_NODE_ENV === "production" &&
-      !["/dev-tools-alert", "/", "/signup"].includes(location.pathname)
-    ) {
-      preventDevTools();
-    }
-  }, [location.pathname]);
+  // useEffect(() => {
+  //   if (
+  //     import.meta.env.VITE_NODE_ENV === "production" &&
+  //     !["/dev-tools-alert", "/", "/signup"].includes(location.pathname)
+  //   ) {
+  //     preventDevTools();
+  //   }
+  // }, [location.pathname]);
 
   return (
     <>
