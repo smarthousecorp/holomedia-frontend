@@ -90,7 +90,7 @@ const BaseSidebar = ({
             </ProfileLeft>
             <ProfileRight>
               <h5>{user.username}</h5>
-              <p>@{user.user_id}</p>
+              <p>@{user.id}</p>
             </ProfileRight>
           </Profile>
           <Bloom>
