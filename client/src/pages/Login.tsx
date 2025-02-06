@@ -1,14 +1,15 @@
 // pages/Login.tsx
 import React, { useState, useEffect } from "react";
-import styled, { keyframes } from "styled-components";
+import styled from "styled-components";
 import logo from "../assets/holomedia-logo.png";
-import { Check, Eye, EyeOff } from "lucide-react";
+import { Eye, EyeOff } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { useTranslation } from "react-i18next";
 // import { setCookie } from "../utils/cookie";
 import { login } from "../store/slices/user";
 import { api } from "../utils/api";
+import CustomCheckbox from "../components/commons/CustomCheckbox";
 
 interface LoginCredentials {
   id: string;
@@ -181,15 +182,11 @@ const Login: React.FC = () => {
               onChange={onChangeValues}
             />
             <CustomCheckboxLabel>
-              <CheckboxInput
-                type="checkbox"
+              <CustomCheckbox
                 checked={rememberID}
                 onChange={handleRememberIDChange}
+                label={t("auth.login.rememberID")}
               />
-              <CheckboxControl>
-                <Check size={12} />
-              </CheckboxControl>
-              <span>{t("auth.login.rememberID")}</span>
             </CustomCheckboxLabel>
           </InputWrapper>
           <InputWrapper>
@@ -295,82 +292,6 @@ const PasswordToggle = styled.button`
   }
 `;
 
-const checkboxAppear = keyframes`
-  0% {
-    transform: scale(0.5);
-    opacity: 0;
-  }
-  100% {
-    transform: scale(1);
-    opacity: 1;
-  }
-`;
-
-const CustomCheckboxLabel = styled.label`
-  position: absolute;
-  right: 0;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  font-size: 1.2rem;
-  color: #707070;
-  cursor: pointer;
-  user-select: none;
-
-  &:hover {
-    color: #eb3553;
-  }
-
-  span {
-    transition: color 0.2s;
-  }
-`;
-
-const CheckboxInput = styled.input`
-  position: absolute;
-  opacity: 0;
-  width: 0;
-  height: 0;
-`;
-
-const CheckboxControl = styled.div`
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 1.3rem;
-  height: 1.3rem;
-  border-radius: 8px;
-  border: 1px solid #d0d0d0;
-  background: white;
-  transition: all 0.2s ease;
-
-  svg {
-    color: white;
-    opacity: 0;
-    transform: scale(0.5);
-    transition: all 0.2s ease;
-  }
-
-  ${CheckboxInput}:checked + & {
-    background: #eb3553;
-    border-color: #eb3553;
-
-    svg {
-      opacity: 1;
-      transform: scale(1);
-      animation: ${checkboxAppear} 0.2s ease;
-    }
-  }
-
-  ${CheckboxInput}:focus + & {
-    box-shadow: 0 0 0 2px rgba(235, 53, 83, 0.2);
-  }
-
-  ${CustomCheckboxLabel}:hover & {
-    border-color: #eb3553;
-  }
-`;
-
 const Button = styled.button`
   background-color: #eb3553;
   color: white;
@@ -434,4 +355,9 @@ const ErrorMessage = styled.div`
   margin-top: -0.5rem;
   margin-bottom: 0.5rem;
   text-align: left;
+`;
+
+const CustomCheckboxLabel = styled.div`
+  position: absolute;
+  right: 0;
 `;
