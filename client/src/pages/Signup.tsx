@@ -24,6 +24,7 @@ export interface SignUp {
   nickname: string;
   termsAgreed: boolean;
   smsAgreed: boolean;
+  verificationData?: VerificationData;
 }
 
 interface ErrorMsg {
@@ -31,6 +32,33 @@ interface ErrorMsg {
   password: string;
   passwordCheck: string;
   nickname: string;
+}
+
+interface SignUpRequest {
+  userInfo: {
+    id: string;
+    password: string;
+    nickname: string;
+    checked: boolean;
+  };
+  authInfo: {
+    responseno: string;
+    birthdate: string;
+    gender: string;
+    di: string;
+    mobileco: string;
+    ci: string;
+    receivedata: string;
+    mobileno: string;
+    requestno: string;
+    nationalinfo: string;
+    authtype: string;
+    sitecode: string;
+    utf8_name: string;
+    enctime: string;
+    name: string;
+    resultcode: string;
+  };
 }
 
 interface ApiResponse {
@@ -74,8 +102,6 @@ const SignUp: React.FC = () => {
   // nice 인증 후 데이터의 상태
   const [verificationData, setVerificationData] =
     useState<VerificationData | null>(null);
-
-  console.log(verificationData);
 
   const handleVerificationComplete = (data: VerificationData) => {
     setVerificationData(data);
@@ -189,12 +215,42 @@ const SignUp: React.FC = () => {
       return;
     }
 
+    if (!verificationData) {
+      dispatch(
+        showToast({
+          message: "본인인증이 필요합니다.",
+          type: "error",
+        })
+      );
+      return;
+    }
+
     // API 요청을 위한 데이터 준비
-    const signupData = {
-      id: inputVal.id,
-      password: inputVal.password,
-      nickname: inputVal.nickname,
-      marketing_agreed: inputVal.smsAgreed,
+    const signupData: SignUpRequest = {
+      userInfo: {
+        id: inputVal.id,
+        password: inputVal.password,
+        nickname: inputVal.nickname,
+        checked: inputVal.smsAgreed,
+      },
+      authInfo: {
+        responseno: verificationData.responseno,
+        birthdate: verificationData.birthdate,
+        gender: verificationData.gender,
+        di: verificationData.di,
+        mobileco: verificationData.mobileco,
+        ci: verificationData.ci,
+        receivedata: verificationData.receivedata,
+        mobileno: verificationData.mobileno,
+        requestno: verificationData.requestno,
+        nationalinfo: verificationData.nationalinfo,
+        authtype: verificationData.authtype,
+        sitecode: verificationData.sitecode,
+        utf8_name: verificationData.utf8_name,
+        enctime: verificationData.enctime,
+        name: verificationData.name,
+        resultcode: verificationData.resultcode,
+      },
     };
 
     try {

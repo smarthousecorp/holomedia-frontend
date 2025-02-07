@@ -22,6 +22,7 @@ import { logger } from "./utils/logger";
 import ProfileSetting from "./pages/ProfileSetting";
 import PasswordChange from "./pages/PasswordChange";
 import PaymentReturn from "./pages/PaymentReturn";
+import NiceReturnPage from "./pages/NiceReturn";
 // interface ErrorMessageProps {
 //   message?: string;
 // }
@@ -53,6 +54,7 @@ function App() {
         <Route element={<MainLayout />}>
           <Route path="/" element={<Login />} />
           <Route path="/signup" element={<SignUp />} />
+          <Route path="/nice/signup" element={<NiceReturnPage />} />
           <Route path="/payment" element={<PaymentReturn />} />
           <Route path="/*" element={<ErrorPage error="404" />} />
           <Route path="/error" element={<ErrorPage error="500" />} />

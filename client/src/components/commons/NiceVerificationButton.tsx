@@ -3,6 +3,13 @@ import axios from "axios";
 import styled from "styled-components";
 import { VerificationData } from "../../types/nice";
 
+interface ApiResponse {
+  code: number;
+  message: string;
+  data: VerificationData;
+  timestamp: string;
+}
+
 interface NiceVerificationProps {
   onVerificationComplete: (data: VerificationData) => void;
   onError: (message: string) => void;
@@ -15,18 +22,61 @@ const NiceVerificationButton: React.FC<NiceVerificationProps> = ({
   const [isVerifying, setIsVerifying] = useState(false);
   const [isVerified, setIsVerified] = useState(false);
   const formRef = useRef<HTMLFormElement>(null);
+  const popupRef = useRef<Window | null>(null);
+
+  // postMessage 이벤트 핸들러
+  const handleMessage = useCallback(
+    (event: MessageEvent) => {
+      // 신뢰할 수 있는 출처인지 확인
+      console.log(event.origin);
+      console.log(event.source);
+      console.log(event.data);
+
+      // if (event.origin !== "https://api.holomedia.co.kr") return;
+
+      try {
+        const responseData = event.data as ApiResponse;
+        console.log("수신된 인증 데이터:", responseData);
+
+        if (responseData.code === 0) {
+          console.log("인증 성공!");
+          setIsVerified(true);
+          onVerificationComplete(responseData.data);
+          if (popupRef.current) {
+            popupRef.current.close();
+          }
+        } else {
+          throw new Error(responseData.message);
+        }
+      } catch (error) {
+        console.error("인증 데이터 처리 중 오류:", error);
+        onError("인증 처리 중 오류가 발생했습니다.");
+      } finally {
+        setIsVerifying(false);
+        // 이벤트 리스너 제거
+        window.removeEventListener("message", handleMessage);
+      }
+    },
+    [onVerificationComplete, onError]
+  );
 
   const handleVerification = useCallback(async () => {
     setIsVerifying(true);
+    console.log("=== 본인인증 시작 ===");
 
     try {
       const { data: authData } = await axios.get(
         `https://api.holomedia.co.kr/nice`,
         {
-          params: { type: 1 },
+          params: {
+            type: 1,
+            returnUrl: `${import.meta.env.VITE_CLIENT_DOMAIN}`,
+          },
           withCredentials: true,
         }
       );
+
+      console.log("인증 초기 데이터 받음:", authData);
 
       if (
         !authData.data.enc_data ||
@@ -36,10 +86,15 @@ const NiceVerificationButton: React.FC<NiceVerificationProps> = ({
         throw new Error("필수 인증 정보가 누락되었습니다.");
       }
 
+      // postMessage 이벤트 리스너 등록
+      window.addEventListener("message", handleMessage, false);
+
       const width = 500;
       const height = 600;
       const left = window.screen.width / 2 - width / 2;
       const top = window.screen.height / 2 - height / 2;
+
+      console.log("팝업 창 여는 중...");
       const popup = window.open(
         "",
         "nicePopup",
@@ -50,6 +105,9 @@ const NiceVerificationButton: React.FC<NiceVerificationProps> = ({
         throw new Error("팝업이 차단되었습니다.");
       }
 
+      popupRef.current = popup;
+      console.log("팝업 창 열림");
+
       if (!formRef.current) {
         throw new Error("폼 요소를 찾을 수 없습니다.");
       }
@@ -57,6 +115,7 @@ const NiceVerificationButton: React.FC<NiceVerificationProps> = ({
       const form = formRef.current;
       const { enc_data, integrity_value, token_version_id } = authData.data;
 
+      // 폼 데이터 설정
       const encDataInput = form.querySelector(
         '[name="enc_data"]'
       ) as HTMLInputElement;
@@ -75,40 +134,28 @@ const NiceVerificationButton: React.FC<NiceVerificationProps> = ({
       tokenInput.value = token_version_id;
       integrityInput.value = integrity_value;
 
+      console.log("폼 데이터 설정 완료");
+
+      // 팝업 모니터링 (닫힘 감지용)
       const popupMonitor = setInterval(() => {
         if (popup.closed) {
+          console.log("팝업 창이 닫힘 감지");
           clearInterval(popupMonitor);
-          window.removeEventListener("message", handleMessage);
           setIsVerifying(false);
+          window.removeEventListener("message", handleMessage);
         }
       }, 500);
 
-      const handleMessage = async (event: MessageEvent) => {
-        if (event.data.source === "react-devtools-bridge") return;
-
-        try {
-          const { success, authStatus, userInfo } = event.data;
-
-          console.log("본인인증 이후 데이터", event.data);
-
-          if (success && authStatus === "0000") {
-            setIsVerified(true);
-            console.log("성공 시 유저정보", userInfo);
-          }
-        } catch (error) {
-          console.error("인증 오류:", error);
-          onError("인증 처리 중 오류가 발생했습니다.");
-        }
-      };
-
-      window.addEventListener("message", handleMessage);
+      console.log("폼 제출 시작...");
       form.submit();
+      console.log("폼 제출 완료");
     } catch (error) {
       console.error("본인인증 처리 중 오류 발생:", error);
       onError("본인인증 처리 중 오류가 발생했습니다.");
       setIsVerifying(false);
+      window.removeEventListener("message", handleMessage);
     }
-  }, [onVerificationComplete, onError]);
+  }, [onVerificationComplete, onError, handleMessage]);
 
   return (
     <>
