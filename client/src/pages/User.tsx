@@ -1,26 +1,25 @@
 // src/pages/User.tsx
-import {useEffect, useState} from "react";
+import { useEffect, useState } from "react";
 import styled from "styled-components";
 // import VisibilityIcon from "@mui/icons-material/Visibility";
-import {useNavigate, useParams} from "react-router-dom";
-import {media} from "../types/media";
+import { useNavigate, useParams } from "react-router-dom";
+import { media } from "../types/media";
 // import {SkeletonImage} from "../components/commons/media/Skeleton";
-import {api} from "../utils/api";
-import {RootState} from "../store";
-import {useSelector, useDispatch} from "react-redux";
-import {logout, verifyAdult} from "../store/slices/user";
-import AdultVerificationModal from "../components/commons/media/AdultVerificationModal";
+import { api } from "../utils/api";
+import { RootState } from "../store";
+import { useSelector, useDispatch } from "react-redux";
+import { logout } from "../store/slices/user";
 import Toast from "../components/commons/Toast";
-import {ToastType} from "../types/toast";
-import {getCookie} from "../utils/cookie";
-import {Settings} from "lucide-react";
+import { ToastType } from "../types/toast";
+import { getCookie } from "../utils/cookie";
+import { Settings } from "lucide-react";
 import Loading from "../components/commons/Loading";
 import EmptyState from "../components/commons/EmptyState";
 // import searchIcon from "../assets/search.png";
-import {Uploader} from "../types/user";
+import { Uploader } from "../types/user";
 
 import MovieList from "../components/main/MovieList";
-import {RecommendedUploaders} from "../components/main/RecommendList";
+import { RecommendedUploaders } from "../components/main/RecommendList";
 import ReactQuill from "react-quill";
 // import SideBannder from "../assets/side-banner.png";
 
@@ -61,6 +60,8 @@ const User = () => {
   const [showModal, setShowModal] = useState<boolean>(false);
   const [selectedVideoId, setSelectedVideoId] = useState<number | null>(null);
 
+  console.log(showModal, selectedVideoId);
+
   const handleUploaderClick = (uploader: Uploader): void => {
     navigate(`/user/${uploader.id}`);
   };
@@ -90,7 +91,7 @@ const User = () => {
       console.error("Error fetching data:", error);
       setLoadingState("error");
       Toast(ToastType.error, "데이터를 불러오는데 실패했습니다.");
-      navigate("/error", {state: 500});
+      navigate("/error", { state: 500 });
     }
   };
 
@@ -176,24 +177,6 @@ const User = () => {
         <RecommendedUploaders />
         {/* <img src={SideBannder} alt="광고 배너" /> */}
       </SideContainer>
-
-      {showModal && (
-        <AdultVerificationModal
-          isOpen={showModal}
-          onClose={() => {
-            setShowModal(false);
-            setSelectedVideoId(null);
-          }}
-          onComplete={() => {
-            setShowModal(false);
-            dispatch(verifyAdult());
-            if (selectedVideoId) {
-              navigate(`/video/${selectedVideoId}`);
-              setSelectedVideoId(null);
-            }
-          }}
-        />
-      )}
     </MainContainer>
   );
 };
@@ -313,7 +296,7 @@ const ProfileHeader = styled.div`
   padding: 2rem;
 `;
 
-const ProfileBackground = styled.div<{$image: string}>`
+const ProfileBackground = styled.div<{ $image: string }>`
   position: relative;
   background-image: url(${(props) => props.$image});
   background-size: cover;

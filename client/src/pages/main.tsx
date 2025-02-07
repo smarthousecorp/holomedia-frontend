@@ -9,8 +9,7 @@ import { media } from "../types/media";
 import { api } from "../utils/api";
 import { RootState } from "../store";
 import { useSelector, useDispatch } from "react-redux";
-import { logout, verifyAdult } from "../store/slices/user";
-import AdultVerificationModal from "../components/commons/media/AdultVerificationModal";
+import { logout } from "../store/slices/user";
 import Toast from "../components/commons/Toast";
 import { ToastType } from "../types/toast";
 import { getCookie } from "../utils/cookie";
@@ -55,6 +54,8 @@ const Main = () => {
   const [showModal, setShowModal] = useState<boolean>(false);
   const [selectedVideoId, setSelectedVideoId] = useState<number | null>(null);
 
+  console.log(showModal, selectedVideoId);
+
   const handleUploaderClick = (uploader: Uploader): void => {
     navigate(`/user/${uploader.id}`);
   };
@@ -95,7 +96,7 @@ const Main = () => {
       return;
     }
 
-    if (!isAdmin && !isAdultVerified) {
+    if (!isAdmin) {
       setSelectedVideoId(media.id);
       setShowModal(true);
       return;
@@ -206,25 +207,6 @@ const Main = () => {
             alt="광고 배너"
           />
         </SideContainer>
-        {/* 성인인증 모달 */}
-        {showModal && (
-          <AdultVerificationModal
-            isOpen={showModal}
-            onClose={() => {
-              setShowModal(false);
-              setSelectedVideoId(null);
-            }}
-            onComplete={() => {
-              setShowModal(false);
-              dispatch(verifyAdult());
-              if (selectedVideoId) {
-                navigate(`/video/${selectedVideoId}`);
-                setSelectedVideoId(null);
-              }
-            }}
-            isTestMode={false}
-          />
-        )}
       </MainContainer>
       <MainPopup imageUrl={mainPopupImage} onClose={handlePopupClose} />
     </>
