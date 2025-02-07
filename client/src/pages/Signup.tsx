@@ -12,9 +12,9 @@ import { checkId, checkPassword, checkNickname } from "../utils/validCheck";
 import { showToast } from "../store/slices/toast";
 import { ToastType } from "../types/toast";
 import Toast from "../components/commons/Toast";
-import { useAdultVerification } from "../hooks/useAdultVerification";
-import AdultVerificationModal from "../components/commons/media/AdultVerificationModal";
 import CustomCheckbox from "../components/commons/CustomCheckbox";
+import NiceVerificationButton from "../components/commons/NiceVerificationButton";
+import { VerificationData } from "../types/nice";
 
 export interface SignUp {
   [key: string]: any;
@@ -71,13 +71,19 @@ const SignUp: React.FC = () => {
 
   const validationResults = useSignUpValidation(inputVal);
 
-  const {
-    isVerificationModalOpen,
-    isVerified,
-    openVerificationModal,
-    closeVerificationModal,
-    handleVerificationComplete,
-  } = useAdultVerification();
+  // nice 인증 후 데이터의 상태
+  const [verificationData, setVerificationData] =
+    useState<VerificationData | null>(null);
+
+  console.log(verificationData);
+
+  const handleVerificationComplete = (data: VerificationData) => {
+    setVerificationData(data);
+  };
+
+  const handleVerificationError = (message: string) => {
+    dispatch(showToast({ message, type: "error" }));
+  };
 
   // const handleClickPaymentBtn = () => {
   //   axios
@@ -306,16 +312,10 @@ const SignUp: React.FC = () => {
               <ErrorMessage>{errorMsg.nickname}</ErrorMessage>
             )}
 
-            <VerificationButton
-              type="button"
-              onClick={openVerificationModal}
-              // disabled={!inputVal.id || isVerified}
-            >
-              {isVerified ? "인증완료" : "본인인증"}
-              <VerificationStatus verified={isVerified}>
-                {isVerified && "✓"}
-              </VerificationStatus>
-            </VerificationButton>
+            <NiceVerificationButton
+              onVerificationComplete={handleVerificationComplete}
+              onError={handleVerificationError}
+            />
 
             {/* <VerificationButton type="button" onClick={handleClickPaymentBtn}>
               결제하기
@@ -411,13 +411,6 @@ const SignUp: React.FC = () => {
           </ModalContent>
         </Modal>
       )}
-      {/* 성인인증 모달 */}
-      <AdultVerificationModal
-        isOpen={isVerificationModalOpen}
-        onClose={closeVerificationModal}
-        onComplete={handleVerificationComplete}
-        isTestMode={false}
-      />
     </>
   );
 };
@@ -567,33 +560,6 @@ const ErrorMessage = styled.div`
   margin-top: -1.5rem;
   margin-bottom: 0.5rem;
   text-align: left;
-`;
-
-// 버튼 스타일 컴포넌트
-const VerificationButton = styled(Button)`
-  background-color: white;
-  color: ${(props) => (props.disabled ? "#cccccc" : "#eb3553")};
-  border: 2px solid ${(props) => (props.disabled ? "#cccccc" : "#eb3553")};
-  font-size: 1.2rem;
-  padding: 0.5rem 1rem;
-  transition: all 0.2s ease-in-out;
-  width: auto;
-  min-width: 100px;
-
-  &:hover:not(:disabled) {
-    background-color: #eb3553;
-    color: white;
-  }
-
-  &:disabled {
-    border-color: #cccccc;
-    cursor: not-allowed;
-  }
-`;
-// 확인 표시 아이콘 컴포넌트
-const VerificationStatus = styled.span<{ verified: boolean }>`
-  margin-left: 8px;
-  color: ${(props) => (props.verified ? "#4CAF50" : "#cccccc")};
 `;
 
 // 약관 관련 스타일 컴포넌트
