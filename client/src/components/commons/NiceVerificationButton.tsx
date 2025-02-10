@@ -28,15 +28,10 @@ const NiceVerificationButton: React.FC<NiceVerificationProps> = ({
   const handleMessage = useCallback(
     (event: MessageEvent) => {
       // 신뢰할 수 있는 출처인지 확인
-      console.log(event.origin);
-      console.log(event.source);
-      console.log(event.data);
-
       // if (event.origin !== "https://api.holomedia.co.kr") return;
 
       try {
         const responseData = event.data as ApiResponse;
-        console.log("수신된 인증 데이터:", responseData);
 
         if (responseData.code === 0) {
           console.log("인증 성공!");
