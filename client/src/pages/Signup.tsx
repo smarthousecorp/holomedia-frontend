@@ -15,6 +15,7 @@ import Toast from "../components/commons/Toast";
 import CustomCheckbox from "../components/commons/CustomCheckbox";
 import NiceVerificationButton from "../components/commons/NiceVerificationButton";
 import { VerificationData } from "../types/nice";
+import TermsModal from "../components/commons/TermsModal";
 
 export interface SignUp {
   [key: string]: any;
@@ -68,8 +69,6 @@ interface ApiResponse {
   timestamp: string;
 }
 
-type ModalType = "terms" | "privacy" | null;
-
 const SignUp: React.FC = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
@@ -95,7 +94,8 @@ const SignUp: React.FC = () => {
   const [showPasswordCheck, setShowPasswordCheck] = useState(false);
 
   // 약관 모달 상태
-  const [modalType, setModalType] = useState<ModalType>(null);
+  const [modalType, setModalType] = useState<"terms" | "privacy">("terms");
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   const validationResults = useSignUpValidation(inputVal);
 
@@ -137,12 +137,13 @@ const SignUp: React.FC = () => {
   };
 
   // 약관 모달 컨트롤
-  const openModal = (type: ModalType) => {
+  const openModal = (type: "terms" | "privacy") => {
     setModalType(type);
+    setIsModalOpen(true);
   };
 
   const closeModal = () => {
-    setModalType(null);
+    setIsModalOpen(false);
   };
 
   const onChangeValues = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -446,27 +447,11 @@ const SignUp: React.FC = () => {
         </SignUpBox>
       </Container>
       {/* 약관 모달 */}
-      {modalType && (
-        <Modal>
-          <ModalContent>
-            <ModalHeader>
-              <h2>{modalType === "terms" ? "이용약관" : "개인정보처리방침"}</h2>
-              <CloseButton onClick={closeModal}>&times;</CloseButton>
-            </ModalHeader>
-            <ModalBody>
-              {modalType === "terms" ? (
-                <div>
-                  <p>이용약관 내용이 들어갈 자리입니다...</p>
-                </div>
-              ) : (
-                <div>
-                  <p>개인정보처리방침 내용이 들어갈 자리입니다...</p>
-                </div>
-              )}
-            </ModalBody>
-          </ModalContent>
-        </Modal>
-      )}
+      <TermsModal
+        isOpen={isModalOpen}
+        modalType={modalType}
+        onClose={closeModal}
+      />
     </>
   );
 };
@@ -664,57 +649,4 @@ const MarketingDescription = styled.p`
   line-height: 1.3;
   color: #666;
   margin-bottom: 1rem;
-`;
-
-const Modal = styled.div`
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(0, 0, 0, 0.5);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 1000;
-`;
-
-const ModalContent = styled.div`
-  background-color: white;
-  padding: 2rem;
-  border-radius: 10px;
-  width: 90%;
-  max-width: 600px;
-  max-height: 80vh;
-  overflow-y: auto;
-`;
-
-const ModalHeader = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 1.5rem;
-
-  h2 {
-    font-size: 1.8rem;
-    color: #333;
-  }
-`;
-
-const ModalBody = styled.div`
-  font-size: 1.2rem;
-  line-height: 1.6;
-  color: #444;
-`;
-
-const CloseButton = styled.button`
-  background: none;
-  border: none;
-  font-size: 2rem;
-  cursor: pointer;
-  color: #666;
-
-  &:hover {
-    color: #eb3553;
-  }
 `;
