@@ -21,7 +21,7 @@ interface ErrorMsg {
   password: string;
 }
 
-interface Apiresponse {
+interface ApiResponse {
   code: number;
   data: {
     id: string;
@@ -75,8 +75,16 @@ const Login: React.FC = () => {
   const onClickLoginBtn = async (e: React.FormEvent) => {
     e.preventDefault();
 
+    if (!inputVal.id || !inputVal.password) {
+      setErrorMsg((prev) => ({
+        ...prev,
+        id: t("auth.login.errors.requiredFields"),
+      }));
+      return;
+    }
+
     try {
-      const res = await api.post<Apiresponse>(`/login`, inputVal);
+      const res = await api.post<ApiResponse>(`/login`, inputVal);
 
       if (rememberID) {
         localStorage.setItem("remembered_id", inputVal.id);
@@ -87,16 +95,16 @@ const Login: React.FC = () => {
       // 에러 코드에 따른 처리
       if (res.data.code !== 0) {
         switch (res.data.code) {
-          case 1: // 아이디가 없는 경우
+          case 1: // 아이디 또는 비밀번호를 잘못 입력한 경우
             setErrorMsg((prev) => ({
               ...prev,
-              id: t("auth.login.errors.userNotFound"),
+              id: t("auth.login.errors.retypeFields"),
             }));
             return;
-          case 2: // 비밀번호가 틀린 경우
+          case 2: // 서버 에러
             setErrorMsg((prev) => ({
               ...prev,
-              password: t("auth.login.errors.wrongPassword"),
+              password: t("auth.login.errors.userNotFound"),
             }));
             return;
           default:
