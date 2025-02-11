@@ -18,15 +18,15 @@ import Loading from "../components/commons/Loading";
 // import EmptyState from "../components/commons/EmptyState";
 // import searchIcon from "../assets/search.png";
 import SearchOutlinedIcon from "@mui/icons-material/SearchOutlined";
-import { Uploader } from "../types/user";
-import UploaderList from "../components/main/UploaderList";
-// import ScoreProgress from "../components/main/ScoreProgress";
-import MovieList from "../components/main/MovieList";
-import { RecommendedUploaders } from "../components/main/RecommendList";
+import { Creator } from "../types/user";
+// import { RecommendedUploaders } from "../components/main/RecommendList";
 import { useTranslation } from "react-i18next";
 import { Helmet } from "react-helmet-async";
 import MainPopup from "../components/commons/MainPopup";
 import mainPopupImage from "../assets/main-popup.jpg";
+// import MasonryGrid from "../components/main/MasonryGrid";
+import ContentGrid from "../components/main/ContentGrid";
+import RotatingBanner from "../components/main/RotatingBanner";
 // import SideBannder from "../assets/side-banner.png";
 
 type LoadingState = "loading" | "error" | "success";
@@ -49,28 +49,28 @@ const Main = () => {
 
   // api 응답 저장 상태
   const [medias, setMedias] = useState<media[]>([]);
-  const [uploaders, setUploaders] = useState<Uploader[]>([]);
+  const [uploaders, setUploaders] = useState<Creator[]>([]);
 
   const [showModal, setShowModal] = useState<boolean>(false);
   const [selectedVideoId, setSelectedVideoId] = useState<number | null>(null);
 
   console.log(showModal, selectedVideoId);
 
-  const handleUploaderClick = (uploader: Uploader): void => {
-    navigate(`/user/${uploader.id}`);
+  const handleUploaderClick = (uploader: Creator): void => {
+    navigate(`/user/${uploader.no}`);
   };
 
   const fetchData = async () => {
     try {
       setLoadingState("loading");
       // Promise.all을 사용하여 병렬로 API 요청
-      const [mediaResponse, uploaderResponse] = await Promise.all([
-        api.get(`/media/recent?limit=12`),
-        api.get(`/uploaders?page=1&limit=10`),
+      const [boardResponse, creatorResponse] = await Promise.all([
+        api.get("/board/list"),
+        api.get("/creator/list"),
       ]);
 
-      setMedias(mediaResponse.data.data);
-      setUploaders(uploaderResponse.data.data);
+      setMedias(boardResponse.data.data);
+      setUploaders(creatorResponse.data.data);
       setLoadingState("success");
     } catch (error) {
       console.error("Error fetching data:", error);
@@ -97,12 +97,12 @@ const Main = () => {
     }
 
     if (!isAdmin) {
-      setSelectedVideoId(media.id);
+      setSelectedVideoId(media.boardNo);
       setShowModal(true);
       return;
     }
 
-    navigate(`/video/${media.id}`);
+    navigate(`/video/${media.boardNo}`);
   };
 
   const handlePopupClose = () => {
@@ -184,28 +184,19 @@ const Main = () => {
             <></>
           ) : (
             <MovieMainContainer>
-              <UploaderList
-                uploaders={uploaders}
-                onUploaderClick={handleUploaderClick}
-              />
-              {/* 241211 출석체크 기능 주석처리 */}
-              {/* <ScoreProgress currentScore={10} /> */}
-              <MovieList
-                medias={medias}
-                uploaders={uploaders}
-                onUploaderClick={handleUploaderClick}
-                onMediaClick={handleMediaClick}
+              <ContentGrid
+                boards={medias}
+                creators={uploaders}
+                onCreatorClick={handleUploaderClick}
+                onBoardClick={handleMediaClick}
                 shouldBlur={shouldBlur}
               />
             </MovieMainContainer>
           )}
         </MovieContainer>
         <SideContainer>
-          <RecommendedUploaders />
-          <img
-            src="https://firebasestorage.googleapis.com/v0/b/quill-image-store.appspot.com/o/HOLOMEDIA%2FMask%20group.png?alt=media&token=8c8f852f-e813-45f6-bd00-83c0a8accd60"
-            alt="광고 배너"
-          />
+          {/* <RecommendedUploaders /> */}
+          <RotatingBanner />
         </SideContainer>
       </MainContainer>
       <MainPopup imageUrl={mainPopupImage} onClose={handlePopupClose} />
@@ -301,13 +292,14 @@ const MainContainer = styled.section`
 `;
 
 const MovieContainer = styled.div`
-  max-width: 750px;
+  width: 100%;
+  max-width: 950px;
   flex: 1;
   color: #000000;
   margin: 0 4rem;
 
   @media (max-width: 900px) {
-    max-width: 900px;
+    max-width: 100%;
     margin: 0;
   }
 `;
@@ -368,16 +360,10 @@ const MovieMainContainer = styled.div`
 
 const SideContainer = styled.div`
   margin-right: 4rem;
-  position: sticky; // sticky 포지셔닝 추가
-  top: 0.1rem; // 상단에서 2rem 떨어진 위치에 고정
-  height: fit-content; // 내용물 높이에 맞게 조정
-  align-self: flex-start; // 플렉스 컨테이너의 상단에 정렬
-
-  > img {
-    width: 200px;
-    height: 540px;
-    margin-bottom: 5rem;
-  }
+  position: sticky;
+  top: 0.1rem;
+  height: fit-content;
+  align-self: flex-start;
 
   @media (max-width: 1150px) {
     display: none;
