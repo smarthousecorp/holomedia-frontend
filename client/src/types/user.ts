@@ -12,6 +12,16 @@ export interface Uploader {
   last_upload: string; // 추가
 }
 
+export interface Creator {
+  no: number;
+  loginId: string;
+  nickname: string;
+  content: string;
+  createdAt: string;
+  profile_image: string;
+  background_image: string;
+}
+
 export interface UploaderResponse {
   status: "success" | "error";
   data: Uploader[];
