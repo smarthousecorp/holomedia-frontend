@@ -5,6 +5,7 @@ const path = require("path");
 const mediaRouter = require("./routes/media");
 const userRouter = require("./routes/user");
 const niceAuthRouter = require("./routes/niceAuthRoute");
+const reviewRouter = require("./routes/review");
 
 const app = express();
 
@@ -40,5 +41,6 @@ app.use(express.static(path.join(__dirname, "public")));
 app.use("/", userRouter);
 app.use("/media", mediaRouter);
 app.use("/api/nice/auth", niceAuthRouter);
+app.use("/api", reviewRouter);
 
 module.exports = app;

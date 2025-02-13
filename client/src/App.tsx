@@ -24,6 +24,7 @@ import { logger } from "./utils/logger";
 import ProfileSetting from "./pages/ProfileSetting";
 import PasswordChange from "./pages/PasswordChange";
 import PaymentReturn from "./pages/PaymentReturn";
+import Test from "./pages/Test";
 // interface ErrorMessageProps {
 //   message?: string;
 // }
@@ -58,6 +59,7 @@ function App() {
       <Routes>
         <Route element={<MainLayout />}>
           <Route path="/" element={<Login />} />
+          <Route path="/test" element={<Test />} />
           <Route path="/signup" element={<SignUp />} />
           <Route path="/payment" element={<PaymentReturn />} />
           <Route path="/*" element={<ErrorPage error="404" />} />
