@@ -2,6 +2,7 @@ import React, { useState, useMemo } from "react";
 import styled from "styled-components";
 import { X } from "lucide-react";
 import GgulImg from "../../assets/Ggul.png";
+import { api } from "../../utils/api";
 
 interface PaymentModalProps {
   onClose: () => void;
@@ -45,6 +46,30 @@ const PaymentModal = ({ onClose }: PaymentModalProps) => {
   // 가격 포맷팅 함수
   const formatPrice = (price: number) => {
     return new Intl.NumberFormat("ko-KR").format(price);
+  };
+
+  const handleClickPaymentBtn = () => {
+    api
+      .post(
+        "/api/payment/request",
+        {
+          pgcode: "creditcard",
+          memberId: "suafjwe1",
+          productName: "100",
+          price: 110000,
+        },
+        {
+          withCredentials: true,
+        }
+      )
+      .then((res) => {
+        console.log(res);
+
+        console.log(res.data.online_url);
+        const options =
+          "toolbar=no,scrollbars=no,resizable=yes,status=no,menubar=no,width=1200, height=800, top=0,left=0";
+        window.open(res.data.online_url, "_blank", options);
+      });
   };
 
   return (
@@ -112,7 +137,7 @@ const PaymentModal = ({ onClose }: PaymentModalProps) => {
             </TotalRow>
           </PriceSection>
 
-          <PayButton onClick={onClose}>결제하기</PayButton>
+          <PayButton onClick={handleClickPaymentBtn}>결제하기</PayButton>
         </Content>
       </Container>
     </Background>

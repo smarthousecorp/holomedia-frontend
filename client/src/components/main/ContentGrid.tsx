@@ -23,8 +23,8 @@ interface Creator {
   nickname: string;
   content: string;
   createdAt: string;
-  profile_image: string;
-  background_image: string;
+  profile: string;
+  background: string;
 }
 
 interface ContentGridProps {
@@ -47,6 +47,8 @@ const ContentGrid: React.FC<ContentGridProps> = ({
   const findCreator = (creatorNo: number): Creator | undefined => {
     return creators.find((creator) => creator.no === creatorNo);
   };
+
+  console.log(boards);
 
   return (
     <GridContainer>
@@ -73,7 +75,10 @@ const ContentGrid: React.FC<ContentGridProps> = ({
             <GradientOverlay $position="top">
               <CreatorInfo>
                 <ProfileImageWrapper>
-                  <ProfileImage src="/default-profile.png" alt="profile" />
+                  <ProfileImage
+                    src={findCreator(board.creatorNo)?.profile}
+                    alt="profile"
+                  />
                 </ProfileImageWrapper>
                 <CreatorName>
                   {findCreator(board.creatorNo)?.nickname}
@@ -134,7 +139,7 @@ export default ContentGrid;
 const GridContainer = styled.div`
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  gap: 2rem;
+  gap: 0.5rem;
   width: 100%;
   max-width: 1200px;
   margin: 0 auto;
@@ -143,7 +148,7 @@ const GridContainer = styled.div`
 const ContentRow = styled.div`
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 2rem;
+  gap: 0.5rem;
   height: 500px;
 `;
 
@@ -185,7 +190,7 @@ const VideoPlayer = styled.video`
 const RightColumn = styled.div`
   display: grid;
   grid-template-rows: 1fr 1fr;
-  gap: 2rem;
+  gap: 0.5rem;
   height: 100%;
 `;
 

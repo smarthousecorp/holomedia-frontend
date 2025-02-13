@@ -111,13 +111,13 @@ const User = () => {
       return;
     }
 
-    if (!isAdmin && !isAdultVerified) {
-      setSelectedVideoId(media.id);
+    if (!isAdmin) {
+      setSelectedVideoId(media.boardNo);
       setShowModal(true);
       return;
     }
 
-    navigate(`/video/${media.id}`);
+    navigate(`/video/${media.boardNo}`);
   };
 
   if (loadingState === "loading") {

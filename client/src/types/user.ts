@@ -18,8 +18,8 @@ export interface Creator {
   nickname: string;
   content: string;
   createdAt: string;
-  profile_image: string;
-  background_image: string;
+  profile: string;
+  background: string;
 }
 
 export interface UploaderResponse {
