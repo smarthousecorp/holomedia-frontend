@@ -55,20 +55,18 @@ const PaymentModal = ({ onClose }: PaymentModalProps) => {
         {
           pgcode: "creditcard",
           memberId: "suafjwe1",
-          productName: "100",
-          price: 110000,
+          productName: selectedAmount?.toString() || customAmount,
+          price: totalPrice,
         },
         {
           withCredentials: true,
         }
       )
       .then((res) => {
-        console.log(res);
-
-        console.log(res.data.online_url);
+        console.log(res.data.data.urls.online_url);
         const options =
           "toolbar=no,scrollbars=no,resizable=yes,status=no,menubar=no,width=1200, height=800, top=0,left=0";
-        window.open(res.data.online_url, "_blank", options);
+        window.open(res.data.data.urls.online_url, "_blank", options);
       });
   };
 
