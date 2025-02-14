@@ -8,7 +8,7 @@ interface ContentGridProps {
   boards: board[];
   creators: Creator[];
   onCreatorClick: (creator: Creator) => void;
-  onBoardClick: (board: board) => void;
+  onBoardClick?: (board: board) => void;
   shouldBlur: boolean;
 }
 
@@ -16,7 +16,7 @@ const ContentGrid: React.FC<ContentGridProps> = ({
   boards,
   creators,
   onCreatorClick,
-  onBoardClick,
+  // onBoardClick,
   shouldBlur,
 }) => {
   const [hoveredVideo, setHoveredVideo] = useState<number | null>(null);
@@ -35,7 +35,8 @@ const ContentGrid: React.FC<ContentGridProps> = ({
           <VideoSection
             onMouseEnter={() => setHoveredVideo(board.boardNo)}
             onMouseLeave={() => setHoveredVideo(null)}
-            onClick={() => onBoardClick(board)}
+            // onClick={() => onBoardClick(board)}
+            onClick={() => onCreatorClick(findCreator(board.creatorNo)!)}
           >
             <VideoWrapper>
               {hoveredVideo === board.boardNo ? (
@@ -81,6 +82,7 @@ const ContentGrid: React.FC<ContentGridProps> = ({
                 <ContentImage
                   src={board.urls.image}
                   alt="content"
+                  onClick={() => onCreatorClick(findCreator(board.creatorNo)!)}
                   $shouldBlur={shouldBlur}
                 />
               </ImageWrapper>
@@ -143,7 +145,7 @@ const VideoSection = styled.div`
   transition: transform 0.2s ease;
 
   &:hover {
-    transform: translateY(-2px);
+    transform: translateY(-4px);
   }
 `;
 
@@ -180,6 +182,14 @@ const ImageSection = styled.div`
   border-radius: 1rem;
   overflow: hidden;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+
+  transition: transform 0.2s ease;
+
+  &:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 12px rgba(0, 0, 0, 0.15);
+    border: 2px solid rgba(255, 255, 255, 0.2);
+  }
 `;
 
 const ImageWrapper = styled.div`
@@ -193,6 +203,7 @@ const ContentImage = styled.img<{ $shouldBlur: boolean }>`
   width: 100%;
   height: 100%;
   object-fit: cover;
+  cursor: pointer;
 `;
 
 const CreatorSection = styled.div`
@@ -204,6 +215,14 @@ const CreatorSection = styled.div`
   overflow: hidden;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   cursor: pointer;
+
+  transition: transform 0.2s ease;
+
+  &:hover {
+    transform: translateY(4px);
+    box-shadow: 0 8px 12px rgba(0, 0, 0, 0.15);
+    border: 2px solid rgba(255, 255, 255, 0.2);
+  }
 `;
 
 const CreatorContent = styled.div`
