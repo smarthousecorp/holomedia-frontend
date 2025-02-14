@@ -63,7 +63,6 @@ const PaymentModal = ({ onClose }: PaymentModalProps) => {
         }
       )
       .then((res) => {
-        console.log(res.data.data.urls.online_url);
         const options =
           "toolbar=no,scrollbars=no,resizable=yes,status=no,menubar=no,width=1200, height=800, top=0,left=0";
         window.open(res.data.data.urls.online_url, "_blank", options);
