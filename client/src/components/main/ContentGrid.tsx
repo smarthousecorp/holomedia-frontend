@@ -94,7 +94,7 @@ const ContentGrid: React.FC<ContentGridProps> = ({
             >
               <CreatorContent>
                 <ImageWrapper>
-                  <Image src="https://firebasestorage.googleapis.com/v0/b/quill-image-store.appspot.com/o/HOLOMEDIA%2Fsample3.jpg?alt=media&token=3ea497ba-1898-4a81-acf8-3bef130d6f7e" />
+                  <Image src={findCreator(board.creatorNo)?.profile} />
                 </ImageWrapper>
                 <GradientOverlay $position="bottom">
                   <Username>{findCreator(board.creatorNo)?.nickname}</Username>

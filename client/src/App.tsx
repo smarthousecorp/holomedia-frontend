@@ -55,7 +55,7 @@ function App() {
           <Route path="/" element={<Login />} />
           <Route path="/signup" element={<SignUp />} />
           <Route path="/nice/signup" element={<NiceReturnPage />} />
-          <Route path="/payment" element={<PaymentReturn />} />
+          <Route path="/api/payment/success" element={<PaymentReturn />} />
           <Route path="/*" element={<ErrorPage error="404" />} />
           <Route path="/error" element={<ErrorPage error="500" />} />
           <Route path="/dev-tools-alert" element={<DevToolsAlert />} />
@@ -71,14 +71,6 @@ function App() {
             }
           />
           <Route path="/user/:id" element={<User />} />
-          {/* <Route
-            path="/upload"
-            element={
-              // <UploaderRoute>
-              <UploadForm />
-              // </UploaderRoute>
-            }
-          /> */}
           <Route path="/alarm" element={<NotificationPage />} />
           {/* <Route
             path="/membership"
