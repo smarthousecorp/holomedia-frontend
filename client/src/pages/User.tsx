@@ -1,91 +1,63 @@
-// src/pages/User.tsx
 import { useEffect, useState } from "react";
 import styled from "styled-components";
-// import VisibilityIcon from "@mui/icons-material/Visibility";
 import { useNavigate, useParams } from "react-router-dom";
-import { media } from "../types/media";
-// import {SkeletonImage} from "../components/commons/media/Skeleton";
+import { Settings } from "lucide-react";
+import ReactQuill from "react-quill";
 import { api } from "../utils/api";
-import { RootState } from "../store";
-import { useSelector, useDispatch } from "react-redux";
-import { logout } from "../store/slices/user";
 import Toast from "../components/commons/Toast";
 import { ToastType } from "../types/toast";
-import { getCookie } from "../utils/cookie";
-import { Settings } from "lucide-react";
 import Loading from "../components/commons/Loading";
 import EmptyState from "../components/commons/EmptyState";
-// import searchIcon from "../assets/search.png";
-import { Uploader } from "../types/user";
-
 import MovieList from "../components/main/MovieList";
-import { RecommendedUploaders } from "../components/main/RecommendList";
-import ReactQuill from "react-quill";
-// import SideBannder from "../assets/side-banner.png";
+// import { RecommendedUploaders } from "../components/main/RecommendList";
+import { Creator } from "../types/user";
+import { board } from "../types/board";
 
 type LoadingState = "loading" | "error" | "success";
+type TabType = "free" | "premium";
 
 const User = () => {
   const navigate = useNavigate();
-  const dispatch = useDispatch();
+  const creatorNo = useParams().id;
 
-  const id = useParams().id;
-  const user = useSelector((state: RootState) => state.user.isLoggedIn);
-  const isAdultVerified = useSelector(
-    (state: RootState) => state.user.is_adult_verified
-  );
-  const isAdmin = useSelector((state: RootState) => state.user.is_admin);
+  // const isAdultVerified = useSelector(
+  //   (state: RootState) => state.user.is_adult_verified
+  // );
+  // const isAdmin = useSelector((state: RootState) => state.user.is_admin);
 
-  const shouldBlur = !isAdmin && (!user || !isAdultVerified);
+  // const shouldBlur = !isAdmin && (!user || !isAdultVerified);
 
   const [loadingState, setLoadingState] = useState<LoadingState>("loading");
-
-  // api 응답 저장 상태
-  const [medias, setMedias] = useState<media[]>([]);
-  const [uploaders, setUploaders] = useState<Uploader[]>([]);
-  const [uploader, setUploader] = useState<Uploader>({
-    id: 0,
-    user_id: "",
-    username: "",
-    description: "",
-    profile_image: "",
-    created_at: "",
-    background_image: "",
-    bloom: 0,
-    media_count: 0,
-    total_views: 0,
-    last_upload: "",
+  const [activeTab, setActiveTab] = useState<TabType>("free");
+  const [boards, setBoards] = useState<board[]>([]);
+  const [creators, setCreators] = useState<Creator[]>([]);
+  const [creator, setCreator] = useState<Creator>({
+    no: 0,
+    loginId: "",
+    nickname: "",
+    content: "",
+    createdAt: "",
+    profile: "",
+    background: "",
   });
 
-  const [showModal, setShowModal] = useState<boolean>(false);
-  const [selectedVideoId, setSelectedVideoId] = useState<number | null>(null);
-
-  console.log(showModal, selectedVideoId);
-
-  const handleUploaderClick = (uploader: Uploader): void => {
-    navigate(`/user/${uploader.id}`);
+  const handleCreatorClick = (creator: Creator): void => {
+    navigate(`/user/${creator.no}`);
   };
 
   const fetchData = async () => {
     try {
       setLoadingState("loading");
-      // Promise.all을 사용하여 병렬로 API 요청
-      const [mediaResponse, uploaderResponse] = await Promise.all([
-        api.get(`/media/recent?uploaderId=${id}limit=12`),
-        api.get(`/uploaders?page=1&limit=10`),
-      ]);
+      const [boardsResponse, creatorResponse, creatorsResponse] =
+        await Promise.all([
+          api.get(`/board/list?creatorNo=${creatorNo}`),
+          api.get(`/creator?creatorNo=${creatorNo}`),
+          api.get(`/creator/list`),
+        ]);
 
-      setMedias(mediaResponse.data.data);
-      setUploaders(uploaderResponse.data.data);
-      // 업로더 단일조회 정보 저장
-
-      const findUploaderIdx = (id: number) => {
-        return uploaderResponse.data.data.filter((uploader: Uploader) => {
-          return uploader.id === id;
-        })[0];
-      };
-      setUploader(findUploaderIdx(Number(id)));
-
+      setBoards(boardsResponse.data.data);
+      setCreator(creatorResponse.data.data);
+      setCreators(creatorsResponse.data.data);
       setLoadingState("success");
     } catch (error) {
       console.error("Error fetching data:", error);
@@ -97,28 +69,19 @@ const User = () => {
 
   useEffect(() => {
     fetchData();
+  }, [creatorNo]);
 
-    const access = getCookie("accessToken");
-    if (!access) {
-      dispatch(logout());
-      localStorage.removeItem("accessToken");
-    }
-  }, []);
-
-  const handleMediaClick = (media: media) => {
-    if (!user) {
-      Toast(ToastType.error, "로그인 후에 접근 가능합니다.");
-      return;
-    }
-
-    if (!isAdmin) {
-      setSelectedVideoId(media.boardNo);
-      setShowModal(true);
-      return;
-    }
-
-    navigate(`/video/${media.boardNo}`);
+  const handleBoardClick = (board: board) => {
+    navigate(`/video/${board.boardNo}`);
   };
+
+  const filteredBoards = boards.filter((board) => {
+    if (activeTab === "free") {
+      return board.urls.image; // 이미지가 있는 게시글만 표시
+    } else {
+      return board.urls.thumbnail; // 썸네일(영상)이 있는 게시글만 표시
+    }
+  });
 
   if (loadingState === "loading") {
     return <Loading />;
@@ -138,18 +101,15 @@ const User = () => {
     <MainContainer>
       <UserContainer>
         <UserTopSection>
-          <ProfileBackground $image={uploader.background_image}>
-            <ProfilePicture
-              src={uploader.profile_image}
-              alt={uploader.username}
-            />
+          <ProfileBackground $image={creator.background}>
+            <ProfilePicture src={creator.profile} alt={creator.nickname} />
           </ProfileBackground>
           <ProfileHeader>
-            <Username>{uploader.username}</Username>
-            <Bio>@{uploader.user_id}</Bio>
+            <Username>{creator.nickname}</Username>
+            <Bio>@{creator.loginId}</Bio>
             <StyledQuillWrapper>
               <ReactQuill
-                value={uploader.description}
+                value={creator.content}
                 readOnly={true}
                 theme="bubble"
                 modules={{
@@ -159,28 +119,68 @@ const User = () => {
             </StyledQuillWrapper>
           </ProfileHeader>
         </UserTopSection>
-        {medias.length === 0 ? (
-          <EmptyState message={`등록된 영상이 없습니다`} />
+
+        <TabContainer>
+          <TabButton
+            active={activeTab === "free"}
+            onClick={() => setActiveTab("free")}
+          >
+            무료
+          </TabButton>
+          <TabButton
+            active={activeTab === "premium"}
+            onClick={() => setActiveTab("premium")}
+          >
+            유료
+          </TabButton>
+        </TabContainer>
+
+        {filteredBoards.length === 0 ? (
+          <EmptyState
+            message={`등록된 ${
+              activeTab === "free" ? "사진" : "영상"
+            }이 없습니다`}
+          />
         ) : (
           <MovieMainContainer>
             <MovieList
-              medias={medias}
-              uploaders={uploaders}
-              onUploaderClick={handleUploaderClick}
-              onMediaClick={handleMediaClick}
-              shouldBlur={shouldBlur}
+              boards={filteredBoards}
+              creators={creators}
+              onCreatorClick={handleCreatorClick}
+              onBoardClick={handleBoardClick}
+              shouldBlur={activeTab === "premium"}
             />
           </MovieMainContainer>
         )}
       </UserContainer>
-      <SideContainer>
-        <RecommendedUploaders />
-        {/* <img src={SideBannder} alt="광고 배너" /> */}
-      </SideContainer>
+      <SideContainer>{/* <RecommendedUploaders /> */}</SideContainer>
     </MainContainer>
   );
 };
+
 export default User;
+
+const TabContainer = styled.div`
+  display: flex;
+  gap: 1rem;
+  margin: 2rem 0;
+  padding: 0 2rem;
+`;
+
+const TabButton = styled.button<{ active: boolean }>`
+  padding: 1rem 2rem;
+  font-size: 1.4rem;
+  background-color: ${(props) => (props.active ? "#eb3553" : "#ffffff")};
+  color: ${(props) => (props.active ? "#ffffff" : "#000000")};
+  border: 1px solid ${(props) => (props.active ? "#eb3553" : "#dddddd")};
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  &:hover {
+    background-color: ${(props) => (props.active ? "#d42e4a" : "#f5f5f5")};
+  }
+`;
 
 const MaintenanceContainer = styled.div`
   width: 100%;

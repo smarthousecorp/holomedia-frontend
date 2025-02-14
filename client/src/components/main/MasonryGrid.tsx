@@ -1,7 +1,7 @@
 import React from "react";
 import { Eye } from "lucide-react";
 import styled from "styled-components";
-import { media } from "../../types/media";
+import { media } from "../../types/board";
 import { Creator } from "../../types/user";
 import adultBadge from "../../assets/19_badge.png";
 

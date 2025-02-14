@@ -2,77 +2,81 @@ import React, { useState } from "react";
 import styled from "styled-components";
 import ReactQuill from "react-quill";
 import "react-quill/dist/quill.bubble.css";
-import { Uploader } from "../../types/user";
-import { media } from "../../types/media";
-import VisibilityIcon from "@mui/icons-material/Visibility";
-import { SvgIcon } from "@mui/material";
-import LikeButton from "./LikeButton";
+import { Creator } from "../../types/user";
+import { board } from "../../types/board";
+// import VisibilityIcon from "@mui/icons-material/Visibility";
+// import { SvgIcon } from "@mui/material";
+// import LikeButton from "./LikeButton";
 
 interface MovieListProps {
-  uploaders: Uploader[];
-  onUploaderClick: (uploader: Uploader) => void;
-  medias: media[];
-  onMediaClick: (media: media) => void;
+  creators: Creator[];
+  onCreatorClick: (creator: Creator) => void;
+  boards: board[];
+  onBoardClick: (board: board) => void;
   shouldBlur: boolean;
 }
 
 const MovieList: React.FC<MovieListProps> = ({
-  uploaders,
-  onUploaderClick,
-  medias,
-  onMediaClick,
+  creators,
+  onCreatorClick,
+  boards,
+  onBoardClick,
   shouldBlur,
 }) => {
   const [expandedDescriptions, setExpandedDescriptions] = useState<number[]>(
     []
   );
 
-  const findUploaderIdx = (id: number) => {
-    return uploaders.filter((uploader) => {
-      return uploader.id === id;
-    })[0];
+  const findCreator = (id: number) => {
+    return creators.find((creator) => creator.no === id);
   };
 
-  const handleUploaderClick = (uploader: Uploader): void => {
-    onUploaderClick(uploader);
+  const handleCreatorClick = (creator: Creator): void => {
+    onCreatorClick(creator);
   };
 
-  const handleMediaClick = (media: media): void => {
-    onMediaClick(media);
+  const handleBoardClick = (board: board): void => {
+    onBoardClick(board);
   };
 
-  const toggleDescription = (mediaId: number) => {
+  const toggleDescription = (boardId: number) => {
     setExpandedDescriptions((prev) =>
-      prev.includes(mediaId)
-        ? prev.filter((id) => id !== mediaId)
-        : [...prev, mediaId]
+      prev.includes(boardId)
+        ? prev.filter((id) => id !== boardId)
+        : [...prev, boardId]
     );
   };
 
   return (
     <>
-      {medias.map((media) => {
-        const uploader = findUploaderIdx(media.uploader_id);
-        const isExpanded = expandedDescriptions.includes(media.id);
+      {boards.map((board) => {
+        const creator = findCreator(board.creatorNo);
+        const isExpanded = expandedDescriptions.includes(board.boardNo);
+        const isVideo = Boolean(board.urls.thumbnail);
+        const mediaUrl = isVideo ? board.urls.thumbnail : board.urls.image;
+
+        if (!creator || !mediaUrl) return null;
 
         return (
-          <MediaLists key={media.id}>
-            <MediaItem>
+          <BoardLists key={board.boardNo}>
+            <BoardItem>
               <PostHeader>
-                <UploaderInfo onClick={() => handleUploaderClick(uploader)}>
+                <CreatorInfo onClick={() => handleCreatorClick(creator)}>
                   <ProfileImage
-                    src={uploader.profile_image || "/default-profile.png"}
-                    alt={uploader.username || "Profile"}
+                    src={creator.profile || "/default-profile.png"}
+                    alt={creator.nickname || "Profile"}
                   />
-                  <UploaderItem>
-                    <UploaderName>{uploader.username}</UploaderName>
-                    <UploaderId>@{uploader.user_id}</UploaderId>
-                  </UploaderItem>
-                </UploaderInfo>
+                  <CreatorItem>
+                    <CreatorName>{creator.nickname}</CreatorName>
+                    <CreatorId>@{creator.loginId}</CreatorId>
+                  </CreatorItem>
+                </CreatorInfo>
                 <StyledQuillWrapper $isExpanded={isExpanded}>
                   <div className="quill-container">
                     <ReactQuill
-                      value={media.description}
+                      value={
+                        isVideo ? board.contents.video : board.contents.image
+                      }
                       readOnly={true}
                       theme="bubble"
                       modules={{
@@ -80,41 +84,34 @@ const MovieList: React.FC<MovieListProps> = ({
                       }}
                     />
                   </div>
-                  <ExpandButton onClick={() => toggleDescription(media.id)}>
+                  <ExpandButton
+                    onClick={() => toggleDescription(board.boardNo)}
+                  >
                     {isExpanded ? "접기" : "더보기"}
                   </ExpandButton>
                 </StyledQuillWrapper>
               </PostHeader>
 
-              <MediaContent onClick={() => handleMediaClick(media)}>
-                <MediaThumbnail
-                  src={media.thumbnail}
-                  alt={media.title}
-                  $shouldBlur={shouldBlur}
+              <BoardContent onClick={() => handleBoardClick(board)}>
+                <BoardThumbnail
+                  src={mediaUrl}
+                  alt={board.title}
+                  $shouldBlur={isVideo && shouldBlur}
                 />
-                {shouldBlur && (
+                {isVideo && shouldBlur && (
                   <BlurOverlay>
                     <h3>이 영상만 구매</h3>
-                    <button>???로 구매</button>
+                    <button>{board.point}P 구매하기</button>
                   </BlurOverlay>
                 )}
-              </MediaContent>
+                {isVideo && !shouldBlur && <PlayIcon />}
+              </BoardContent>
 
               <PostFooter>
-                <Interactions>
-                  <LikeButton
-                    mediaId={media.id}
-                    isLiked={media.is_liked}
-                    initialLikeCount={media.like_count}
-                  />
-                  <InteractionItem>
-                    <SvgIcon component={VisibilityIcon} />
-                    <Count>{media.views}</Count>
-                  </InteractionItem>
-                </Interactions>
+                <Interactions>{/* 기존 인터렉션 요소들 */}</Interactions>
               </PostFooter>
-            </MediaItem>
-          </MediaLists>
+            </BoardItem>
+          </BoardLists>
         );
       })}
     </>
@@ -187,9 +184,9 @@ const ExpandButton = styled.button`
   }
 `;
 
-// MediaDescription 스타일 컴포넌트는 제거 (Quill로 대체)
+// boardDescription 스타일 컴포넌트는 제거 (Quill로 대체)
 
-const MediaLists = styled.ul`
+const BoardLists = styled.ul`
   position: relative;
   max-width: 100%;
   background: #ffffff;
@@ -200,7 +197,7 @@ const MediaLists = styled.ul`
   margin: 0;
 `;
 
-const MediaItem = styled.li`
+const BoardItem = styled.li`
   border-radius: 12px;
   overflow: hidden;
 `;
@@ -210,7 +207,7 @@ const PostHeader = styled.div`
   border-bottom: 1px solid #f0f0f0;
 `;
 
-const UploaderInfo = styled.div`
+const CreatorInfo = styled.div`
   display: flex;
   align-items: center;
   cursor: pointer;
@@ -223,7 +220,7 @@ const UploaderInfo = styled.div`
   }
 `;
 
-const UploaderItem = styled.div`
+const CreatorItem = styled.div`
   display: flex;
   flex-direction: column;
   gap: 3px;
@@ -236,23 +233,23 @@ const ProfileImage = styled.img`
   margin-right: 12px;
 `;
 
-const UploaderName = styled.span`
+const CreatorName = styled.span`
   font-weight: 600;
   font-size: 1.3rem;
   color: #333;
 `;
 
-const UploaderId = styled.span`
+const CreatorId = styled.span`
   color: #828282;
 `;
 
-const MediaContent = styled.div`
+const BoardContent = styled.div`
   cursor: pointer;
   position: relative;
   padding-top: 67.25%; // 16:9 Aspect Ratio (이미지 사이즈가 각기 다른 관계로 56.25 => 67.25 변경)
 `;
 
-const MediaThumbnail = styled.img<{ $shouldBlur: boolean }>`
+const BoardThumbnail = styled.img<{ $shouldBlur: boolean }>`
   position: absolute;
   top: 0;
   left: 0;
@@ -308,28 +305,54 @@ const Interactions = styled.div`
   margin-bottom: 0.5rem;
 `;
 
-const InteractionItem = styled.div`
-  display: flex;
-  align-items: center;
-  gap: 0.25rem;
+const PlayIcon = styled.div`
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 0;
+  height: 0;
+  border-style: solid;
+  border-width: 15px 0 15px 25px;
+  border-color: transparent transparent transparent #ffffff;
+  opacity: 0.8;
 
-  > svg {
-    font-size: 2.2rem;
+  &::before {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 60px;
+    height: 60px;
+    background: rgba(0, 0, 0, 0.5);
+    border-radius: 50%;
+    z-index: -1;
   }
 `;
 
-const Count = styled.span`
-  color: #666;
-  font-size: 1.5rem;
-`;
+// const InteractionItem = styled.div`
+//   display: flex;
+//   align-items: center;
+//   gap: 0.25rem;
 
-// const MediaTitle = styled.h3`
+//   > svg {
+//     font-size: 2.2rem;
+//   }
+// `;
+
+// const Count = styled.span`
+//   color: #666;
+//   font-size: 1.5rem;
+// `;
+
+// const boardTitle = styled.h3`
 //   margin: 0.5rem 0;
 //   font-size: 1.1rem;
 //   font-weight: 600;
 // `;
 
-// const MediaDescription = styled.p`
+// const boardDescription = styled.p`
 //   margin: 0;
 //   margin-top: 2rem;
 //   color: #000000;

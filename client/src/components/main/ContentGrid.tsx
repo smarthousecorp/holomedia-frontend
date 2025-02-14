@@ -1,37 +1,14 @@
 import React, { useState } from "react";
 import styled from "styled-components";
 import { Eye } from "lucide-react";
-
-interface BoardItem {
-  boardNo: number;
-  creatorNo: number;
-  title: string;
-  content: string;
-  price: number;
-  loginId: string;
-  urls: {
-    thumbnail: string;
-    video: string;
-    image: string;
-    highlight: string;
-  };
-}
-
-interface Creator {
-  no: number;
-  loginId: string;
-  nickname: string;
-  content: string;
-  createdAt: string;
-  profile: string;
-  background: string;
-}
+import { board } from "../../types/board";
+import { Creator } from "../../types/user";
 
 interface ContentGridProps {
-  boards: BoardItem[];
+  boards: board[];
   creators: Creator[];
   onCreatorClick: (creator: Creator) => void;
-  onBoardClick: (board: BoardItem) => void;
+  onBoardClick: (board: board) => void;
   shouldBlur: boolean;
 }
 
@@ -149,7 +126,6 @@ const ContentRow = styled.div`
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 0.5rem;
-  height: 500px;
 `;
 
 const VideoSection = styled.div`

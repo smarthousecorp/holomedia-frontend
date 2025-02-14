@@ -4,15 +4,11 @@ import styled from "styled-components";
 // import VisibilityIcon from "@mui/icons-material/Visibility";
 import { SvgIcon } from "@mui/material";
 import { useNavigate } from "react-router-dom";
-import { media } from "../types/media";
+import { board } from "../types/board";
 // import {SkeletonImage} from "../components/commons/media/Skeleton";
 import { api } from "../utils/api";
-import { RootState } from "../store";
-import { useSelector, useDispatch } from "react-redux";
-import { logout } from "../store/slices/user";
 import Toast from "../components/commons/Toast";
 import { ToastType } from "../types/toast";
-import { getCookie } from "../utils/cookie";
 import { Settings } from "lucide-react";
 import Loading from "../components/commons/Loading";
 // import EmptyState from "../components/commons/EmptyState";
@@ -35,26 +31,17 @@ const Main = () => {
   const { t } = useTranslation();
 
   const navigate = useNavigate();
-  const dispatch = useDispatch();
 
-  const user = useSelector((state: RootState) => state.user.isLoggedIn);
-  const isAdultVerified = useSelector(
-    (state: RootState) => state.user.is_adult_verified
-  );
-  const isAdmin = useSelector((state: RootState) => state.user.is_admin);
-
-  const shouldBlur = !isAdmin && (!user || !isAdultVerified);
+  // const isAdmin = useSelector((state: RootState) => state.user.is_admin);
 
   const [loadingState, setLoadingState] = useState<LoadingState>("loading");
 
   // api 응답 저장 상태
-  const [medias, setMedias] = useState<media[]>([]);
+  const [medias, setMedias] = useState<board[]>([]);
   const [uploaders, setUploaders] = useState<Creator[]>([]);
 
-  const [showModal, setShowModal] = useState<boolean>(false);
-  const [selectedVideoId, setSelectedVideoId] = useState<number | null>(null);
-
-  console.log(showModal, selectedVideoId);
+  // const [showModal, setShowModal] = useState<boolean>(false);
+  // const [selectedVideoId, setSelectedVideoId] = useState<number | null>(null);
 
   const handleUploaderClick = (uploader: Creator): void => {
     navigate(`/user/${uploader.no}`);
@@ -82,25 +69,14 @@ const Main = () => {
 
   useEffect(() => {
     fetchData();
-
-    const access = getCookie("accessToken");
-    if (!access) {
-      dispatch(logout());
-      localStorage.removeItem("accessToken");
-    }
   }, []);
 
-  const handleMediaClick = (media: media) => {
-    if (!user) {
-      Toast(ToastType.error, "로그인 후에 접근 가능합니다.");
-      return;
-    }
-
-    if (!isAdmin) {
-      setSelectedVideoId(media.boardNo);
-      setShowModal(true);
-      return;
-    }
+  const handleMediaClick = (media: board) => {
+    // if (!isAdmin) {
+    //   setSelectedVideoId(media.boardNo);
+    //   setShowModal(true);
+    //   return;
+    // }
 
     navigate(`/video/${media.boardNo}`);
   };
@@ -189,7 +165,7 @@ const Main = () => {
                 creators={uploaders}
                 onCreatorClick={handleUploaderClick}
                 onBoardClick={handleMediaClick}
-                shouldBlur={shouldBlur}
+                shouldBlur={true}
               />
             </MovieMainContainer>
           )}
