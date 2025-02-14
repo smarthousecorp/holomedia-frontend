@@ -72,6 +72,8 @@ const User = () => {
   }, [creatorNo]);
 
   const handleBoardClick = (board: board) => {
+    console.log("실행됨");
+
     navigate(`/video/${board.boardNo}`);
   };
 

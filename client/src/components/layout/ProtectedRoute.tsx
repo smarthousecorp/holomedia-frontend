@@ -6,7 +6,7 @@ interface ProtectedRouteProps {
 
 const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
   // const isAdmin = useSelector((state: RootState) => state.user.is_admin);
-  const isAdmin = false;
+  const isAdmin = true;
 
   // 성인인증 체크
   if (!isAdmin) {

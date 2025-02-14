@@ -59,14 +59,10 @@ const VideoDetail = () => {
 
   const fetchMediaData = async () => {
     try {
-      const response = await api.get(`/media/${id}`);
+      const response = await api.get(`/board?boardNo=${id}`);
 
-      if (!isAdmin && response.data.requirePayment) {
-        setPaymentInfo(response.data);
-        setShowPaymentDialog(true);
-      } else {
-        setMedia(response.data);
-      }
+      console.log(response);
+      setMedia(response.data.data);
     } catch (error) {
       const { response } = error as any;
       if (!isAdmin && response?.data?.requirePayment) {
