@@ -1,15 +1,15 @@
 import React from "react";
 import { Eye } from "lucide-react";
 import styled from "styled-components";
-import { media } from "../../types/board";
+import { board } from "../../types/board";
 import { Creator } from "../../types/user";
 import adultBadge from "../../assets/19_badge.png";
 
 interface MasonryGridProps {
-  boards: media[];
+  boards: board[];
   creators: Creator[];
   onCreatorClick: (creator: Creator) => void;
-  onBoardClick: (board: media) => void;
+  onBoardClick: (board: board) => void;
   shouldBlur: boolean;
 }
 
@@ -27,7 +27,7 @@ interface ImageProps {
 
 interface MixedContent {
   type: "creator" | "board";
-  content: Creator | media;
+  content: Creator | board;
 }
 
 const MasonryGrid: React.FC<MasonryGridProps> = ({
@@ -73,7 +73,7 @@ const MasonryGrid: React.FC<MasonryGridProps> = ({
     if (item.type === "creator") {
       onCreatorClick(item.content as Creator);
     } else {
-      onBoardClick(item.content as media);
+      onBoardClick(item.content as board);
     }
   };
 
@@ -87,12 +87,12 @@ const MasonryGrid: React.FC<MasonryGridProps> = ({
                 src={
                   item.type === "creator"
                     ? "/default-profile.png" // You might want to add profile_image to Creator type
-                    : (item.content as media).urls.thumbnail
+                    : (item.content as board).urls.thumbnail
                 }
                 alt={
                   item.type === "creator"
                     ? (item.content as Creator).nickname
-                    : (item.content as media).title
+                    : (item.content as board).title
                 }
                 $shouldBlur={item.type === "board" && shouldBlur}
               />
@@ -111,7 +111,7 @@ const MasonryGrid: React.FC<MasonryGridProps> = ({
                     <CreatorInfo>
                       {(() => {
                         const creator = findCreator(
-                          (item.content as media).creatorNo
+                          (item.content as board).creatorNo
                         );
                         return (
                           <>
