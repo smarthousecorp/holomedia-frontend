@@ -1,10 +1,10 @@
-import {combineReducers, configureStore} from "@reduxjs/toolkit";
+import { combineReducers, configureStore } from "@reduxjs/toolkit";
 import storage from "redux-persist/lib/storage";
-import {persistReducer} from "redux-persist";
+import { persistReducer } from "redux-persist";
 import modal from "./slices/modal";
 import user from "./slices/user";
 import sidebar from "./slices/sidebar";
-import {thunk} from "redux-thunk";
+import { thunk } from "redux-thunk";
 import header from "./slices/header";
 import toast from "./slices/toast";
 
@@ -19,7 +19,7 @@ const reducers = combineReducers({
 const persistConfig = {
   key: "root",
   storage,
-  whiteList: ["user"],
+  whitelist: ["user"],
 };
 
 const persistedReducer = persistReducer(persistConfig, reducers);

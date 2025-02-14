@@ -24,13 +24,7 @@ interface ErrorMsg {
 interface ApiResponse {
   code: number;
   data: {
-    id: string;
-    nickname: string;
-    // profile_image: string;
-    // is_adult_verified: boolean;
-    // is_admin: boolean;
-    // is_uploader: boolean;
-    // bloom: number;
+    memberNo: string;
   } | null;
   message: string;
   timestamp: string;
@@ -126,11 +120,11 @@ const Login: React.FC = () => {
 
         dispatch(
           login({
-            isLoggedIn: true,
-            id: res.data.data.id,
-            nickname: res.data.data.nickname,
+            memberNo: res.data.data.memberNo,
           })
         );
+
+        localStorage.setItem("member_No", res.data.data.memberNo);
 
         navigate("/main");
       }

@@ -5,7 +5,7 @@ import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import Modal from "../components/commons/Modal";
 import Button from "../components/commons/Button";
-import { removeCookie } from "../utils/cookie";
+import { api } from "../utils/api";
 
 interface MenuItemProps {
   id: number;
@@ -27,9 +27,15 @@ const Settings = () => {
   ];
 
   const handleLogout = () => {
-    localStorage.removeItem("token");
-    removeCookie("accessToken");
-    navigate("/");
+    api
+      .post("/logout")
+      .then(() => {
+        localStorage.removeItem("member_No");
+        navigate("/");
+      })
+      .catch(() => {
+        console.log("로그아웃 실패");
+      });
   };
 
   const handleMenuClick = (item: MenuItemProps) => {

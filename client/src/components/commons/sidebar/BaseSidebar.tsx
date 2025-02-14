@@ -14,8 +14,8 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { RootState } from "../../../store";
 import GgulImg from "../../../assets/Ggul.png";
-import { getCookie } from "../../../utils/cookie";
 import PaymentModal from "../../main/PaymentModal";
+import { useUserInfo } from "../../../hooks/useUserInfo";
 
 interface BaseSidebarProps {
   isOpen?: boolean;
@@ -36,8 +36,12 @@ const BaseSidebar = ({
   const navigate = useNavigate();
   const location = useLocation();
 
-  const user = useSelector((state: RootState) => state.user);
-  const isLogin = getCookie("accessToken");
+  // Get memberNo from global state
+  const memberNo = useSelector((state: RootState) => state.user.memberNo);
+  console.log("멤버번호", memberNo);
+
+  const { userInfo, isLoading } = useUserInfo(memberNo);
+  console.log(isLoading, userInfo);
 
   const [showPaymentModal, setShowPaymentModal] = useState<boolean>(false);
 
@@ -71,7 +75,7 @@ const BaseSidebar = ({
             <img
               src={logo}
               alt={t("sidebar.logo.alt")}
-              onClick={() => navigate(isLogin ? "/main" : "/")}
+              onClick={() => navigate("/main")}
             />
             {variant === "mobile" && (
               <SvgIcon
@@ -84,18 +88,18 @@ const BaseSidebar = ({
           <Profile>
             <ProfileLeft>
               <img
-                src={user.profile_image}
+                src={userInfo?.urls.profile}
                 alt={t("sidebar.profile.picture")}
               />
             </ProfileLeft>
             <ProfileRight>
-              <h5>{user.username}</h5>
-              <p>@{user.id}</p>
+              <h5>{userInfo?.nickname}</h5>
+              <p>@{userInfo?.loginId}</p>
             </ProfileRight>
           </Profile>
           <Bloom>
             <img src={GgulImg} alt={t("sidebar.profile.bloom.icon")} />
-            <BloomText>{user.bloom}</BloomText>
+            <BloomText>{userInfo?.point}</BloomText>
             <SelectButton onClick={handleClickChargeBtn}>
               <ButtonText>{t("sidebar.profile.bloom.charge")}</ButtonText>
             </SelectButton>

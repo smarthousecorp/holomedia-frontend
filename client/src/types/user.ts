@@ -12,6 +12,17 @@ export interface Uploader {
   last_upload: string; // 추가
 }
 
+export interface User {
+  memberNo: number;
+  nickname: string;
+  point: number;
+  loginId: string;
+  urls: {
+    background: string;
+    profile: string;
+  };
+}
+
 export interface Creator {
   no: number;
   loginId: string;

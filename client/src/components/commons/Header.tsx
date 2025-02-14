@@ -1,22 +1,16 @@
 import styled, { css } from "styled-components";
 import logo from "../../assets/logo_test.png";
 import { useLocation, useNavigate } from "react-router-dom";
-import { getCookie } from "../../utils/cookie";
 
 const Header = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const isLogin = getCookie("accessToken");
 
   return (
     <>
       <Container $path={location.pathname}>
         <Logo>
-          <img
-            src={logo}
-            alt="로고"
-            onClick={() => navigate(isLogin ? "/main" : "/")}
-          />
+          <img src={logo} alt="로고" onClick={() => navigate("/main")} />
         </Logo>
       </Container>
     </>
