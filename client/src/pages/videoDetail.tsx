@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import styled from "styled-components";
-import { media } from "../types/media";
+import { board } from "../types/board";
 import {
   Button,
   Dialog,
@@ -12,8 +12,7 @@ import {
 import { IconButton } from "@mui/material";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import { api } from "../utils/api";
-import { useSelector } from "react-redux";
-import { RootState } from "../store";
+
 import VideoPlayer from "../components/commons/media/VideoPlayer";
 
 interface PaymentStatus {
@@ -26,9 +25,10 @@ const VideoDetail = () => {
   const navigate = useNavigate();
   const id = useParams().id;
 
-  const isAdmin = useSelector((state: RootState) => state.user.is_admin);
+  // const isAdmin = useSelector((state: RootState) => state.user.is_admin);
+  const isAdmin = false;
 
-  const [media, setMedia] = useState<media>();
+  const [media, setMedia] = useState<board>();
   const [showPaymentDialog, setShowPaymentDialog] = useState<boolean>(false);
 
   const [paymentInfo, setPaymentInfo] = useState<PaymentStatus | null>(null);
@@ -98,10 +98,10 @@ const VideoDetail = () => {
       </BackButtonContainer>
       <VideoPlayContainer>
         <VideoPlayerDiv>
-          {!showPaymentDialog && media?.url && (
+          {!showPaymentDialog && media?.urls.video && (
             <VideoPlayer
-              src={media.url}
-              poster={media.thumbnail}
+              src={media.urls.video}
+              poster={media.urls.thumbnail}
               watermark={{
                 text: "192.168.0.1",
                 opacity: 0.1,
