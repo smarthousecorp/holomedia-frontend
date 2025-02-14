@@ -52,7 +52,7 @@ const MovieList: React.FC<MovieListProps> = ({
       {boards.map((board) => {
         const creator = findCreator(board.creatorNo);
         const isExpanded = expandedDescriptions.includes(board.boardNo);
-        const isVideo = Boolean(board.urls.thumbnail);
+        const isVideo = shouldBlur;
         const mediaUrl = isVideo ? board.urls.thumbnail : board.urls.image;
 
         if (!creator || !mediaUrl) return null;
@@ -100,11 +100,10 @@ const MovieList: React.FC<MovieListProps> = ({
                 />
                 {isVideo && shouldBlur && (
                   <BlurOverlay>
-                    <h3>이 영상만 구매</h3>
-                    <button>{board.point}P 구매하기</button>
+                    <h3>이 영상 구매하기</h3>
+                    <button>{board.point}꿀</button>
                   </BlurOverlay>
                 )}
-                {isVideo && !shouldBlur && <PlayIcon />}
               </BoardContent>
 
               <PostFooter>
@@ -305,31 +304,31 @@ const Interactions = styled.div`
   margin-bottom: 0.5rem;
 `;
 
-const PlayIcon = styled.div`
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  width: 0;
-  height: 0;
-  border-style: solid;
-  border-width: 15px 0 15px 25px;
-  border-color: transparent transparent transparent #ffffff;
-  opacity: 0.8;
+// const PlayIcon = styled.div`
+//   position: absolute;
+//   top: 50%;
+//   left: 50%;
+//   transform: translate(-50%, -50%);
+//   width: 0;
+//   height: 0;
+//   border-style: solid;
+//   border-width: 15px 0 15px 25px;
+//   border-color: transparent transparent transparent #ffffff;
+//   opacity: 0.8;
 
-  &::before {
-    content: "";
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    width: 60px;
-    height: 60px;
-    background: rgba(0, 0, 0, 0.5);
-    border-radius: 50%;
-    z-index: -1;
-  }
-`;
+//   &::before {
+//     content: "";
+//     position: absolute;
+//     top: 50%;
+//     left: 50%;
+//     transform: translate(-50%, -50%);
+//     width: 60px;
+//     height: 60px;
+//     background: rgba(0, 0, 0, 0.5);
+//     border-radius: 50%;
+//     z-index: -1;
+//   }
+// `;
 
 // const InteractionItem = styled.div`
 //   display: flex;

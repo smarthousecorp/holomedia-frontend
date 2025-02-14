@@ -120,6 +120,10 @@ const GridContainer = styled.div`
   width: 100%;
   max-width: 1200px;
   margin: 0 auto;
+
+  @media (max-width: 620px) {
+    grid-template-columns: repeat(1, 1fr);
+  }
 `;
 
 const ContentRow = styled.div`

@@ -1,8 +1,9 @@
 import styled, { css } from "styled-components";
 import homeIcon from "../../../assets/home.png";
+import { useLocation, useNavigate } from "react-router-dom";
+import { useUserInfo } from "../../../hooks/useUserInfo";
 import { useSelector } from "react-redux";
 import { RootState } from "../../../store";
-import { useLocation, useNavigate } from "react-router-dom";
 
 interface BottomSidebarProps {
   onProfileClick: () => void;
@@ -12,9 +13,10 @@ const BottomSidebar = ({ onProfileClick }: BottomSidebarProps) => {
   const navigate = useNavigate();
   const location = useLocation();
 
-  const profileImage = useSelector(
-    (state: RootState) => state.user.profile_image
-  );
+  const memberNo = useSelector((state: RootState) => state.user.memberNo);
+  const { userInfo, isLoading } = useUserInfo(memberNo);
+
+  console.log(isLoading);
 
   return (
     <Container $path={location.pathname}>
@@ -26,7 +28,7 @@ const BottomSidebar = ({ onProfileClick }: BottomSidebarProps) => {
         <img src={homeIcon} alt="홈 아이콘" />
       </Home>
       <Profile onClick={onProfileClick}>
-        <img src={profileImage} alt="프로필 이미지" />
+        <img src={userInfo?.urls.profile} alt="프로필 이미지" />
       </Profile>
     </Container>
   );
