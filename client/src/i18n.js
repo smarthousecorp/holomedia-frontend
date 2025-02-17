@@ -31,7 +31,7 @@ i18n.use(initReactI18next).init({
             findAccount: "Find Account",
             findPassword: "Find Password",
             errors: {
-              // userNotFound: "Account does not exist",
+              userNotFound: "Account does not exist",
               // wrongPassword: "Password is incorrect",
               retypeFields: "Please enter your ID or password again",
               requiredFields: "Please enter ID and password",
@@ -226,7 +226,7 @@ i18n.use(initReactI18next).init({
             findPassword: "비밀번호 찾기",
             errors: {
               retypeFields: "아이디 또는 비밀번호를 다시 입력해주세요",
-              // userNotFound: "존재하지 않는 계정입니다",
+              userNotFound: "존재하지 않는 계정입니다",
               // wrongPassword: "비밀번호가 일치하지 않습니다",
               requiredFields: "아이디와 비밀번호를 입력하세요",
             },
@@ -417,7 +417,7 @@ i18n.use(initReactI18next).init({
             findPassword: "パスワード検索",
             errors: {
               retypeFields: " IDまたはパスワードを再入力してください",
-              // userNotFound: "アカウントが存在しません",
+              userNotFound: "アカウントが存在しません",
               // wrongPassword: "パスワードが一致しません",
               requiredFields: "IDとパスワードを入力してください",
             },
@@ -609,7 +609,7 @@ i18n.use(initReactI18next).init({
             findPassword: "找回密码",
             errors: {
               retypeFields: "请重新输入您的ID或密码",
-              // userNotFound: "账号不存在",
+              userNotFound: "账号不存在",
               // wrongPassword: "密码不正确",
               requiredFields: "请输入账号和密码",
             },

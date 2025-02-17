@@ -95,7 +95,7 @@ const Login: React.FC = () => {
               id: t("auth.login.errors.retypeFields"),
             }));
             return;
-          case 2: // 서버 에러
+          case 2: // 서버 에러? 아이디 존재하지 않음?
             setErrorMsg((prev) => ({
               ...prev,
               password: t("auth.login.errors.userNotFound"),
