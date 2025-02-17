@@ -39,7 +39,6 @@ const BaseSidebar = ({
 
   // Get memberNo from global state
   const memberNo = useSelector((state: RootState) => state.user.memberNo);
-  console.log("멤버번호", memberNo);
 
   const { userInfo, isLoading } = useUserInfo(memberNo);
   console.log(isLoading, userInfo);

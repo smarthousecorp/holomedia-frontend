@@ -3,6 +3,9 @@ import styled from "styled-components";
 import { X } from "lucide-react";
 import GgulImg from "../../assets/Ggul.png";
 import { api } from "../../utils/api";
+import { useSelector } from "react-redux";
+import { RootState } from "../../store";
+import { useUserInfo } from "../../hooks/useUserInfo";
 
 interface PaymentModalProps {
   onClose: () => void;
@@ -14,6 +17,10 @@ const VAT_RATE = 0.1; // 10% 부가세
 const PaymentModal = ({ onClose }: PaymentModalProps) => {
   const [selectedAmount, setSelectedAmount] = useState<number | null>(null);
   const [customAmount, setCustomAmount] = useState("");
+
+  const memberNo = useSelector((state: RootState) => state.user.memberNo);
+  const { userInfo, isLoading } = useUserInfo(memberNo);
+  console.log(userInfo, isLoading);
 
   const amounts = [5, 10, 50, 100, 300];
 
@@ -54,7 +61,7 @@ const PaymentModal = ({ onClose }: PaymentModalProps) => {
         "/api/payment/request",
         {
           pgcode: "creditcard",
-          memberId: "suafjwe1",
+          memberId: userInfo?.loginId,
           productName: selectedAmount?.toString() || customAmount,
           price: totalPrice,
         },

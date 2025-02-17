@@ -15,7 +15,6 @@ export const useUserInfo = (memberNo: string) => {
       try {
         const response = await api.get(`/member?memberNo=${memberNo}`);
         const data = await response.data;
-        console.log(data);
 
         if (data.code === 0) {
           setUserInfo(data.data);
