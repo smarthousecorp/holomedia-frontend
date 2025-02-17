@@ -26,6 +26,11 @@ const MovieList: React.FC<MovieListProps> = ({
   const [expandedDescriptions, setExpandedDescriptions] = useState<number[]>(
     []
   );
+  // 이미지 갤러리 상태 관리
+  const [selectedImageGallery, setSelectedImageGallery] = useState<{
+    images: string[];
+    currentIndex: number;
+  } | null>(null);
 
   const findCreator = (id: number) => {
     return creators.find((creator) => creator.no === id);
@@ -36,7 +41,48 @@ const MovieList: React.FC<MovieListProps> = ({
   };
 
   const handleBoardClick = (board: board): void => {
-    onBoardClick(board);
+    if (shouldBlur) {
+      // 유료 콘텐츠(영상)인 경우 기존 로직 유지
+      onBoardClick(board);
+    } else {
+      // 무료 콘텐츠(이미지)인 경우 갤러리 오픈
+      // 여러 이미지를 배열로 가정. 실제 데이터 구조에 맞게 수정 필요
+      const images = Array.isArray(board.urls.image)
+        ? board.urls.image
+        : [board.urls.image];
+
+      setSelectedImageGallery({
+        images,
+        currentIndex: 0,
+      });
+    }
+  };
+
+  const handleGalleryClose = (e: React.MouseEvent) => {
+    if (e.target === e.currentTarget) {
+      setSelectedImageGallery(null);
+    }
+  };
+
+  const handlePrevImage = () => {
+    if (selectedImageGallery) {
+      setSelectedImageGallery({
+        ...selectedImageGallery,
+        currentIndex: Math.max(0, selectedImageGallery.currentIndex - 1),
+      });
+    }
+  };
+
+  const handleNextImage = () => {
+    if (selectedImageGallery) {
+      setSelectedImageGallery({
+        ...selectedImageGallery,
+        currentIndex: Math.min(
+          selectedImageGallery.images.length - 1,
+          selectedImageGallery.currentIndex + 1
+        ),
+      });
+    }
   };
 
   const toggleDescription = (boardId: number) => {
@@ -113,6 +159,42 @@ const MovieList: React.FC<MovieListProps> = ({
           </BoardLists>
         );
       })}
+
+      {selectedImageGallery && (
+        <ImageGalleryOverlay onClick={handleGalleryClose}>
+          <GalleryContent>
+            <GalleryImage
+              src={
+                selectedImageGallery.images[selectedImageGallery.currentIndex]
+              }
+              alt="Gallery"
+            />
+            {selectedImageGallery.images.length > 1 && (
+              <GalleryNavigation>
+                <NavButton
+                  onClick={handlePrevImage}
+                  disabled={selectedImageGallery.currentIndex === 0}
+                >
+                  &#10094;
+                </NavButton>
+                <GalleryCounter>
+                  {selectedImageGallery.currentIndex + 1} /{" "}
+                  {selectedImageGallery.images.length}
+                </GalleryCounter>
+                <NavButton
+                  onClick={handleNextImage}
+                  disabled={
+                    selectedImageGallery.currentIndex ===
+                    selectedImageGallery.images.length - 1
+                  }
+                >
+                  &#10095;
+                </NavButton>
+              </GalleryNavigation>
+            )}
+          </GalleryContent>
+        </ImageGalleryOverlay>
+      )}
     </>
   );
 };
@@ -302,6 +384,60 @@ const Interactions = styled.div`
   display: flex;
   gap: 2rem;
   margin-bottom: 0.5rem;
+`;
+
+const ImageGalleryOverlay = styled.div`
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.9);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+`;
+
+const GalleryContent = styled.div`
+  position: relative;
+  max-width: 90vw;
+  max-height: 90vh;
+`;
+
+const GalleryImage = styled.img`
+  max-width: 100%;
+  max-height: 90vh;
+  object-fit: contain;
+`;
+
+const GalleryNavigation = styled.div`
+  position: absolute;
+  bottom: -60px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 20px;
+`;
+
+const NavButton = styled.button`
+  background: none;
+  border: none;
+  color: white;
+  font-size: 24px;
+  cursor: pointer;
+  padding: 10px;
+
+  &:disabled {
+    color: #666;
+    cursor: not-allowed;
+  }
+`;
+
+const GalleryCounter = styled.div`
+  color: white;
+  font-size: 16px;
 `;
 
 // const PlayIcon = styled.div`
