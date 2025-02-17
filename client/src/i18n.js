@@ -93,7 +93,8 @@ i18n.use(initReactI18next).init({
           },
           nav: {
             home: "HOME",
-            alarm: "ALARM",
+            creator: "CREATOR",
+            vod: "VOD",
             setting: "SETTING",
             membership: "MEMBERSHIP",
           },
@@ -285,7 +286,8 @@ i18n.use(initReactI18next).init({
           },
           nav: {
             home: "홈",
-            alarm: "알림",
+            creator: "크리에이터",
+            vod: "vod",
             setting: "설정",
             membership: "멤버십",
           },
@@ -477,7 +479,8 @@ i18n.use(initReactI18next).init({
           },
           nav: {
             home: "ホーム",
-            alarm: "通知",
+            creator: "クリエイター",
+            vod: "vod",
             setting: "設定",
             membership: "メンバーシップ",
           },
@@ -667,7 +670,8 @@ i18n.use(initReactI18next).init({
           },
           nav: {
             home: "首页",
-            alarm: "通知",
+            creator: "创造者",
+            vod: "vod",
             setting: "设置",
             membership: "会员",
           },

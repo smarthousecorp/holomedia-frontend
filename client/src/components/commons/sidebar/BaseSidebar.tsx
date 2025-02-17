@@ -4,7 +4,8 @@ import styled, { css } from "styled-components";
 import { useTranslation } from "react-i18next";
 import logo from "../../../assets/logo_test.png";
 import homeIcon from "../../../assets/home.png";
-import alarmIcon from "../../../assets/alarm.png";
+import creatorIcon from "../../../assets/creator.png";
+import vodIcon from "../../../assets/vod.png";
 import settingIcon from "../../../assets/setting.png";
 // import starIcon from "../../../assets/star.png";
 import { SvgIcon } from "@mui/material";
@@ -118,11 +119,19 @@ const BaseSidebar = ({
             </SidebarLi>
             <SidebarLi
               onClick={() => {
-                navigate("/alarm");
+                navigate("/creators");
               }}
             >
-              <img src={alarmIcon} alt="알림" />
-              <p>{t("sidebar.nav.alarm")}</p>
+              <img src={creatorIcon} alt="크리에이터" />
+              <p>{t("sidebar.nav.creator")}</p>
+            </SidebarLi>
+            <SidebarLi
+              onClick={() => {
+                navigate("/videos");
+              }}
+            >
+              <img src={vodIcon} alt="영상" />
+              <p>{t("sidebar.nav.vod")}</p>
             </SidebarLi>
             {/* <SidebarLi
             onClick={() => {
