@@ -55,6 +55,7 @@ const Creators: React.FC = () => {
 
   return (
     <Container>
+      <CreatorTitle>크리에이터</CreatorTitle>
       <GridContainer>
         {creators.map((creator) => (
           <ImageCard
@@ -75,13 +76,17 @@ export default Creators;
 const Container = styled.section`
   max-width: 1200px;
   /* margin: 0 auto; */
-  padding: 20px;
+`;
+
+const CreatorTitle = styled.h2`
+  font-size: 2.2rem;
 `;
 
 const GridContainer = styled.div`
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   gap: 5px;
+  margin-top: 2rem;
 
   @media (max-width: 1024px) {
     grid-template-columns: repeat(3, 1fr);

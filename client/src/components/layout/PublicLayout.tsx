@@ -8,6 +8,7 @@ import { useEffect, useState } from "react";
 import MobileSidebar from "../commons/sidebar/MobileSidebar";
 import { useLocation } from "react-router-dom";
 import PaymentModal from "../main/PaymentModal";
+import RotatingBanner from "../main/RotatingBanner";
 
 const PublicLayout = () => {
   const location = useLocation();
@@ -15,13 +16,18 @@ const PublicLayout = () => {
   const [isOpenBS, setIsOpenBS] = useState<boolean>(false);
   const [showPaymentModal, setShowPaymentModal] = useState<boolean>(false);
 
+  const showSidebarPaths = ["/main", "/creators", "/user"];
+  const shouldShowBanner = showSidebarPaths.some((path) =>
+    location.pathname.startsWith(path)
+  );
+
   const toggleBottomSidebar = () => {
     setIsOpenBS(!isOpenBS);
   };
 
   const handlePaymentModalOpen = () => {
     setShowPaymentModal(true);
-    setIsOpenBS(false); // 결제 모달이 열릴 때 MobileSidebar를 닫습니다
+    setIsOpenBS(false);
   };
 
   const handlePaymentModalClose = () => {
@@ -30,10 +36,8 @@ const PublicLayout = () => {
 
   useEffect(() => {
     if (isOpenBS || showPaymentModal) {
-      // 사이드바나 결제 모달이 열렸을 때 body의 스크롤 방지
       document.body.style.overflow = "hidden";
     } else {
-      // 둘 다 닫혔을 때 스크롤 복원
       document.body.style.overflow = "unset";
     }
 
@@ -47,15 +51,26 @@ const PublicLayout = () => {
   }, [location]);
 
   return (
-    <Full>
+    <LayoutContainer>
       <Header />
-      <Inner $path={location.pathname}>
+      <LayoutInner $path={location.pathname}>
         <DefaultSidebarStyled onPaymentClick={handlePaymentModalOpen} />
-        <Container $isSettingsPage={location.pathname.startsWith("/settings")}>
-          <Outlet />
-        </Container>
+        <MainContentWrapper $path={location.pathname}>
+          <ContentContainer
+            $isSettingsPage={location.pathname.startsWith("/settings")}
+          >
+            <MainSection>
+              <Outlet />
+            </MainSection>
+          </ContentContainer>
+          {shouldShowBanner && (
+            <SideBannerContainer>
+              <RotatingBanner />
+            </SideBannerContainer>
+          )}
+        </MainContentWrapper>
         <BottomSidebar onProfileClick={toggleBottomSidebar} />
-      </Inner>
+      </LayoutInner>
       {isOpenBS && (
         <OverlayBackground onClick={toggleBottomSidebar}>
           <MobileSidebar
@@ -66,13 +81,13 @@ const PublicLayout = () => {
         </OverlayBackground>
       )}
       {showPaymentModal && <PaymentModal onClose={handlePaymentModalClose} />}
-    </Full>
+    </LayoutContainer>
   );
 };
 
 export default PublicLayout;
 
-const Full = styled.div`
+const LayoutContainer = styled.div`
   position: relative;
   width: 100%;
   display: flex;
@@ -80,12 +95,31 @@ const Full = styled.div`
   justify-content: center;
 `;
 
-const Inner = styled.div<{ $path?: string }>`
+const LayoutInner = styled.div<{ $path?: string }>`
   width: 100%;
   height: 100vh;
-  overflow-x: hidden;
   background-color: #ededed;
   display: flex;
+  overflow-y: auto;
+
+  /* 웹킷 스크롤바 스타일링 */
+  &::-webkit-scrollbar {
+    width: 10px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 5px;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: linear-gradient(180deg, #eb3553 0%, #ff4d6a 100%);
+    border-radius: 5px;
+  }
+
+  &::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(180deg, #d42e4a 0%, #eb3553 100%);
+  }
 
   @media (max-width: 900px) {
     ${({ $path }) => {
@@ -97,14 +131,52 @@ const Inner = styled.div<{ $path?: string }>`
         `
       );
     }}
+    overflow-y: visible;
   }
 `;
 
-const Container = styled.main<{ $isSettingsPage: boolean }>`
+const MainContentWrapper = styled.div<{ $path?: string }>`
+  display: flex;
   width: 100%;
+  padding-top: ${({ $path }) =>
+    $path?.startsWith("/settings") ? "0" : "2rem"};
+
+  @media (max-width: 900px) {
+    flex-direction: column;
+    padding-top: 0;
+  }
+`;
+
+const ContentContainer = styled.main<{ $isSettingsPage: boolean }>`
+  flex: 1;
   background-color: ${(props) => (props.$isSettingsPage ? "#fff" : "#ededed")};
   border-left: ${(props) =>
     props.$isSettingsPage ? "2px solid #eee" : "none"};
+`;
+
+const MainSection = styled.div`
+  width: 100%;
+  max-width: 950px;
+  margin: 0 4rem;
+  padding-bottom: 5rem;
+
+  @media (max-width: 900px) {
+    max-width: 100%;
+    margin: 0;
+    padding-bottom: 10rem;
+  }
+`;
+
+const SideBannerContainer = styled.aside`
+  margin-right: 4rem;
+  position: sticky;
+  top: 2rem;
+  height: fit-content;
+  align-self: flex-start;
+
+  @media (max-width: 1150px) {
+    display: none;
+  }
 `;
 
 const DefaultSidebarStyled = styled(DefaultSidebar)`
