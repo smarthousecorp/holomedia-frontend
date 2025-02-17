@@ -74,7 +74,7 @@ export default Creators;
 
 const Container = styled.section`
   max-width: 1200px;
-  margin: 0 auto;
+  /* margin: 0 auto; */
   padding: 20px;
 `;
 
@@ -97,10 +97,11 @@ const GridContainer = styled.div`
 `;
 
 const ImageCard = styled.div`
+  cursor: pointer;
   position: relative;
   width: 100%;
   padding-bottom: 100%; /* 정사각형 비율 유지 */
-  border-radius: 12px;
+  /* border-radius: 12px; */
   overflow: hidden;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   transition: transform 0.2s ease;
