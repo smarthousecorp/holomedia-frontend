@@ -149,6 +149,7 @@ const MainContentWrapper = styled.div<{ $path?: string }>`
 
 const ContentContainer = styled.main<{ $isSettingsPage: boolean }>`
   flex: 1;
+  overflow-y: auto;
   background-color: ${(props) => (props.$isSettingsPage ? "#fff" : "#ededed")};
   border-left: ${(props) =>
     props.$isSettingsPage ? "2px solid #eee" : "none"};

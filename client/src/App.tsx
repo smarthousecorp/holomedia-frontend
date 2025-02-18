@@ -26,6 +26,7 @@ import NiceReturnPage from "./pages/NiceReturn";
 import Creators from "./pages/Creators";
 // import Videos from "./pages/Videos";
 import PreparePage from "./pages/Prepare";
+import PaymentSuccess from "./pages/PaymentSuccess";
 // interface ErrorMessageProps {
 //   message?: string;
 // }
@@ -59,6 +60,7 @@ function App() {
           <Route path="/signup" element={<SignUp />} />
           <Route path="/nice/signup" element={<NiceReturnPage />} />
           <Route path="/api/payment/success" element={<PaymentReturn />} />
+          <Route path="/payment/success" element={<PaymentSuccess />} />
           <Route path="/*" element={<ErrorPage error="404" />} />
           <Route path="/error" element={<ErrorPage error="500" />} />
           <Route path="/dev-tools-alert" element={<DevToolsAlert />} />

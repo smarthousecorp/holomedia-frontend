@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import styled from "styled-components";
 import { X } from "lucide-react";
 import GgulImg from "../../assets/Ggul.png";
@@ -17,6 +17,8 @@ const VAT_RATE = 0.1; // 10% 부가세
 const PaymentModal = ({ onClose }: PaymentModalProps) => {
   const [selectedAmount, setSelectedAmount] = useState<number | null>(null);
   const [customAmount, setCustomAmount] = useState("");
+  const [isPaymentPending, setIsPaymentPending] = useState(false);
+  const [paymentWindow, setPaymentWindow] = useState<Window | null>(null);
 
   const memberNo = useSelector((state: RootState) => state.user.memberNo);
   const { userInfo, isLoading } = useUserInfo(memberNo);
@@ -72,9 +74,55 @@ const PaymentModal = ({ onClose }: PaymentModalProps) => {
       .then((res) => {
         const options =
           "toolbar=no,scrollbars=no,resizable=yes,status=no,menubar=no,width=1200, height=800, top=0,left=0";
-        window.open(res.data.data.urls.online_url, "_blank", options);
+        const newWindow = window.open(
+          res.data.data.urls.online_url,
+          "_blank",
+          options
+        );
+        if (newWindow) {
+          setPaymentWindow(newWindow);
+          setIsPaymentPending(true);
+        }
+      })
+      .catch((error) => {
+        console.error("Payment request failed:", error);
+        setIsPaymentPending(false);
       });
   };
+
+  // 결제 창 모니터링
+  useEffect(() => {
+    if (!paymentWindow) return;
+
+    const checkPaymentWindow = setInterval(() => {
+      if (paymentWindow.closed) {
+        setIsPaymentPending(false);
+        setPaymentWindow(null);
+        clearInterval(checkPaymentWindow);
+      }
+    }, 500);
+
+    // 결제 창이 열려있는 동안 메인 창 클릭 이벤트 방지
+    const handleMainWindowClick = (e: MouseEvent) => {
+      if (isPaymentPending) {
+        e.preventDefault();
+        e.stopPropagation();
+        // 선택적: 사용자에게 결제 진행 중임을 알림
+        alert("결제가 진행 중입니다. 결제창을 닫거나 완료 후 이용해주세요.");
+      }
+    };
+
+    document.addEventListener("click", handleMainWindowClick, true);
+    document.addEventListener("mousedown", handleMainWindowClick, true);
+    document.addEventListener("mouseup", handleMainWindowClick, true);
+
+    return () => {
+      clearInterval(checkPaymentWindow);
+      document.removeEventListener("click", handleMainWindowClick, true);
+      document.removeEventListener("mousedown", handleMainWindowClick, true);
+      document.removeEventListener("mouseup", handleMainWindowClick, true);
+    };
+  }, [paymentWindow, isPaymentPending]);
 
   return (
     <Background>
@@ -141,14 +189,28 @@ const PaymentModal = ({ onClose }: PaymentModalProps) => {
             </TotalRow>
           </PriceSection>
 
-          <PayButton onClick={handleClickPaymentBtn}>결제하기</PayButton>
+          <PayButton
+            onClick={handleClickPaymentBtn}
+            disabled={isPaymentPending}
+          >
+            {isPaymentPending ? "결제 진행 중..." : "결제하기"}
+          </PayButton>
         </Content>
       </Container>
+      {isPaymentPending && <LoadingOverlay />}
     </Background>
   );
 };
 
 export default PaymentModal;
+
+const LoadingOverlay = styled.div`
+  position: fixed;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.3);
+  z-index: 1001;
+  cursor: not-allowed;
+`;
 
 const Background = styled.div`
   position: fixed;
@@ -168,14 +230,15 @@ const Container = styled.div`
   position: relative;
 `;
 
-const CloseButton = styled.button`
+const CloseButton = styled.button<{ disabled?: boolean }>`
   position: absolute;
   right: 1.5rem;
   top: 2rem;
-  color: #6b7280;
+  color: ${(props) => (props.disabled ? "#ccc" : "#6b7280")};
+  cursor: ${(props) => (props.disabled ? "not-allowed" : "pointer")};
 
   &:hover {
-    color: #374151;
+    color: ${(props) => (props.disabled ? "#ccc" : "#374151")};
   }
 `;
 
@@ -333,17 +396,18 @@ const TotalRow = styled(PriceRow)`
   border-bottom: none;
 `;
 
-const PayButton = styled.button`
+const PayButton = styled.button<{ disabled?: boolean }>`
   width: 100%;
   padding: 1rem;
-  background-color: #eb3553;
+  background-color: ${(props) => (props.disabled ? "#ccc" : "#eb3553")};
   color: white;
   border-radius: 0.5rem;
   font-size: 1.125rem;
   font-weight: 500;
   transition: background-color 0.2s;
+  cursor: ${(props) => (props.disabled ? "not-allowed" : "pointer")};
 
   &:hover {
-    background-color: #f55c75;
+    background-color: ${(props) => (props.disabled ? "#ccc" : "#f55c75")};
   }
 `;
