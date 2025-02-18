@@ -288,69 +288,81 @@ const SignUp: React.FC = () => {
           </Logo>
           <Title>{t("auth.modal.title.signup")}</Title>
           <Form onSubmit={onSubmitSignUp}>
-            <InputWrapper>
-              <Input
-                name="id"
-                placeholder={t("auth.signup.idPlaceholder")}
-                value={inputVal.id}
-                onChange={onChangeValues}
-                onBlur={onBlurIdInput}
-              />
-            </InputWrapper>
-            {errorMsg.id && <ErrorMessage>{errorMsg.id}</ErrorMessage>}
+            <InputContainer>
+              <InputLabel>아이디</InputLabel>
+              <InputWrapper>
+                <Input
+                  name="id"
+                  placeholder={t("auth.signup.idPlaceholder")}
+                  value={inputVal.id}
+                  onChange={onChangeValues}
+                  onBlur={onBlurIdInput}
+                />
+              </InputWrapper>
+              {errorMsg.id && <ErrorMessage>{errorMsg.id}</ErrorMessage>}
+            </InputContainer>
 
-            <InputWrapper>
-              <Input
-                type={showPassword ? "text" : "password"}
-                name="password"
-                placeholder={t("auth.signup.passwordPlaceholder")}
-                value={inputVal.password}
-                onChange={onChangeValues}
-                onBlur={onBlurPwdInputs}
-              />
-              <PasswordToggle
-                type="button"
-                onClick={() => setShowPassword(!showPassword)}
-              >
-                {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
-              </PasswordToggle>
-            </InputWrapper>
-            {errorMsg.password && (
-              <ErrorMessage>{errorMsg.password}</ErrorMessage>
-            )}
+            <InputContainer>
+              <InputLabel>비밀번호</InputLabel>
+              <InputWrapper>
+                <Input
+                  type={showPassword ? "text" : "password"}
+                  name="password"
+                  placeholder={t("auth.signup.passwordPlaceholder")}
+                  value={inputVal.password}
+                  onChange={onChangeValues}
+                  onBlur={onBlurPwdInputs}
+                />
+                <PasswordToggle
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                >
+                  {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                </PasswordToggle>
+              </InputWrapper>
+              {errorMsg.password && (
+                <ErrorMessage>{errorMsg.password}</ErrorMessage>
+              )}
+            </InputContainer>
 
-            <InputWrapper>
-              <Input
-                type={showPasswordCheck ? "text" : "password"}
-                name="passwordCheck"
-                placeholder={t("auth.signup.passwordCheckPlaceholder")}
-                value={inputVal.passwordCheck}
-                onChange={onChangeValues}
-                onBlur={onBlurPwdInputs}
-              />
-              <PasswordToggle
-                type="button"
-                onClick={() => setShowPasswordCheck(!showPasswordCheck)}
-              >
-                {showPasswordCheck ? <EyeOff size={18} /> : <Eye size={18} />}
-              </PasswordToggle>
-            </InputWrapper>
-            {errorMsg.passwordCheck && (
-              <ErrorMessage>{errorMsg.passwordCheck}</ErrorMessage>
-            )}
+            <InputContainer>
+              <InputLabel>비밀번호 확인</InputLabel>
+              <InputWrapper>
+                <Input
+                  type={showPasswordCheck ? "text" : "password"}
+                  name="passwordCheck"
+                  placeholder={t("auth.signup.passwordCheckPlaceholder")}
+                  value={inputVal.passwordCheck}
+                  onChange={onChangeValues}
+                  onBlur={onBlurPwdInputs}
+                />
+                <PasswordToggle
+                  type="button"
+                  onClick={() => setShowPasswordCheck(!showPasswordCheck)}
+                >
+                  {showPasswordCheck ? <EyeOff size={18} /> : <Eye size={18} />}
+                </PasswordToggle>
+              </InputWrapper>
+              {errorMsg.passwordCheck && (
+                <ErrorMessage>{errorMsg.passwordCheck}</ErrorMessage>
+              )}
+            </InputContainer>
 
-            <InputWrapper>
-              <Input
-                name="nickname"
-                placeholder={t("auth.signup.usernamePlaceholder")}
-                value={inputVal.nickname}
-                onChange={onChangeValues}
-                onBlur={onBlurNameInput}
-              />
-            </InputWrapper>
-            {errorMsg.nickname && (
-              <ErrorMessage>{errorMsg.nickname}</ErrorMessage>
-            )}
+            <InputContainer>
+              <InputLabel>닉네임</InputLabel>
+              <InputWrapper>
+                <Input
+                  name="nickname"
+                  placeholder={t("auth.signup.usernamePlaceholder")}
+                  value={inputVal.nickname}
+                  onChange={onChangeValues}
+                  onBlur={onBlurNameInput}
+                />
+              </InputWrapper>
+              {errorMsg.nickname && (
+                <ErrorMessage>{errorMsg.nickname}</ErrorMessage>
+              )}
+            </InputContainer>
 
             <NiceVerificationButton
               onVerificationComplete={handleVerificationComplete}
@@ -482,13 +494,26 @@ const Form = styled.form`
   gap: 1rem;
 `;
 
+const InputContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  /* margin-bottom: 1rem; */
+`;
+
+const InputLabel = styled.label`
+  font-size: 1.3rem;
+  font-weight: 500;
+  color: #333;
+  margin-bottom: 0.3rem;
+`;
+
 const InputWrapper = styled.div`
   width: 100%;
   position: relative;
   display: flex;
   align-items: center;
   border: 1px solid #d0d0d0;
-  margin-bottom: 1rem;
   border-radius: 10px;
 `;
 
@@ -577,12 +602,9 @@ const About = styled.div`
 `;
 
 const ErrorMessage = styled.div`
-  position: relative;
-  left: 3px;
   color: red;
   font-size: 1rem;
-  margin-top: -1.5rem;
-  margin-bottom: 0.5rem;
+  margin-top: 0.3rem;
   text-align: left;
 `;
 
