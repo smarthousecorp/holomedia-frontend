@@ -28,7 +28,19 @@ const NiceVerificationButton: React.FC<NiceVerificationProps> = ({
   const handleMessage = useCallback(
     (event: MessageEvent) => {
       // 신뢰할 수 있는 출처인지 확인
-      // if (event.origin !== "https://api.holomedia.co.kr") return;
+      console.log("Received message:", event.data);
+      console.log("Origin:", event.origin);
+
+      const allowedOrigins = [
+        "https://api.holomedia.co.kr",
+        "https://dev.holomedia.co.kr",
+        "http://localhost:5173",
+        "https://nice.checkplus.co.kr",
+      ];
+      if (!allowedOrigins.includes(event.origin)) {
+        console.log("Unauthorized origin:", event.origin);
+        return;
+      }
 
       try {
         const responseData = event.data as ApiResponse;
@@ -138,6 +150,11 @@ const NiceVerificationButton: React.FC<NiceVerificationProps> = ({
           clearInterval(popupMonitor);
           setIsVerifying(false);
           window.removeEventListener("message", handleMessage);
+
+          // 인증이 완료되지 않은 상태에서 팝업이 닫혔다면 에러 처리
+          if (!isVerified) {
+            onError("인증이 완료되지 않았습니다.");
+          }
         }
       }, 500);
 
