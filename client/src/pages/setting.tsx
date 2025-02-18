@@ -20,7 +20,7 @@ const Settings = () => {
 
   const menuItems = [
     { id: 1, label: t("settings.profile"), link: "profile" },
-    { id: 2, label: t("settings.account"), link: "account" },
+    // { id: 2, label: t("settings.account"), link: "account" },
     { id: 3, label: t("settings.payment"), link: "payment-manage" },
     { id: 4, label: t("settings.password"), link: "password-change" },
     { id: 5, label: t("settings.logout") },

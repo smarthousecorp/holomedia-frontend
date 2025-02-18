@@ -27,6 +27,7 @@ import Creators from "./pages/Creators";
 // import Videos from "./pages/Videos";
 import PreparePage from "./pages/Prepare";
 import PaymentSuccess from "./pages/PaymentSuccess";
+import PaymentManage from "./pages/PaymentManage";
 // interface ErrorMessageProps {
 //   message?: string;
 // }
@@ -89,6 +90,7 @@ function App() {
             path="/settings/password-change"
             element={<PasswordChange />}
           />
+          <Route path="/settings/payment-manage" element={<PaymentManage />} />
         </Route>
       </Routes>
       <ToastContainer style={{ fontSize: "1.4rem" }} limit={1} />

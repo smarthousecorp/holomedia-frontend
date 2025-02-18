@@ -150,7 +150,7 @@ const Header = styled.div`
   gap: 1rem;
   align-items: center;
   margin-bottom: 24px;
-  padding: 12px;
+  padding: 12px 0;
 `;
 
 const Title = styled.h1`
