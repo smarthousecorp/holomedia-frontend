@@ -111,23 +111,6 @@ const SignUp: React.FC = () => {
     dispatch(showToast({ message, type: "error" }));
   };
 
-  // const handleClickPaymentBtn = () => {
-  //   axios
-  //     .post(
-  //       "https://apiholomedia.duckdns.org/board/pg",
-  //       {},
-  //       {
-  //         withCredentials: true,
-  //       }
-  //     )
-  //     .then((res) => {
-  //       console.log(res.data.online_url);
-  //       const options =
-  //         "toolbar=no,scrollbars=no,resizable=yes,status=no,menubar=no,width=1200, height=800, top=0,left=0";
-  //       window.open(res.data.online_url, "_blank", options);
-  //     });
-  // };
-
   // 체크박스 변경 핸들러
   const handleCheckboxChange = (name: string) => {
     setInputVal((prev) => ({
