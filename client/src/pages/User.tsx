@@ -12,6 +12,7 @@ import MovieList from "../components/main/MovieList";
 // import { RecommendedUploaders } from "../components/main/RecommendList";
 import { Creator } from "../types/user";
 import { board } from "../types/board";
+import PointUseModal from "../components/commons/media/PointUseModal";
 
 type LoadingState = "loading" | "error" | "success";
 type TabType = "free" | "premium";
@@ -40,6 +41,9 @@ const User = () => {
     profile: "",
     background: "",
   });
+  // 영상 결제시도 시 상태 관리
+  const [selectedBoard, setSelectedBoard] = useState<board | null>(null);
+  const [showPaymentModal, setShowPaymentModal] = useState(false);
 
   const handleCreatorClick = (creator: Creator): void => {
     navigate(`/user/${creator.no}`);
@@ -71,10 +75,20 @@ const User = () => {
     fetchData();
   }, [creatorNo]);
 
-  const handleBoardClick = (board: board) => {
-    console.log("실행됨");
+  const findCreator = (id: number) => {
+    return creators.find((creator) => creator.no === id);
+  };
 
-    navigate(`/video/${board.boardNo}`);
+  const handleBoardClick = (board: board) => {
+    // 유료 콘텐츠(영상)인 경우 결제 모달 표시
+    setSelectedBoard(board);
+    setShowPaymentModal(true);
+  };
+
+  const handlePaymentComplete = () => {
+    if (selectedBoard) {
+      navigate(`/video/${selectedBoard.boardNo}`);
+    }
   };
 
   const filteredBoards = boards.filter((board) => {
@@ -154,6 +168,18 @@ const User = () => {
         </MovieMainContainer>
       )}
       <SideContainer>{/* <RecommendedUploaders /> */}</SideContainer>
+      {selectedBoard && (
+        <PointUseModal
+          isOpen={showPaymentModal}
+          onClose={() => {
+            setShowPaymentModal(false);
+            setSelectedBoard(null);
+          }}
+          board={selectedBoard}
+          creator={findCreator(selectedBoard.creatorNo)!}
+          onPaymentComplete={handlePaymentComplete}
+        />
+      )}
     </>
   );
 };
@@ -163,7 +189,7 @@ export default User;
 const TabContainer = styled.div`
   display: flex;
   border-bottom: 1px solid #e5e7eb;
-  padding: 0 2rem;
+  /* padding: 0 2rem; */
   margin: 3rem 0;
 `;
 
@@ -172,10 +198,9 @@ const TabButton = styled.button<{ active: boolean }>`
   padding: 1rem 2rem;
   margin-bottom: -1px;
   font-size: 1.6rem;
-  color: ${(props) => (props.active ? "#7C3AED" : "#6B7280")};
-  border-bottom: 2px solid
-    ${(props) => (props.active ? "#7C3AED" : "transparent")};
   font-weight: ${(props) => (props.active ? "600" : "500")};
+  color: ${(props) => (props.active ? "#7C3AED" : "#6B7280")};
+  border-bottom: 2px solid ${(props) => (props.active ? "#7C3AED" : "#d6d6d6")};
   transition: all 0.2s ease;
 
   &:hover {
