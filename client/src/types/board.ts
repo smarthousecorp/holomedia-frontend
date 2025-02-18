@@ -4,6 +4,7 @@ export interface board {
   title: string;
   contents: contents;
   point: number;
+  paid: boolean;
   loginId: string;
   fileNames: string;
   urls: {

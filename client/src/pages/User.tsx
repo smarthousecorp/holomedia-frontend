@@ -80,9 +80,16 @@ const User = () => {
   };
 
   const handleBoardClick = (board: board) => {
-    // 유료 콘텐츠(영상)인 경우 결제 모달 표시
-    setSelectedBoard(board);
-    setShowPaymentModal(true);
+    // 이미 결제 된 영상은 바로 재생
+    if (board.paid) {
+      console.log("이미 결제 된 영상");
+
+      navigate(`/video/${board.boardNo}`);
+    } else {
+      // 유료 콘텐츠(영상)인 경우 결제 모달 표시
+      setSelectedBoard(board);
+      setShowPaymentModal(true);
+    }
   };
 
   const handlePaymentComplete = () => {

@@ -142,9 +142,9 @@ const MovieList: React.FC<MovieListProps> = ({
                 <BoardThumbnail
                   src={mediaUrl}
                   alt={board.title}
-                  $shouldBlur={isVideo && shouldBlur}
+                  $shouldBlur={isVideo && shouldBlur && !board.paid}
                 />
-                {isVideo && shouldBlur && (
+                {isVideo && shouldBlur && !board.paid && (
                   <BlurOverlay>
                     <h3>이 영상 구매하기</h3>
                     <button>{board.point}꿀</button>
