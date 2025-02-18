@@ -162,23 +162,24 @@ export default User;
 
 const TabContainer = styled.div`
   display: flex;
-  gap: 1rem;
-  margin: 2rem 0;
+  border-bottom: 1px solid #e5e7eb;
   padding: 0 2rem;
+  margin: 3rem 0;
 `;
 
 const TabButton = styled.button<{ active: boolean }>`
+  flex: 1;
   padding: 1rem 2rem;
-  font-size: 1.4rem;
-  background-color: ${(props) => (props.active ? "#eb3553" : "#ffffff")};
-  color: ${(props) => (props.active ? "#ffffff" : "#000000")};
-  border: 1px solid ${(props) => (props.active ? "#eb3553" : "#dddddd")};
-  border-radius: 8px;
-  cursor: pointer;
+  margin-bottom: -1px;
+  font-size: 1.6rem;
+  color: ${(props) => (props.active ? "#7C3AED" : "#6B7280")};
+  border-bottom: 2px solid
+    ${(props) => (props.active ? "#7C3AED" : "transparent")};
+  font-weight: ${(props) => (props.active ? "600" : "500")};
   transition: all 0.2s ease;
 
   &:hover {
-    background-color: ${(props) => (props.active ? "#d42e4a" : "#f5f5f5")};
+    color: ${(props) => (props.active ? "#7C3AED" : "#374151")};
   }
 `;
 
