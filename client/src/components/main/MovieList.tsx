@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import styled from "styled-components";
 import ReactQuill from "react-quill";
 import "react-quill/dist/quill.bubble.css";
@@ -31,6 +31,11 @@ const MovieList: React.FC<MovieListProps> = ({
     images: string[];
     currentIndex: number;
   } | null>(null);
+
+  const [showExpandButtons, setShowExpandButtons] = useState<{
+    [key: number]: boolean;
+  }>({});
+  const quillRefs = useRef<{ [key: number]: HTMLDivElement | null }>({});
 
   const findCreator = (id: number) => {
     return creators.find((creator) => creator.no === id);
@@ -93,6 +98,23 @@ const MovieList: React.FC<MovieListProps> = ({
     );
   };
 
+  useEffect(() => {
+    // 각 게시글의 내용 높이를 체크하여 expandButton 표시 여부 결정
+    boards.forEach((board) => {
+      const quillElement =
+        quillRefs.current[board.boardNo]?.querySelector(".ql-editor");
+      if (quillElement) {
+        const contentHeight = quillElement.scrollHeight;
+        const MAX_HEIGHT = 72; // 4.8rem = 72px (assuming 1rem = 15px)
+
+        setShowExpandButtons((prev) => ({
+          ...prev,
+          [board.boardNo]: contentHeight > MAX_HEIGHT,
+        }));
+      }
+    });
+  }, [boards]);
+
   return (
     <>
       {boards.map((board) => {
@@ -118,7 +140,10 @@ const MovieList: React.FC<MovieListProps> = ({
                   </CreatorItem>
                 </CreatorInfo>
                 <StyledQuillWrapper $isExpanded={isExpanded}>
-                  <div className="quill-container">
+                  <div
+                    className="quill-container"
+                    ref={(el) => (quillRefs.current[board.boardNo] = el)}
+                  >
                     <ReactQuill
                       value={
                         isVideo ? board.contents.video : board.contents.image
@@ -130,11 +155,13 @@ const MovieList: React.FC<MovieListProps> = ({
                       }}
                     />
                   </div>
-                  <ExpandButton
-                    onClick={() => toggleDescription(board.boardNo)}
-                  >
-                    {isExpanded ? "접기" : "더보기"}
-                  </ExpandButton>
+                  {showExpandButtons[board.boardNo] && (
+                    <ExpandButton
+                      onClick={() => toggleDescription(board.boardNo)}
+                    >
+                      {isExpanded ? "접기" : "더보기"}
+                    </ExpandButton>
+                  )}
                 </StyledQuillWrapper>
               </PostHeader>
 

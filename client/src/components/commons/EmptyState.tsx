@@ -1,7 +1,7 @@
-import {FolderOpen} from "lucide-react";
-import styled, {keyframes} from "styled-components";
+import { FolderOpen } from "lucide-react";
+import styled, { keyframes } from "styled-components";
 
-const EmptyState = ({message = "등록된 영상이 없습니다."}) => {
+const EmptyState = ({ message = "등록된 영상이 없습니다." }) => {
   return (
     <EmptyContainer>
       <IconWrapper>
@@ -41,7 +41,7 @@ const EmptyContainer = styled.div`
   align-items: center;
   justify-content: center;
   width: 100%;
-  height: 85vh;
+  height: 35vh;
   min-height: 400px;
   border-radius: 10px;
   /* background-color: #171717; */

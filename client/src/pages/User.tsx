@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import styled from "styled-components";
 import { useNavigate, useParams } from "react-router-dom";
 import { Settings } from "lucide-react";
@@ -45,6 +45,11 @@ const User = () => {
   const [selectedBoard, setSelectedBoard] = useState<board | null>(null);
   const [showPaymentModal, setShowPaymentModal] = useState(false);
 
+  // 설명 상세보기 버튼 상태 관리
+  const [isExpandedBio, setIsExpandedBio] = useState(false);
+  const [showExpandButton, setShowExpandButton] = useState(false);
+  const quillRef = useRef<HTMLDivElement | null>(null);
+
   const handleCreatorClick = (creator: Creator): void => {
     navigate(`/user/${creator.no}`);
   };
@@ -74,6 +79,20 @@ const User = () => {
   useEffect(() => {
     fetchData();
   }, [creatorNo]);
+
+  useEffect(() => {
+    // creator.content가 변경될 때마다 content 높이 체크
+    const checkContentHeight = () => {
+      const quillEditor = quillRef.current?.querySelector(".ql-editor");
+      if (quillEditor) {
+        const contentHeight = quillEditor.scrollHeight;
+        const MAX_HEIGHT = 72; // 4.8rem = 72px
+        setShowExpandButton(contentHeight > MAX_HEIGHT);
+      }
+    };
+
+    checkContentHeight();
+  }, [creator.content]);
 
   const findCreator = (id: number) => {
     return creators.find((creator) => creator.no === id);
@@ -129,15 +148,22 @@ const User = () => {
         <ProfileHeader>
           <Username>{creator.nickname}</Username>
           <Bio>@{creator.loginId}</Bio>
-          <StyledQuillWrapper>
-            <ReactQuill
-              value={creator.content}
-              readOnly={true}
-              theme="bubble"
-              modules={{
-                toolbar: false,
-              }}
-            />
+          <StyledQuillWrapper $isExpanded={isExpandedBio}>
+            <div className="quill-container" ref={quillRef}>
+              <ReactQuill
+                value={creator.content}
+                readOnly={true}
+                theme="bubble"
+                modules={{
+                  toolbar: false,
+                }}
+              />
+            </div>
+            {showExpandButton && (
+              <ExpandButton onClick={() => setIsExpandedBio(!isExpandedBio)}>
+                {isExpandedBio ? "접기" : "더보기"}
+              </ExpandButton>
+            )}
           </StyledQuillWrapper>
         </ProfileHeader>
       </UserTopSection>
@@ -308,6 +334,35 @@ const Bio = styled.p`
   color: #666;
 `;
 
+const ExpandButton = styled.button`
+  position: relative;
+  width: 100%;
+  margin: 1rem 0 0 0;
+  padding: 0;
+  background: none;
+  border: none;
+  color: #007aff;
+  cursor: pointer;
+  font-size: 1.2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+
+  &::before,
+  &::after {
+    content: "";
+    flex: 1;
+    height: 1px;
+    background: #e0e0e0;
+    max-width: 400px;
+  }
+
+  &:hover {
+    text-decoration: underline;
+  }
+`;
+
 const MovieMainContainer = styled.div`
   margin-top: 2rem;
   padding-bottom: 5rem;
@@ -332,8 +387,14 @@ const SideContainer = styled.div`
   }
 `;
 
-const StyledQuillWrapper = styled.div`
+const StyledQuillWrapper = styled.div<{ $isExpanded: boolean }>`
   margin-top: 2rem;
+  position: relative;
+
+  .quill-container {
+    max-height: ${(props) => (props.$isExpanded ? "none" : "4.8rem")};
+    overflow: hidden;
+  }
 
   .ql-container {
     font-family: inherit;
@@ -344,6 +405,7 @@ const StyledQuillWrapper = styled.div`
     font-size: 1.2rem;
     line-height: 1.4;
     color: #000000;
+    padding-right: ${(props) => (props.$isExpanded ? "0" : "4rem")};
 
     p {
       margin: 0;
