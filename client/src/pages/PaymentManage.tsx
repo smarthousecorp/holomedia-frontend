@@ -11,6 +11,7 @@ interface PaymentHistory {
   creatorNickname: string;
   fileName: string;
   pointAmount: number;
+  createdAt: Date;
 }
 
 const PaymentManage = () => {
