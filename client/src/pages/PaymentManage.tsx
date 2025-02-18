@@ -11,7 +11,7 @@ interface PaymentHistory {
   creatorNickname: string;
   fileName: string;
   pointAmount: number;
-  createdAt: Date;
+  createdAt: string;
 }
 
 const PaymentManage = () => {
@@ -20,6 +20,17 @@ const PaymentManage = () => {
   const memberNo = useSelector((state: RootState) => state.user.memberNo);
   const [activeTab, setActiveTab] = useState<"payment" | "history">("payment");
   const [paymentHistory, setPaymentHistory] = useState<PaymentHistory[]>([]);
+
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString);
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const day = String(date.getDate()).padStart(2, "0");
+    const hours = String(date.getHours()).padStart(2, "0");
+    const minutes = String(date.getMinutes()).padStart(2, "0");
+
+    return `${year}.${month}.${day} ${hours}:${minutes}`;
+  };
 
   const fetchPaymentHistory = async () => {
     try {
@@ -75,11 +86,14 @@ const PaymentManage = () => {
         <HistoryContainer>
           {paymentHistory.map((item, index) => (
             <HistoryItem key={index}>
-              <HistoryHeader>
-                <CreatorName>{item.creatorNickname}</CreatorName>
-                <PointAmount>{item.pointAmount} 🍯</PointAmount>
-              </HistoryHeader>
-              <FileName>{item.fileName}</FileName>
+              <HistoryContent>
+                <HistoryHeader>
+                  <CreatorName>{item.creatorNickname}</CreatorName>
+                  <PointAmount>{item.pointAmount} 🍯</PointAmount>
+                </HistoryHeader>
+                <FileName>{item.fileName}</FileName>
+              </HistoryContent>
+              <DateText>{formatDate(item.createdAt)}</DateText>
             </HistoryItem>
           ))}
         </HistoryContainer>
@@ -177,8 +191,17 @@ const HistoryContainer = styled.div`
 `;
 
 const HistoryItem = styled.div`
+  position: relative;
   padding: 16px 0;
   border-bottom: 1px solid #e5e7eb;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+`;
+
+const HistoryContent = styled.div`
+  flex: 1;
 `;
 
 const HistoryHeader = styled.div`
@@ -202,4 +225,13 @@ const FileName = styled.p`
   font-size: 14px;
   color: #6b7280;
   margin: 0;
+`;
+
+const DateText = styled.span`
+  position: absolute;
+  right: 0;
+  bottom: 8px;
+  font-size: 12px;
+  color: #9ca3af;
+  white-space: nowrap;
 `;
