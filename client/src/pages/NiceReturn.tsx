@@ -58,16 +58,15 @@ const NiceReturnPage: React.FC = () => {
           // 응답 구조 재구성
           finalResponse = {
             code: 0,
-            message: "success",
+            message: "아이디 찾기가 완료되었습니다.",
             data: {
-              foundIds: idResponse.data.data,
-              // 필요한 경우 본인인증 정보도 포함
-              name: decodeURIComponent(response.data.data.utf8_name),
-              mobileno: response.data.data.mobileno,
+              ...response.data.data, // 기존 본인인증 데이터 유지
+              foundIds: idResponse.data.data, // ID 찾기 결과 추가
             },
             timestamp: new Date().toISOString(),
           };
         } else {
+          console.log("else문 실행 됨");
           finalResponse = response.data;
         }
 
