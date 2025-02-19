@@ -53,6 +53,8 @@ const NiceReturnPage: React.FC = () => {
             }
           );
 
+          console.log("아이디 찾기 API 응답:", idResponse.data);
+
           // 응답 구조 재구성
           finalResponse = {
             code: 0,
@@ -74,7 +76,7 @@ const NiceReturnPage: React.FC = () => {
           await new Promise<void>((resolve) => {
             console.log("부모 창으로 전송할 데이터:", finalResponse);
             window.opener.postMessage(finalResponse, window.opener.origin);
-            setTimeout(resolve, 3000);
+            setTimeout(resolve, 1000);
           });
         }
       } catch (error: any) {
@@ -95,7 +97,7 @@ const NiceReturnPage: React.FC = () => {
               errorData,
               `${import.meta.env.VITE_CLIENT_DOMAIN}`
             );
-            setTimeout(resolve, 3000);
+            setTimeout(resolve, 1000);
           });
         }
       } finally {

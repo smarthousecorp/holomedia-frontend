@@ -53,23 +53,10 @@ const NiceVerificationButton: React.FC<NiceVerificationProps> = ({
         if (responseData.code === 0) {
           console.log("인증 성공!", responseData);
           setIsVerified(true);
-
-          // verificationType에 따라 다른 처리
-          if (verificationType === "id") {
-            console.log("id일 때 responseData 처리", responseData.data);
-            // 아이디 찾기의 경우 foundIds 확인
-            if (responseData.data.foundIds) {
-              onVerificationComplete(responseData.data);
-            } else {
-              console.error("아이디 찾기 결과가 없습니다.");
-              onError("아이디를 찾을 수 없습니다.");
-            }
-          } else {
-            // 다른 인증 타입의 경우 기존처럼 처리
-            onVerificationComplete(responseData.data);
-          }
+          onVerificationComplete(responseData.data);
 
           if (popupRef.current) {
+            console.log("current???", popupRef.current);
             popupRef.current.close();
           }
         } else {
