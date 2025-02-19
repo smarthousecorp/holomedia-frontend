@@ -28,6 +28,7 @@ import Creators from "./pages/Creators";
 import PreparePage from "./pages/Prepare";
 import PaymentSuccess from "./pages/PaymentSuccess";
 import PaymentManage from "./pages/PaymentManage";
+import FindAccount from "./pages/FindAccount";
 // interface ErrorMessageProps {
 //   message?: string;
 // }
@@ -59,6 +60,7 @@ function App() {
         <Route element={<MainLayout />}>
           <Route path="/" element={<Login />} />
           <Route path="/signup" element={<SignUp />} />
+          <Route path="/find-account" element={<FindAccount />} />
           <Route path="/nice/signup" element={<NiceReturnPage />} />
           <Route path="/api/payment/success" element={<PaymentReturn />} />
           <Route path="/payment/success" element={<PaymentSuccess />} />

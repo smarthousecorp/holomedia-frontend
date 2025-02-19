@@ -13,11 +13,15 @@ interface ApiResponse {
 interface NiceVerificationProps {
   onVerificationComplete: (data: VerificationData) => void;
   onError: (message: string) => void;
+  verificationType: 1 | 2 | 3; // 1: 회원가입, 2: 아이디찾기, 3: 비밀번호찾기
+  returnUrl?: string; // 각 인증 타입별 리턴 URL 경로
 }
 
 const NiceVerificationButton: React.FC<NiceVerificationProps> = ({
   onVerificationComplete,
   onError,
+  verificationType,
+  returnUrl = `${import.meta.env.VITE_CLIENT_DOMAIN}`,
 }) => {
   const [isVerifying, setIsVerifying] = useState(false);
   const [isVerified, setIsVerified] = useState(false);
@@ -76,8 +80,8 @@ const NiceVerificationButton: React.FC<NiceVerificationProps> = ({
         `https://api.holomedia.co.kr/nice`,
         {
           params: {
-            type: 1,
-            returnUrl: `${import.meta.env.VITE_CLIENT_DOMAIN}`,
+            type: verificationType,
+            returnUrl,
           },
           withCredentials: true,
         }
@@ -217,7 +221,7 @@ const VerificationButton = styled.button<{ disabled?: boolean }>`
   padding: 0.5rem 1rem;
   border-radius: 10px;
   transition: all 0.2s ease-in-out;
-  width: auto;
+  width: 100%;
   min-width: 100px;
   cursor: pointer;
 
