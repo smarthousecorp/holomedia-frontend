@@ -6,14 +6,23 @@ import { useState } from "react";
 import NiceVerificationButton from "../components/commons/NiceVerificationButton";
 import { VerificationData } from "../types/nice";
 
+interface FoundIds {
+  foundIds?: string[];
+}
+
 const FindAccount = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const [verificationError, setVerificationError] = useState<string>("");
+  const [foundIds, setFoundIds] = useState<string[]>([]);
+  const [isVerified, setIsVerified] = useState(false);
 
-  const handleVerificationComplete = (data: VerificationData) => {
-    // 인증 완료 후 처리 로직
+  const handleVerificationComplete = (data: VerificationData & FoundIds) => {
     console.log("Verification completed:", data);
+    if (data.foundIds) {
+      setFoundIds(data.foundIds);
+      setIsVerified(true);
+    }
   };
 
   // 인증 에러 메시지 설정
@@ -29,26 +38,49 @@ const FindAccount = () => {
         </Logo>
         <HeaderSection>
           <Title>아이디 찾기</Title>
-          <SubTitle>아이디를 찾는 방법을 선택해주세요</SubTitle>
+          <SubTitle>
+            {isVerified
+              ? "확인된 아이디 목록입니다"
+              : "아이디를 찾는 방법을 선택해주세요"}
+          </SubTitle>
         </HeaderSection>
-        <VerificationSection>
-          <VerificationOption>
-            <OptionTitle>본인명의 휴대전화로 인증</OptionTitle>
-            <OptionDescription>
-              본인명의로 등록된 휴대전화로 인증하여 아이디를 찾을 수 있습니다.
-            </OptionDescription>
-            <ButtonWrapper>
-              <NiceVerificationButton
-                onVerificationComplete={handleVerificationComplete}
-                onError={handleVerificationError}
-                verificationType={"id"}
-              />
-            </ButtonWrapper>
-            {verificationError && (
-              <ErrorMessage>{verificationError}</ErrorMessage>
+
+        {!isVerified ? (
+          <VerificationSection>
+            <VerificationOption>
+              <OptionTitle>본인명의 휴대전화로 인증</OptionTitle>
+              <OptionDescription>
+                본인명의로 등록된 휴대전화로 인증하여 아이디를 찾을 수 있습니다.
+              </OptionDescription>
+              <ButtonWrapper>
+                <NiceVerificationButton
+                  onVerificationComplete={handleVerificationComplete}
+                  onError={handleVerificationError}
+                  verificationType={"id"}
+                />
+              </ButtonWrapper>
+              {verificationError && (
+                <ErrorMessage>{verificationError}</ErrorMessage>
+              )}
+            </VerificationOption>
+          </VerificationSection>
+        ) : (
+          <IdListSection>
+            {foundIds.length > 0 ? (
+              <>
+                <IdListTitle>등록된 아이디 목록</IdListTitle>
+                <IdList>
+                  {foundIds.map((id, index) => (
+                    <IdItem key={index}>{id}</IdItem>
+                  ))}
+                </IdList>
+              </>
+            ) : (
+              <NoIdsMessage>등록된 아이디가 없습니다.</NoIdsMessage>
             )}
-          </VerificationOption>
-        </VerificationSection>
+          </IdListSection>
+        )}
+
         <Footer>
           <BackButton onClick={() => navigate("/")}>
             로그인 페이지로 돌아가기
@@ -117,6 +149,47 @@ const VerificationOption = styled.div`
     border-color: #eb3553;
     box-shadow: 0 2px 8px rgba(235, 53, 83, 0.1);
   }
+`;
+
+const IdListSection = styled.div`
+  margin: 2rem 0;
+`;
+
+const IdListTitle = styled.h3`
+  font-size: 1.4rem;
+  color: #333;
+  margin-bottom: 1.5rem;
+  text-align: center;
+`;
+
+const IdList = styled.ul`
+  list-style: none;
+  padding: 0;
+  margin: 0;
+`;
+
+const IdItem = styled.li`
+  padding: 1rem;
+  margin-bottom: 1rem;
+  background-color: #f8f8f8;
+  border-radius: 8px;
+  text-align: center;
+  font-size: 1.3rem;
+  color: #333;
+  border: 1px solid #e0e0e0;
+
+  &:last-child {
+    margin-bottom: 0;
+  }
+`;
+
+const NoIdsMessage = styled.p`
+  text-align: center;
+  color: #666;
+  font-size: 1.3rem;
+  padding: 2rem;
+  background-color: #f8f8f8;
+  border-radius: 8px;
 `;
 
 const OptionTitle = styled.h3`
