@@ -37,9 +37,9 @@ const NiceReturnPage: React.FC = () => {
           }
         );
 
-        // 아이디 찾기인 경우 추가 API 호출
-        let finalResponse = response;
-        if (authType === "id" && response.data.data.mobileno) {
+        let finalResponse;
+        if (authType === "id") {
+          // 본인인증 결과로 받은 휴대폰 번호로 아이디 찾기 API 호출
           const idResponse = await axios.get(
             `${import.meta.env.VITE_API_URL}/member/forgot-id`,
             {
@@ -48,34 +48,30 @@ const NiceReturnPage: React.FC = () => {
               },
             }
           );
+
+          // 응답 구조 재구성
           finalResponse = {
-            ...response,
+            code: 0,
+            message: "success",
             data: {
-              ...response.data,
               foundIds: idResponse.data.data,
+              // 필요한 경우 본인인증 정보도 포함
+              name: decodeURIComponent(response.data.data.utf8_name),
+              mobileno: response.data.data.mobileno,
             },
+            timestamp: new Date().toISOString(),
           };
+        } else {
+          finalResponse = response.data;
         }
 
         // 부모 창으로 결과 전송
         if (window.opener) {
-          // 응답 데이터에서 이름 디코딩
-          const responseData = {
-            ...finalResponse.data,
-            data: {
-              ...finalResponse.data.data,
-              name: decodeURIComponent(finalResponse.data.data.utf8_name),
-            },
-          };
-
-          console.log("부모 창으로 전송할 데이터:", responseData);
-
           await new Promise<void>((resolve) => {
-            window.opener.postMessage(responseData, window.opener.origin);
-            setTimeout(resolve, 500);
+            console.log("부모 창으로 전송할 데이터:", finalResponse);
+            window.opener.postMessage(finalResponse, window.opener.origin);
+            setTimeout(resolve, 1000);
           });
-
-          console.log("메시지 전송 완료");
         }
       } catch (error: any) {
         console.log(error);
@@ -95,7 +91,7 @@ const NiceReturnPage: React.FC = () => {
               errorData,
               `${import.meta.env.VITE_CLIENT_DOMAIN}`
             );
-            setTimeout(resolve, 500);
+            setTimeout(resolve, 1000);
           });
         }
       } finally {

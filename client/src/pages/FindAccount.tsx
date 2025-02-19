@@ -19,9 +19,12 @@ const FindAccount = () => {
 
   const handleVerificationComplete = (data: VerificationData & FoundIds) => {
     console.log("Verification completed:", data);
-    if (data.foundIds) {
+    // foundIds가 있는지 명확하게 체크
+    if (data.foundIds && Array.isArray(data.foundIds)) {
       setFoundIds(data.foundIds);
       setIsVerified(true);
+    } else {
+      setVerificationError("아이디를 찾을 수 없습니다.");
     }
   };
 
