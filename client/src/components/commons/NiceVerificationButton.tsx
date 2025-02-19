@@ -2,11 +2,12 @@ import React, { useCallback, useRef, useState } from "react";
 import axios from "axios";
 import styled from "styled-components";
 import { VerificationData } from "../../types/nice";
+import { FoundIds } from "../../pages/FindAccount";
 
 interface ApiResponse {
   code: number;
   message: string;
-  data: VerificationData;
+  data: VerificationData & FoundIds;
   timestamp: string;
 }
 
@@ -50,9 +51,24 @@ const NiceVerificationButton: React.FC<NiceVerificationProps> = ({
         const responseData = event.data as ApiResponse;
 
         if (responseData.code === 0) {
-          console.log("인증 성공!");
+          console.log("인증 성공!", responseData);
           setIsVerified(true);
-          onVerificationComplete(responseData.data);
+
+          // verificationType에 따라 다른 처리
+          if (verificationType === "id") {
+            console.log("id일 때 responseData 처리", responseData.data);
+            // 아이디 찾기의 경우 foundIds 확인
+            if (responseData.data.foundIds) {
+              onVerificationComplete(responseData.data);
+            } else {
+              console.error("아이디 찾기 결과가 없습니다.");
+              onError("아이디를 찾을 수 없습니다.");
+            }
+          } else {
+            // 다른 인증 타입의 경우 기존처럼 처리
+            onVerificationComplete(responseData.data);
+          }
+
           if (popupRef.current) {
             popupRef.current.close();
           }
@@ -64,7 +80,6 @@ const NiceVerificationButton: React.FC<NiceVerificationProps> = ({
         onError("인증 처리 중 오류가 발생했습니다.");
       } finally {
         setIsVerifying(false);
-        // 이벤트 리스너 제거
         window.removeEventListener("message", handleMessage);
       }
     },

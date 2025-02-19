@@ -6,7 +6,7 @@ import { useState } from "react";
 import NiceVerificationButton from "../components/commons/NiceVerificationButton";
 import { VerificationData } from "../types/nice";
 
-interface FoundIds {
+export interface FoundIds {
   foundIds?: string[];
 }
 
