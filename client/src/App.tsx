@@ -62,6 +62,8 @@ function App() {
           <Route path="/signup" element={<SignUp />} />
           <Route path="/find-account" element={<FindAccount />} />
           <Route path="/nice/signup" element={<NiceReturnPage />} />
+          <Route path="/nice/id" element={<NiceReturnPage />} />
+          <Route path="/nice/password" element={<NiceReturnPage />} />
           <Route path="/api/payment/success" element={<PaymentReturn />} />
           <Route path="/payment/success" element={<PaymentSuccess />} />
           <Route path="/*" element={<ErrorPage error="404" />} />
