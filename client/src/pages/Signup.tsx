@@ -367,7 +367,7 @@ const SignUp: React.FC = () => {
             <NiceVerificationButton
               onVerificationComplete={handleVerificationComplete}
               onError={handleVerificationError}
-              verificationType={1}
+              verificationType={"signup"}
             />
 
             {/* <VerificationButton type="button" onClick={handleClickPaymentBtn}>

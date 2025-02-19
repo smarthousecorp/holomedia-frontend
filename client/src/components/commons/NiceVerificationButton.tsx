@@ -13,7 +13,7 @@ interface ApiResponse {
 interface NiceVerificationProps {
   onVerificationComplete: (data: VerificationData) => void;
   onError: (message: string) => void;
-  verificationType: 1 | 2 | 3; // 1: 회원가입, 2: 아이디찾기, 3: 비밀번호찾기
+  verificationType: "signup" | "id" | "password";
   returnUrl?: string; // 각 인증 타입별 리턴 URL 경로
 }
 

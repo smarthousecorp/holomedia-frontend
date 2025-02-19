@@ -41,7 +41,7 @@ const FindAccount = () => {
               <NiceVerificationButton
                 onVerificationComplete={handleVerificationComplete}
                 onError={handleVerificationError}
-                verificationType={2}
+                verificationType={"id"}
               />
             </ButtonWrapper>
             {verificationError && (
