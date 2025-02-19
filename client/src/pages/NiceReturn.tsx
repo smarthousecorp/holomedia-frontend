@@ -1,10 +1,12 @@
 import React, { useEffect } from "react";
-import { useSearchParams } from "react-router-dom";
+import { useLocation, useSearchParams } from "react-router-dom";
 import axios from "axios";
+
+type AuthType = "signup" | "id" | "password";
 
 const NiceReturnPage: React.FC = () => {
   const [searchParams] = useSearchParams();
-  console.log(searchParams);
+  const location = useLocation();
 
   useEffect(() => {
     console.log("=== NiceReturn 페이지 진입 ===");
@@ -16,7 +18,10 @@ const NiceReturnPage: React.FC = () => {
         const enc_data = searchParams.get("enc_data");
         const integrity_value = searchParams.get("integrity_value");
         const token_version_id = searchParams.get("token_version_id");
-        const authType = searchParams.get("type") || "signup"; // 기본값은 signup
+
+        // URL 경로에서 인증 타입 추출
+        const pathSegments = location.pathname.split("/");
+        const authType = pathSegments[pathSegments.length - 1] as AuthType;
 
         console.log("인증 파라미터:", {
           enc_data,
@@ -75,7 +80,7 @@ const NiceReturnPage: React.FC = () => {
           await new Promise<void>((resolve) => {
             console.log("부모 창으로 전송할 데이터:", finalResponse);
             window.opener.postMessage(finalResponse, window.opener.origin);
-            setTimeout(resolve, 1000);
+            setTimeout(resolve, 3000);
           });
         }
       } catch (error: any) {
@@ -96,7 +101,7 @@ const NiceReturnPage: React.FC = () => {
               errorData,
               `${import.meta.env.VITE_CLIENT_DOMAIN}`
             );
-            setTimeout(resolve, 1000);
+            setTimeout(resolve, 3000);
           });
         }
       } finally {
@@ -110,6 +115,7 @@ const NiceReturnPage: React.FC = () => {
   return (
     <div style={{ padding: "20px", textAlign: "center" }}>
       <p>인증 처리 중입니다...</p>
+      <p>처리가 끝나면 창은 자동으로 닫힙니다.</p>
     </div>
   );
 };
