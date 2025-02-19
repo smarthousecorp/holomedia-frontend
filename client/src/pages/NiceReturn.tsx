@@ -7,8 +7,9 @@ const NiceReturnPage: React.FC = () => {
   console.log(searchParams);
 
   useEffect(() => {
-    console.log("niceReturn useEffect 실행");
-
+    console.log("=== NiceReturn 페이지 진입 ===");
+    console.log("현재 URL:", window.location.href);
+    console.log("Search Params:", Object.fromEntries(searchParams));
     const processAuthResult = async () => {
       try {
         // URL 파라미터에서 인증 데이터 추출
@@ -37,9 +38,12 @@ const NiceReturnPage: React.FC = () => {
           }
         );
 
+        console.log("=== API 응답 ===", response.data);
+
         let finalResponse;
         if (authType === "id") {
           // 본인인증 결과로 받은 휴대폰 번호로 아이디 찾기 API 호출
+          console.log("=== 아이디 찾기 API 호출 시작 ===");
           const idResponse = await axios.get(
             `${import.meta.env.VITE_API_URL}/member/forgot-id`,
             {
@@ -70,7 +74,7 @@ const NiceReturnPage: React.FC = () => {
           await new Promise<void>((resolve) => {
             console.log("부모 창으로 전송할 데이터:", finalResponse);
             window.opener.postMessage(finalResponse, window.opener.origin);
-            setTimeout(resolve, 1000);
+            setTimeout(resolve, 3000);
           });
         }
       } catch (error: any) {
@@ -91,7 +95,7 @@ const NiceReturnPage: React.FC = () => {
               errorData,
               `${import.meta.env.VITE_CLIENT_DOMAIN}`
             );
-            setTimeout(resolve, 1000);
+            setTimeout(resolve, 3000);
           });
         }
       } finally {
