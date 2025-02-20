@@ -1,6 +1,7 @@
 import React, { useEffect } from "react";
 import { useLocation, useSearchParams } from "react-router-dom";
 import axios from "axios";
+import { api } from "../utils/api";
 
 type AuthType = "signup" | "id" | "password";
 
@@ -10,8 +11,6 @@ const NiceReturnPage: React.FC = () => {
 
   useEffect(() => {
     console.log("=== NiceReturn 페이지 진입 ===");
-    console.log("현재 URL:", window.location.href);
-    console.log("Search Params:", Object.fromEntries(searchParams));
     const processAuthResult = async () => {
       try {
         // URL 파라미터에서 인증 데이터 추출
@@ -49,21 +48,21 @@ const NiceReturnPage: React.FC = () => {
         if (authType === "id") {
           // 본인인증 결과로 받은 휴대폰 번호로 아이디 찾기 API 호출
           console.log("=== 아이디 찾기 API 호출 시작 ===");
-          const idResponse = await axios.get(
-            `${import.meta.env.VITE_API_URL}/member/forgot-id`,
-            {
-              params: {
-                mobileno: response.data.data.mobileno,
-              },
-            }
-          );
+          const idResponse = await api.get(`/member/forgot-id`, {
+            params: {
+              mobileno: response.data.data.mobileno,
+            },
+          });
 
-          console.log("아이디 찾기 API 응답:", idResponse.data);
+          console.log("아이디 찾기 API 응답:", idResponse);
 
           // 응답 구조 재구성
           finalResponse = {
             code: 0,
             message: "아이디 찾기가 완료되었습니다.",
+            check: {
+              foundIds: idResponse,
+            },
             data: {
               ...response.data.data, // 기존 본인인증 데이터 유지
               foundIds: idResponse.data.data, // ID 찾기 결과 추가

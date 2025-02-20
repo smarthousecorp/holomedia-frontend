@@ -57,7 +57,7 @@ const NiceVerificationButton: React.FC<NiceVerificationProps> = ({
 
           if (popupRef.current) {
             console.log("current???", popupRef.current);
-            popupRef.current.close();
+            // popupRef.current.close();
           }
         } else {
           throw new Error(responseData.message);
