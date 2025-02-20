@@ -33,6 +33,13 @@ const FindAccount = () => {
     setVerificationError(message);
   };
 
+  const handleIdClick = (id: string) => {
+    // 비밀번호 찾기 페이지로 이동하면서 선택한 아이디를 state로 전달
+    navigate("/find-password", {
+      state: { selectedId: id },
+    });
+  };
+
   return (
     <Container>
       <FindAccountBox>
@@ -74,7 +81,19 @@ const FindAccount = () => {
                 <IdListTitle>등록된 아이디 목록</IdListTitle>
                 <IdList>
                   {foundIds.map((id, index) => (
-                    <IdItem key={index}>{id}</IdItem>
+                    <IdItem key={index} onClick={() => handleIdClick(id)}>
+                      {id}
+                      <small
+                        style={{
+                          display: "block",
+                          marginTop: "0.5rem",
+                          fontSize: "1rem",
+                          color: "#666",
+                        }}
+                      >
+                        클릭하여 비밀번호 찾기
+                      </small>
+                    </IdItem>
                   ))}
                 </IdList>
               </>
@@ -180,9 +199,16 @@ const IdItem = styled.li`
   font-size: 1.3rem;
   color: #333;
   border: 1px solid #e0e0e0;
+  cursor: pointer; // 클릭 가능함을 표시
+  transition: all 0.2s ease;
 
   &:last-child {
     margin-bottom: 0;
+  }
+
+  &:hover {
+    background-color: #f0f0f0;
+    border-color: #eb3553;
   }
 `;
 
