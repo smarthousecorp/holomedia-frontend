@@ -66,8 +66,24 @@ const NiceReturnPage: React.FC = () => {
             },
             timestamp: new Date().toISOString(),
           };
+        } else if (authType === "password") {
+          const passwordResponse = await api.get("/member/forgot-password", {
+            params: {
+              mobileno: response.data.data.mobileno,
+            },
+          });
+
+          console.log("비밀번호 찾기 API 응답:", passwordResponse);
+          finalResponse = {
+            code: 0,
+            message: "본인인증이 완료되었습니다.",
+            data: {
+              ...response.data.data,
+              isVerified: true,
+            },
+            timestamp: new Date().toISOString(),
+          };
         } else {
-          console.log("else문 실행 됨");
           finalResponse = response.data;
         }
 
@@ -79,7 +95,7 @@ const NiceReturnPage: React.FC = () => {
               finalResponse,
               import.meta.env.VITE_CLIENT_DOMAIN
             );
-            setTimeout(resolve, 3000);
+            setTimeout(resolve, 1000);
           });
         }
       } catch (error: any) {
@@ -100,7 +116,7 @@ const NiceReturnPage: React.FC = () => {
               errorData,
               `${import.meta.env.VITE_CLIENT_DOMAIN}`
             );
-            setTimeout(resolve, 3000);
+            setTimeout(resolve, 1000);
           });
         }
       } finally {

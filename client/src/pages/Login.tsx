@@ -213,7 +213,7 @@ const Login: React.FC = () => {
             </a>
             <div className="idpw">
               <a href="/find-account">{t("auth.login.findAccount")} |</a>
-              <a href="#">{t("auth.login.findPassword")}</a>
+              <a href="/find-password">{t("auth.login.findPassword")}</a>
             </div>
           </About>
         </Form>
