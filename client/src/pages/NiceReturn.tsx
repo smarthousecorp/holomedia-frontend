@@ -60,9 +60,6 @@ const NiceReturnPage: React.FC = () => {
           finalResponse = {
             code: 0,
             message: "아이디 찾기가 완료되었습니다.",
-            check: {
-              foundIds: idResponse,
-            },
             data: {
               ...response.data.data, // 기존 본인인증 데이터 유지
               foundIds: idResponse.data.data, // ID 찾기 결과 추가
@@ -78,7 +75,10 @@ const NiceReturnPage: React.FC = () => {
         if (window.opener) {
           await new Promise<void>((resolve) => {
             console.log("부모 창으로 전송할 데이터:", finalResponse);
-            window.opener.postMessage(finalResponse, window.opener.origin);
+            window.opener.postMessage(
+              finalResponse,
+              import.meta.env.VITE_CLIENT_DOMAIN
+            );
             setTimeout(resolve, 3000);
           });
         }

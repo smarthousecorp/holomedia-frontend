@@ -37,6 +37,7 @@ const NiceVerificationButton: React.FC<NiceVerificationProps> = ({
       console.log("Origin:", event.origin);
 
       const allowedOrigins = [
+        import.meta.env.VITE_CLIENT_DOMAIN,
         "https://api.holomedia.co.kr",
         "https://dev.holomedia.co.kr",
         "http://localhost:5173",
@@ -100,7 +101,7 @@ const NiceVerificationButton: React.FC<NiceVerificationProps> = ({
       }
 
       // postMessage 이벤트 리스너 등록
-      window.addEventListener("message", handleMessage, false);
+      window.addEventListener("message", handleMessage);
 
       const width = 500;
       const height = 600;
