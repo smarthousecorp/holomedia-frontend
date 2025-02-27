@@ -1,4 +1,3 @@
-// PublicLayout.tsx
 import { Outlet } from "react-router";
 import { css, styled } from "styled-components";
 import Header from "../commons/Header";
@@ -92,7 +91,6 @@ const LayoutContainer = styled.div`
   width: 100%;
   display: flex;
   flex-direction: column;
-  justify-content: center;
 `;
 
 const LayoutInner = styled.div<{ $path?: string }>`
@@ -140,6 +138,13 @@ const MainContentWrapper = styled.div<{ $path?: string }>`
   width: 100%;
   padding-top: ${({ $path }) =>
     $path?.startsWith("/settings") ? "0" : "2rem"};
+  /* Content와 배너 사이의 간격을 flex gap으로 설정 */
+  gap: 2rem;
+
+  @media (max-width: 1150px) {
+    /* 배너가 사라지는 시점에서 gap 제거 */
+    gap: 0;
+  }
 
   @media (max-width: 900px) {
     flex-direction: column;
@@ -153,29 +158,38 @@ const ContentContainer = styled.main<{ $isSettingsPage: boolean }>`
   background-color: ${(props) => (props.$isSettingsPage ? "#fff" : "#ededed")};
   border-left: ${(props) =>
     props.$isSettingsPage ? "2px solid #eee" : "none"};
+  /* 컨텐츠 영역 가운데 정렬을 위한 설정 */
+  display: flex;
+  /* justify-content: center; */
 `;
 
 const MainSection = styled.div`
   width: 100%;
-  max-width: 950px;
-  margin: 0 4rem;
-  padding-bottom: 5rem;
+  max-width: 1050px;
+  /* 여백은 유지하되 가로 스크롤 문제 해결 */
+  padding: 0 4rem 5rem;
+
+  /* 1200px 이하에서 패딩 조정 */
+  @media (max-width: 1200px) {
+    padding: 0 2rem 5rem;
+  }
 
   @media (max-width: 900px) {
     max-width: 100%;
-    margin: 0;
-    padding-bottom: 10rem;
+    padding: 0 1rem 10rem;
   }
 `;
 
 const SideBannerContainer = styled.aside`
+  width: 300px; /* 배너 너비 고정 */
+  flex-shrink: 0; /* 배너 크기 축소 방지 */
   margin-right: 4rem;
   position: sticky;
   top: 2rem;
   height: fit-content;
   align-self: flex-start;
 
-  @media (max-width: 1150px) {
+  @media (max-width: 1400px) {
     display: none;
   }
 `;
