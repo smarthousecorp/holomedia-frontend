@@ -19,8 +19,6 @@ const ContentGrid: React.FC<ContentGridProps> = ({
   // onBoardClick,
   shouldBlur,
 }) => {
-  console.log(boards, creators);
-
   const [hoveredVideo, setHoveredVideo] = useState<number | null>(null);
 
   const findCreator = (creatorNo: number): Creator | undefined => {
@@ -44,11 +42,18 @@ const ContentGrid: React.FC<ContentGridProps> = ({
               {hoveredVideo === board.boardNo ? (
                 <VideoPlayer src={board.urls.highlight} autoPlay muted loop />
               ) : (
-                <ThumbnailImage
-                  src={board.urls.thumbnail}
-                  alt={board.title}
-                  $shouldBlur={shouldBlur}
-                />
+                <>
+                  <ThumbnailImage
+                    src={board.urls.thumbnail}
+                    alt={board.title}
+                    $shouldBlur={shouldBlur && board.point !== 0 && !board.paid}
+                    $isFree={board.point === 0}
+                  />
+                  <PlayIconContainer>
+                    <FilledPlayIcon />
+                  </PlayIconContainer>
+                  {board.point === 0 && <FreeLabel>free</FreeLabel>}
+                </>
               )}
             </VideoWrapper>
 
@@ -158,11 +163,57 @@ const VideoWrapper = styled.div`
   overflow: hidden;
 `;
 
-const ThumbnailImage = styled.img<{ $shouldBlur: boolean }>`
+const ThumbnailImage = styled.img<{ $shouldBlur: boolean; $isFree: boolean }>`
   width: 100%;
   height: 100%;
   object-fit: cover;
-  ${(props) => props.$shouldBlur && `filter: blur(6px);`}
+  filter: ${(props) => (props.$shouldBlur ? "blur(6px)" : "none")};
+  transition: filter 0.3s ease;
+`;
+
+// 재생 아이콘 컨테이너 추가
+const PlayIconContainer = styled.div`
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  background-color: rgba(255, 255, 255);
+  border-radius: 50%;
+  width: 48px;
+  height: 48px;
+  filter: drop-shadow(0 0 3px rgba(0, 0, 0, 0.3));
+`;
+
+// 빨간색으로 채워진 재생 아이콘 (SVG 사용)
+const FilledPlayIcon = styled.div`
+  width: 0;
+  height: 0;
+  border-style: solid;
+  border-width: 10px 0 10px 18px;
+  border-color: transparent transparent transparent #ff0000;
+  margin-left: 4px; /* 시각적 중앙 정렬을 위해 약간 오른쪽으로 이동 */
+`;
+
+const FreeLabel = styled.div`
+  @import url("https://fonts.googleapis.com/css2?family=Inknut+Antiqua:wght@300;400;500;600;700;800;900&display=swap");
+  font-family: "Inknut Antiqua", serif;
+  font-weight: bold;
+  position: absolute;
+  top: 65%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: white;
+  font-weight: bold;
+  -webkit-text-stroke: 1px black;
+  padding: 5px 10px;
+  border-radius: 4px;
+  font-size: 6rem;
+  z-index: 2;
 `;
 
 const VideoPlayer = styled.video`

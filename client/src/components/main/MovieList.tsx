@@ -122,6 +122,7 @@ const MovieList: React.FC<MovieListProps> = ({
         const isExpanded = expandedDescriptions.includes(board.boardNo);
         const isVideo = shouldBlur;
         const mediaUrl = isVideo ? board.urls.thumbnail : board.urls.image;
+        const shouldApplyBlur = isVideo && !board.paid && board.point !== 0;
 
         if (!creator || !mediaUrl) return null;
 
@@ -169,9 +170,9 @@ const MovieList: React.FC<MovieListProps> = ({
                 <BoardThumbnail
                   src={mediaUrl}
                   alt={board.title}
-                  $shouldBlur={isVideo && shouldBlur && !board.paid}
+                  $shouldBlur={shouldApplyBlur}
                 />
-                {isVideo && shouldBlur && !board.paid && (
+                {shouldApplyBlur && (
                   <BlurOverlay>
                     <h3>이 영상 구매하기</h3>
                     <button>{board.point}꿀</button>
