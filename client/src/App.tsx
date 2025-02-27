@@ -24,8 +24,7 @@ import PasswordChange from "./pages/PasswordChange";
 import PaymentReturn from "./pages/PaymentReturn";
 import NiceReturnPage from "./pages/NiceReturn";
 import Creators from "./pages/Creators";
-// import Videos from "./pages/Videos";
-import PreparePage from "./pages/Prepare";
+import Videos from "./pages/Videos";
 import PaymentSuccess from "./pages/PaymentSuccess";
 import PaymentManage from "./pages/PaymentManage";
 import FindAccount from "./pages/FindAccount";
@@ -85,7 +84,7 @@ function App() {
           <Route path="/user/:id" element={<User />} />
           <Route path="/alarm" element={<NotificationPage />} />
           <Route path="/creators" element={<Creators />} />
-          <Route path="/videos" element={<PreparePage pageName="vod" />} />
+          <Route path="/videos" element={<Videos />} />
           {/* <Route
             path="/membership"
             element={<PreparePage pageName="멤버십" />}

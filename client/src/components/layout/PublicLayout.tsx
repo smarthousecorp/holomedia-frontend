@@ -16,7 +16,7 @@ const PublicLayout = () => {
   const [isOpenBS, setIsOpenBS] = useState<boolean>(false);
   const [showPaymentModal, setShowPaymentModal] = useState<boolean>(false);
 
-  const showSidebarPaths = ["/main", "/creators", "/user"];
+  const showSidebarPaths = ["/main", "/creators", "/user", "/videos"];
   const shouldShowBanner = showSidebarPaths.some((path) =>
     location.pathname.startsWith(path)
   );
