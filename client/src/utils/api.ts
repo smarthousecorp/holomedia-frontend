@@ -20,8 +20,18 @@ api.interceptors.response.use(
     if (error.response?.status === 401) {
       // Redux 상태 초기화
       store.dispatch(logout());
-      // 로그인 페이지로 리다이렉트
+
+      // 모든 요청 취소
+      const cancelToken = axios.CancelToken.source();
+      api.defaults.cancelToken = cancelToken.token;
+      cancelToken.cancel("세션 만료로 인한 모든 요청 취소");
+
+      // 알림 표시와 동시에 리다이렉트
+      alert("세션이 만료되어 로그인 페이지로 이동합니다.");
       window.location.href = "/";
+
+      // 이후 코드 실행 방지
+      return new Promise(() => {});
     }
     return Promise.reject(error);
   }

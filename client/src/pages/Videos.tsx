@@ -129,7 +129,7 @@ const Videos: React.FC = () => {
                 {/* 결제가 필요한 영상에 포인트 정보 표시 */}
                 {!video.paid && video.point > 0 && (
                   <PointOverlay>
-                    <PointAmount>{video.point} P</PointAmount>
+                    <PointAmount>{video.point} 🍯</PointAmount>
                   </PointOverlay>
                 )}
               </ThumbnailContainer>

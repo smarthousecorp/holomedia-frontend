@@ -64,7 +64,6 @@ const ProfileSetting = () => {
         }
       } catch (error) {
         console.error("Failed to fetch user data:", error);
-        alert("사용자 정보를 불러오는데 실패했습니다.");
       }
     };
 
