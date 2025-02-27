@@ -5,6 +5,7 @@ import { useNavigate } from "react-router-dom";
 import { board } from "../types/board";
 import PointUseModal from "../components/commons/media/PointUseModal";
 import { Creator } from "../types/user";
+import badgeIcon from "../assets/19_badge.png"; // 19 뱃지 이미지 import
 
 interface DataResponse {
   pagination: {
@@ -38,8 +39,6 @@ interface CreatorApiResponse {
 
 const Videos: React.FC = () => {
   const [videos, setVideos] = useState<board[]>([]);
-  console.log(videos);
-
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -113,24 +112,29 @@ const Videos: React.FC = () => {
       <Container>
         <VideoTitleH2>영상 목록</VideoTitleH2>
         <GridContainer>
-          {videos.map((video) => {
-            const creator = findCreator(video.creatorNo);
-            return (
-              <ImageCard
-                key={video.boardNo}
-                onClick={() => handleClickVideo(video)}
-              >
-                <ThumbnailImage src={video.urls.thumbnail} alt={video.title} />
-                <VideoInfo>
-                  <VideoTitle>{video.title}</VideoTitle>
-                  <CreatorId>
-                    {creator ? creator.nickname : video.loginId}
-                  </CreatorId>
-                  <PointInfo>{video.point} 포인트</PointInfo>
-                </VideoInfo>
-              </ImageCard>
-            );
-          })}
+          {videos.map((video) => (
+            <ImageCard
+              key={video.boardNo}
+              onClick={() => handleClickVideo(video)}
+            >
+              <ThumbnailContainer isPaid={!video.paid && video.point > 0}>
+                <ThumbnailImage
+                  src={video.urls.thumbnail}
+                  alt={video.title}
+                  isPaid={!video.paid && video.point > 0}
+                />
+                {/* 19 뱃지 추가 */}
+                <BadgeIcon src={badgeIcon} alt="19+ 콘텐츠" />
+
+                {/* 결제가 필요한 영상에 포인트 정보 표시 */}
+                {!video.paid && video.point > 0 && (
+                  <PointOverlay>
+                    <PointAmount>{video.point} P</PointAmount>
+                  </PointOverlay>
+                )}
+              </ThumbnailContainer>
+            </ImageCard>
+          ))}
         </GridContainer>
       </Container>
       {selectedBoard && (
@@ -195,42 +199,58 @@ const ImageCard = styled.div`
   }
 `;
 
-const ThumbnailImage = styled.img`
+interface ThumbnailProps {
+  isPaid: boolean;
+}
+
+const ThumbnailContainer = styled.div<ThumbnailProps>`
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+`;
+
+const ThumbnailImage = styled.img<ThumbnailProps>`
   position: absolute;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
   object-fit: cover;
+  filter: ${(props) => (props.isPaid ? "blur(8px)" : "none")};
 `;
 
-const VideoInfo = styled.div`
+const BadgeIcon = styled.img`
   position: absolute;
-  bottom: 0;
+  right: 1rem;
+  top: 1rem;
+  width: 35px;
+  height: 35px;
+  z-index: 10;
+`;
+
+const PointOverlay = styled.div`
+  position: absolute;
+  top: 0;
   left: 0;
   width: 100%;
-  padding: 10px;
-  background: rgba(0, 0, 0, 0.7);
-  color: white;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: rgba(0, 0, 0, 0.4);
+  z-index: 1;
 `;
 
-const VideoTitle = styled.h3`
-  font-size: 1rem;
-  margin: 0 0 5px 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-`;
-
-const CreatorId = styled.p`
-  font-size: 0.8rem;
-  margin: 0 0 5px 0;
-`;
-
-const PointInfo = styled.p`
-  font-size: 0.8rem;
-  margin: 0;
+const PointAmount = styled.div`
+  font-size: 1.5rem;
+  font-weight: bold;
   color: #ffcc00;
+  background-color: rgba(0, 0, 0, 0.6);
+  padding: 8px 16px;
+  border-radius: 8px;
 `;
 
 const LoadingWrapper = styled.div`
