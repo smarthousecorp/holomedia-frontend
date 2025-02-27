@@ -19,6 +19,8 @@ const ContentGrid: React.FC<ContentGridProps> = ({
   // onBoardClick,
   shouldBlur,
 }) => {
+  console.log(boards, creators);
+
   const [hoveredVideo, setHoveredVideo] = useState<number | null>(null);
 
   const findCreator = (creatorNo: number): Creator | undefined => {

@@ -64,9 +64,11 @@ const User = () => {
           api.get(`/creator/list`),
         ]);
 
-      setBoards(boardsResponse.data.data);
+      console.log(creatorResponse, creatorsResponse);
+
+      setBoards(boardsResponse.data.data.list);
       setCreator(creatorResponse.data.data);
-      setCreators(creatorsResponse.data.data);
+      setCreators(creatorsResponse.data.data.list);
       setLoadingState("success");
     } catch (error) {
       console.error("Error fetching data:", error);

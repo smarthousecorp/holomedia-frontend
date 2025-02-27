@@ -51,12 +51,12 @@ const Main = () => {
       setLoadingState("loading");
       // Promise.all을 사용하여 병렬로 API 요청
       const [boardResponse, creatorResponse] = await Promise.all([
-        api.get("/board/list"),
-        api.get("/creator/list"),
+        api.get(`/board/list`),
+        api.get(`/creator/list`),
       ]);
 
-      setMedias(boardResponse.data.data);
-      setUploaders(creatorResponse.data.data);
+      setMedias(boardResponse.data.data.list);
+      setUploaders(creatorResponse.data.data.list);
       setLoadingState("success");
     } catch (error) {
       console.error("Error fetching data:", error);

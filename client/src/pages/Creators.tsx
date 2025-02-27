@@ -10,10 +10,19 @@ interface Creator {
   nickname: string;
 }
 
+interface DataResponse {
+  pagination: {
+    cursor: string;
+    size: number;
+    hasNext: boolean;
+  };
+  list: Creator[];
+}
+
 interface ApiResponse {
   code: number;
   message: string;
-  data: Creator[];
+  data: DataResponse;
 }
 
 const Creators: React.FC = () => {
@@ -35,7 +44,7 @@ const Creators: React.FC = () => {
         const result: ApiResponse = await response.data;
 
         if (result.code === 0) {
-          setCreators(result.data);
+          setCreators(result.data.list);
         } else {
           setError(result.message);
         }
