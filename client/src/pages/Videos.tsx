@@ -2,20 +2,9 @@ import React, { useEffect, useState } from "react";
 import styled from "styled-components";
 import { api } from "../utils/api";
 import { useNavigate } from "react-router-dom";
-
-interface Video {
-  boardNo: number;
-  creatorNo: number;
-  title: string;
-  urls: {
-    thumbnail: string;
-    video: string;
-    image: string;
-    highlight: string;
-  };
-  point: number;
-  loginId: string;
-}
+import { board } from "../types/board";
+import PointUseModal from "../components/commons/media/PointUseModal";
+import { Creator } from "../types/user";
 
 interface DataResponse {
   pagination: {
@@ -23,7 +12,16 @@ interface DataResponse {
     size: number;
     hasNext: boolean;
   };
-  list: Video[];
+  list: board[];
+}
+
+interface CreatorDataResponse {
+  pagination: {
+    cursor: string;
+    size: number;
+    hasNext: boolean;
+  };
+  list: Creator[];
 }
 
 interface ApiResponse {
@@ -32,62 +30,122 @@ interface ApiResponse {
   data: DataResponse;
 }
 
+interface CreatorApiResponse {
+  code: number;
+  message: string;
+  data: CreatorDataResponse;
+}
+
 const Videos: React.FC = () => {
-  const [videos, setVideos] = useState<Video[]>([]);
+  const [videos, setVideos] = useState<board[]>([]);
+  console.log(videos);
+
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+  const [creators, setCreators] = useState<Creator[]>([]);
+
+  // 영상 결제시도 시 상태 관리
+  const [selectedBoard, setSelectedBoard] = useState<board | null>(null);
+  const [showPaymentModal, setShowPaymentModal] = useState(false);
+
   const navigate = useNavigate();
 
-  const handleClickVideo = (boardNo: number) => {
-    navigate(`/board/${boardNo}`);
+  const handleClickVideo = (video: board) => {
+    if (video.paid || video.point === 0) {
+      navigate(`/video/${video.boardNo}`);
+    } else {
+      // 유료 콘텐츠(영상)인 경우 결제 모달 표시
+      setSelectedBoard(video);
+      setShowPaymentModal(true);
+    }
+  };
+
+  const findCreator = (id: number) => {
+    return creators.find((creator) => creator.no === id);
+  };
+
+  const handlePaymentComplete = () => {
+    if (selectedBoard) {
+      navigate(`/video/${selectedBoard.boardNo}`);
+    }
   };
 
   useEffect(() => {
-    const fetchVideos = async () => {
+    const fetchData = async () => {
       try {
         setIsLoading(true);
-        const response = await api.get("/board/list?size=10");
-        const result: ApiResponse = await response.data;
 
-        if (result.code === 0) {
-          setVideos(result.data.list);
+        // 영상 데이터 가져오기
+        const videoResponse = await api.get("/board/list?size=10");
+        const videoResult: ApiResponse = await videoResponse.data;
+
+        // 크리에이터 데이터 가져오기
+        const creatorResponse = await api.get("/creator/list?size=10");
+        const creatorResult: CreatorApiResponse = await creatorResponse.data;
+
+        if (videoResult.code === 0 && creatorResult.code === 0) {
+          setVideos(videoResult.data.list);
+          setCreators(creatorResult.data.list);
         } else {
-          setError(result.message);
+          if (videoResult.code !== 0) {
+            setError(videoResult.message);
+          } else {
+            setError(creatorResult.message);
+          }
         }
       } catch (error) {
-        setError("영상 정보를 불러오는데 실패했습니다.");
-        console.error("영상 목록 조회 실패:", error);
+        setError("데이터를 불러오는데 실패했습니다.");
+        console.error("데이터 조회 실패:", error);
       } finally {
         setIsLoading(false);
       }
     };
 
-    fetchVideos();
+    fetchData();
   }, []);
 
   if (isLoading) return <LoadingWrapper>로딩중...</LoadingWrapper>;
   if (error) return <ErrorWrapper>{error}</ErrorWrapper>;
 
   return (
-    <Container>
-      <VideoTitleH2>영상 목록</VideoTitleH2>
-      <GridContainer>
-        {videos.map((video) => (
-          <ImageCard
-            key={video.boardNo}
-            onClick={() => handleClickVideo(video.boardNo)}
-          >
-            <ThumbnailImage src={video.urls.thumbnail} alt={video.title} />
-            <VideoInfo>
-              <VideoTitle>{video.title}</VideoTitle>
-              <CreatorId>{video.loginId}</CreatorId>
-              <PointInfo>{video.point} 포인트</PointInfo>
-            </VideoInfo>
-          </ImageCard>
-        ))}
-      </GridContainer>
-    </Container>
+    <>
+      <Container>
+        <VideoTitleH2>영상 목록</VideoTitleH2>
+        <GridContainer>
+          {videos.map((video) => {
+            const creator = findCreator(video.creatorNo);
+            return (
+              <ImageCard
+                key={video.boardNo}
+                onClick={() => handleClickVideo(video)}
+              >
+                <ThumbnailImage src={video.urls.thumbnail} alt={video.title} />
+                <VideoInfo>
+                  <VideoTitle>{video.title}</VideoTitle>
+                  <CreatorId>
+                    {creator ? creator.nickname : video.loginId}
+                  </CreatorId>
+                  <PointInfo>{video.point} 포인트</PointInfo>
+                </VideoInfo>
+              </ImageCard>
+            );
+          })}
+        </GridContainer>
+      </Container>
+      {selectedBoard && (
+        <PointUseModal
+          isOpen={showPaymentModal}
+          onClose={() => {
+            setShowPaymentModal(false);
+            setSelectedBoard(null);
+          }}
+          board={selectedBoard}
+          creator={findCreator(selectedBoard.creatorNo)!}
+          onPaymentComplete={handlePaymentComplete}
+        />
+      )}
+    </>
   );
 };
 
