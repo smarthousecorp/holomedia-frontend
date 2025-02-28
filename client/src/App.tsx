@@ -29,6 +29,7 @@ import PaymentSuccess from "./pages/PaymentSuccess";
 import PaymentManage from "./pages/PaymentManage";
 import FindAccount from "./pages/FindAccount";
 import FindPassword from "./pages/FindPassword";
+import ModalExamplePage from "./pages/ModalExample";
 // interface ErrorMessageProps {
 //   message?: string;
 // }
@@ -70,6 +71,7 @@ function App() {
           <Route path="/*" element={<ErrorPage error="404" />} />
           <Route path="/error" element={<ErrorPage error="500" />} />
           <Route path="/dev-tools-alert" element={<DevToolsAlert />} />
+          <Route path="modal-example" element={<ModalExamplePage />} />
         </Route>
         <Route element={<PublicLayout />}>
           <Route path="/main" element={<Main />} />

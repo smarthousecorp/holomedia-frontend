@@ -3,8 +3,7 @@ import styled from "styled-components";
 import { ChevronRight } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import Modal from "../components/commons/Modal";
-import Button from "../components/commons/Button";
+import { ConfirmationModal } from "../components/commons/Modal";
 import { api } from "../utils/api";
 
 interface MenuItemProps {
@@ -46,21 +45,6 @@ const Settings = () => {
     }
   };
 
-  const logoutFooter = (
-    <>
-      <Button
-        onClick={() => setIsLogoutDialogOpen(false)}
-        variant="modal-cancel"
-        radius="4px"
-      >
-        {t("common.cancel")}
-      </Button>
-      <Button onClick={handleLogout} variant="modal-action" radius="4px">
-        {t("settings.logout")}
-      </Button>
-    </>
-  );
-
   return (
     <Container>
       <Header>{t("settings.title")}</Header>
@@ -74,14 +58,15 @@ const Settings = () => {
       </MenuList>
 
       {isLogoutDialogOpen && (
-        <Modal
+        <ConfirmationModal
           isOpen={isLogoutDialogOpen}
           onClose={() => setIsLogoutDialogOpen(false)}
+          onConfirm={handleLogout}
           title={t("settings.logoutModal.title")}
-          footer={logoutFooter}
-        >
-          {t("settings.logoutModal.message")}
-        </Modal>
+          content={t("settings.logoutModal.message")}
+          confirmText="확인"
+          cancelText="취소"
+        />
       )}
     </Container>
   );

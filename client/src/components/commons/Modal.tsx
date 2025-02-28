@@ -1,31 +1,89 @@
-// src/components/common/Modal.tsx
-import React from "react";
+import { ReactNode } from "react";
 import styled from "styled-components";
+// import { X } from "lucide-react";
+
+// Types
+type ModalType = "success" | "warning" | "error" | "confirmation" | "info";
 
 interface ModalProps {
   isOpen: boolean;
   onClose: () => void;
-  title: string;
-  children: React.ReactNode;
-  footer?: React.ReactNode;
+  title?: string;
+  content?: ReactNode;
+  type?: ModalType;
+  confirmText?: string;
+  cancelText?: string;
+  onConfirm?: () => void;
+  children?: ReactNode;
 }
 
-const Modal = ({ isOpen, onClose, title, children, footer }: ModalProps) => {
+// Modal Component
+const Modal = ({
+  isOpen,
+  onClose,
+  title,
+  content,
+  type = "info",
+  confirmText = "확인",
+  cancelText = "취소",
+  onConfirm,
+  children,
+}: ModalProps) => {
   if (!isOpen) return null;
 
+  // Determine if it's a confirmation modal that needs two buttons
+  const isConfirmation = type === "confirmation" || onConfirm;
+
   return (
-    <>
-      <ModalOverlay onClick={onClose} />
+    <ModalOverlay>
       <ModalContainer>
-        <ModalContent>
-          <ModalHeader>{title}</ModalHeader>
-          <ModalBody>{children}</ModalBody>
-          {footer && <ModalFooter>{footer}</ModalFooter>}
-        </ModalContent>
+        {/* <ModalCloseButton onClick={onClose}>
+          <X size={20} />
+        </ModalCloseButton> */}
+
+        {title && <ModalTitle>{title}</ModalTitle>}
+
+        {content && <ModalContent>{content}</ModalContent>}
+
+        {children}
+
+        {isConfirmation ? (
+          <ModalButtonGroup>
+            <ModalCancelButton onClick={onClose}>
+              {cancelText}
+            </ModalCancelButton>
+            <ModalConfirmButton onClick={onConfirm}>
+              {confirmText}
+            </ModalConfirmButton>
+          </ModalButtonGroup>
+        ) : (
+          <ModalButton onClick={onClose}>{confirmText}</ModalButton>
+        )}
       </ModalContainer>
-    </>
+    </ModalOverlay>
   );
 };
+
+// Pre-configured modal variants
+export const SuccessModal = (props: Omit<ModalProps, "type">) => (
+  <Modal {...props} type="success" />
+);
+
+export const ConfirmationModal = (props: Omit<ModalProps, "type">) => (
+  <Modal {...props} type="confirmation" />
+);
+
+export const WarningModal = (props: Omit<ModalProps, "type">) => (
+  <Modal {...props} type="warning" />
+);
+
+export const ErrorModal = (props: Omit<ModalProps, "type">) => (
+  <Modal {...props} type="error" />
+);
+
+export const InfoModal = (props: Omit<ModalProps, "type">) => (
+  <Modal {...props} type="info" />
+);
 
 export default Modal;
 
@@ -36,40 +94,99 @@ const ModalOverlay = styled.div`
   right: 0;
   bottom: 0;
   background-color: rgba(0, 0, 0, 0.5);
-  z-index: 100;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
 `;
 
 const ModalContainer = styled.div`
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  z-index: 101;
-`;
-
-const ModalContent = styled.div`
-  background: white;
+  background-color: white;
+  border-radius: 12px;
+  width: 90%;
+  max-width: 400px;
   padding: 24px;
-  border-radius: 8px;
-  min-width: 300px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  position: relative;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 `;
 
-const ModalHeader = styled.h2`
-  font-size: 20px;
+// const ModalCloseButton = styled.button`
+//   position: absolute;
+//   top: 16px;
+//   right: 16px;
+//   background: none;
+//   border: none;
+//   cursor: pointer;
+//   color: #6b7280;
+
+//   &:hover {
+//     color: #374151;
+//   }
+// `;
+
+const ModalTitle = styled.h2`
+  font-size: 18px;
   font-weight: 600;
-  color: #333;
   margin-bottom: 16px;
+  color: #111827;
 `;
 
-const ModalBody = styled.div`
-  font-size: 16px;
-  color: #666;
-  margin-bottom: ${(props) => (props.children ? "24px" : "0")};
+const ModalContent = styled.p`
+  font-size: 14px;
+  line-height: 1.5;
+  color: #4b5563;
+  margin-bottom: 24px;
 `;
 
-const ModalFooter = styled.div`
+const ModalButton = styled.button`
+  width: 100%;
+  padding: 12px;
+  background-color: #ef4444;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+
+  &:hover {
+    background-color: #dc2626;
+  }
+`;
+
+const ModalButtonGroup = styled.div`
   display: flex;
-  justify-content: flex-end;
   gap: 12px;
+`;
+
+const ModalCancelButton = styled.button`
+  flex: 1;
+  padding: 12px;
+  background-color: #f3f4f6;
+  color: #4b5563;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+
+  &:hover {
+    background-color: #e5e7eb;
+  }
+`;
+
+const ModalConfirmButton = styled.button`
+  flex: 1;
+  padding: 12px;
+  background-color: #ef4444;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+
+  &:hover {
+    background-color: #dc2626;
+  }
 `;
