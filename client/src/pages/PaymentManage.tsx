@@ -34,7 +34,7 @@ const PaymentManage = () => {
 
   const fetchPaymentHistory = async () => {
     try {
-      const response = await api.get(`/point/history?memberNo=${memberNo}`);
+      const response = await api.get(`/point/use/history?memberNo=${memberNo}`);
       if (response.data.code === 0) {
         setPaymentHistory(response.data.data);
       }
