@@ -7,6 +7,7 @@ import { api } from "../utils/api";
 import { useSelector } from "react-redux";
 import { RootState } from "../store";
 import { User } from "../types/user";
+import Pagination from "../components/commons/Pagination"; // 페이지네이션 컴포넌트 불러오기
 
 interface PaymentHistory {
   creatorNickname: string;
@@ -27,6 +28,13 @@ interface ChargeHistory {
   chargeAt: string;
 }
 
+interface PaginationData<T> {
+  totalPages: number;
+  currentPage: number;
+  totalCount: number;
+  list: T[];
+}
+
 const PaymentManage = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
@@ -43,10 +51,30 @@ const PaymentManage = () => {
       profile: "",
     },
   });
-  console.log(member);
 
-  const [paymentHistory, setPaymentHistory] = useState<PaymentHistory[]>([]);
-  const [chargeHistory, setChargeHistory] = useState<ChargeHistory[]>([]);
+  // 페이지네이션 상태
+  const [paymentPage, setPaymentPage] = useState<number>(1);
+  const [chargePage, setChargePage] = useState<number>(1);
+  const pageSize = 5; // 페이지당 아이템 수
+
+  // 페이지네이션 정보를 포함한 상태
+  const [paymentHistoryData, setPaymentHistoryData] = useState<
+    PaginationData<PaymentHistory>
+  >({
+    totalPages: 0,
+    currentPage: 1,
+    totalCount: 0,
+    list: [],
+  });
+
+  const [chargeHistoryData, setChargeHistoryData] = useState<
+    PaginationData<ChargeHistory>
+  >({
+    totalPages: 0,
+    currentPage: 1,
+    totalCount: 0,
+    list: [],
+  });
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
@@ -66,28 +94,41 @@ const PaymentManage = () => {
     return Math.floor(amount / 1100);
   };
 
-  const fetchPaymentHistory = async () => {
+  const fetchPaymentHistory = async (page: number) => {
     try {
-      const response = await api.get(`/point/use/history?memberNo=${memberNo}`);
+      const response = await api.get(
+        `/point/use/history?memberNo=${memberNo}&page=${page}&size=${pageSize}`
+      );
       if (response.data.code === 0) {
-        setPaymentHistory(response.data.data);
+        setPaymentHistoryData(response.data.data);
       }
     } catch (error) {
       console.error("결제 내역 조회 실패:", error);
     }
   };
 
-  const fetchChargeHistory = async () => {
+  const fetchChargeHistory = async (page: number) => {
     try {
       const response = await api.get(
-        `/point/payment/history?memberNo=${memberNo}`
+        `/point/payment/history?memberNo=${memberNo}&page=${page}&size=${pageSize}`
       );
       if (response.data.code === 0) {
-        setChargeHistory(response.data.data);
+        setChargeHistoryData(response.data.data);
       }
     } catch (error) {
       console.error("포인트 충전 내역 조회 실패:", error);
     }
+  };
+
+  // 페이지 변경 핸들러
+  const handlePaymentPageChange = (page: number) => {
+    setPaymentPage(page);
+    fetchPaymentHistory(page);
+  };
+
+  const handleChargePageChange = (page: number) => {
+    setChargePage(page);
+    fetchChargeHistory(page);
   };
 
   useEffect(() => {
@@ -105,12 +146,23 @@ const PaymentManage = () => {
   useEffect(() => {
     if (activeTab === "history") {
       if (historyType === "use") {
-        fetchPaymentHistory();
+        fetchPaymentHistory(paymentPage);
       } else {
-        fetchChargeHistory();
+        fetchChargeHistory(chargePage);
       }
     }
   }, [activeTab, historyType]);
+
+  // 히스토리 타입이 변경될 때 페이지 리셋
+  useEffect(() => {
+    if (historyType === "use") {
+      setPaymentPage(1);
+      fetchPaymentHistory(1);
+    } else {
+      setChargePage(1);
+      fetchChargeHistory(1);
+    }
+  }, [historyType]);
 
   return (
     <Container>
@@ -163,43 +215,71 @@ const PaymentManage = () => {
           </HistoryTabContainer>
 
           {historyType === "use" ? (
-            <HistoryContainer>
-              {paymentHistory.map((item, index) => (
-                <HistoryItem key={index}>
-                  <HistoryContent>
-                    <HistoryHeader>
-                      <CreatorName>{item.creatorNickname}</CreatorName>
-                      <PointAmount>{item.pointAmount} 🍯</PointAmount>
-                    </HistoryHeader>
-                    <FileName>{item.fileName}</FileName>
-                  </HistoryContent>
-                  <DateText>{formatDate(item.createdAt)}</DateText>
-                </HistoryItem>
-              ))}
-            </HistoryContainer>
+            <>
+              <HistoryContainer>
+                {paymentHistoryData.list.length > 0 ? (
+                  paymentHistoryData.list.map((item, index) => (
+                    <HistoryItem key={index}>
+                      <HistoryContent>
+                        <HistoryHeader>
+                          <CreatorName>{item.creatorNickname}</CreatorName>
+                          <PointAmount>{item.pointAmount} 🍯</PointAmount>
+                        </HistoryHeader>
+                        <FileName>{item.fileName}</FileName>
+                      </HistoryContent>
+                      <DateText>{formatDate(item.createdAt)}</DateText>
+                    </HistoryItem>
+                  ))
+                ) : (
+                  <EmptyHistory>구매 내역이 없습니다.</EmptyHistory>
+                )}
+              </HistoryContainer>
+
+              {paymentHistoryData.totalPages > 0 && (
+                <Pagination
+                  currentPage={paymentHistoryData.currentPage}
+                  totalPages={paymentHistoryData.totalPages}
+                  onPageChange={handlePaymentPageChange}
+                />
+              )}
+            </>
           ) : (
-            <HistoryContainer>
-              {chargeHistory.map((item, index) => (
-                <ChargeItem key={index}>
-                  <ChargeContent>
-                    <ChargeHeader>
-                      <CardInfo>{item.payInfo}</CardInfo>
-                      <AmountContainer>
-                        <ChargeAmount>
-                          {item.amount.toLocaleString()}원
-                        </ChargeAmount>
-                        <HoneyAmount2>
-                          {calculateHoney(item.amount)} 🍯
-                        </HoneyAmount2>
-                      </AmountContainer>
-                    </ChargeHeader>
-                    <CardNumber>{item.cardInfo}</CardNumber>
-                    <OrderNumber>주문번호: {item.orderNo}</OrderNumber>
-                  </ChargeContent>
-                  <DateText>{formatDate(item.chargeAt)}</DateText>
-                </ChargeItem>
-              ))}
-            </HistoryContainer>
+            <>
+              <HistoryContainer>
+                {chargeHistoryData.list.length > 0 ? (
+                  chargeHistoryData.list.map((item, index) => (
+                    <ChargeItem key={index}>
+                      <ChargeContent>
+                        <ChargeHeader>
+                          <CardInfo>{item.payInfo}</CardInfo>
+                          <AmountContainer>
+                            <ChargeAmount>
+                              {item.amount.toLocaleString()}원
+                            </ChargeAmount>
+                            <HoneyAmount2>
+                              {calculateHoney(item.amount)} 🍯
+                            </HoneyAmount2>
+                          </AmountContainer>
+                        </ChargeHeader>
+                        <CardNumber>{item.cardInfo}</CardNumber>
+                        <OrderNumber>주문번호: {item.orderNo}</OrderNumber>
+                      </ChargeContent>
+                      <DateText>{formatDate(item.chargeAt)}</DateText>
+                    </ChargeItem>
+                  ))
+                ) : (
+                  <EmptyHistory>충전 내역이 없습니다.</EmptyHistory>
+                )}
+              </HistoryContainer>
+
+              {chargeHistoryData.totalPages > 0 && (
+                <Pagination
+                  currentPage={chargeHistoryData.currentPage}
+                  totalPages={chargeHistoryData.totalPages}
+                  onPageChange={handleChargePageChange}
+                />
+              )}
+            </>
           )}
         </>
       )}
@@ -366,7 +446,7 @@ const ChargeItem = styled.div`
 const ChargeHeader = styled.div`
   display: flex;
   justify-content: space-between;
-  align-items: flex-start; // 변경: center에서 flex-start로
+  align-items: flex-start;
   margin-bottom: 8px;
 `;
 
@@ -386,7 +466,7 @@ const ChargeAmount = styled.span`
 const HoneyAmount2 = styled.span`
   font-size: 14px;
   font-weight: 500;
-  color: #f59e0b; // 꿀 색상
+  color: #f59e0b;
 `;
 
 const ChargeContent = styled.div`
@@ -417,4 +497,11 @@ const DateText = styled.span`
   font-size: 12px;
   color: #9ca3af;
   white-space: nowrap;
+`;
+
+const EmptyHistory = styled.div`
+  text-align: center;
+  padding: 24px 0;
+  color: #9ca3af;
+  font-size: 14px;
 `;
