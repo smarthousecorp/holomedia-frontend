@@ -6,6 +6,7 @@ import { useState, useEffect } from "react";
 import { api } from "../utils/api";
 import { useSelector } from "react-redux";
 import { RootState } from "../store";
+import { User } from "../types/user";
 
 interface PaymentHistory {
   creatorNickname: string;
@@ -14,12 +15,38 @@ interface PaymentHistory {
   createdAt: string;
 }
 
+interface ChargeHistory {
+  cardInfo: string;
+  pgcode: string;
+  payInfo: string;
+  taxAmount: number;
+  amount: number;
+  tid: string;
+  orderNo: string;
+  paymentNo: number;
+  chargeAt: string;
+}
+
 const PaymentManage = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const memberNo = useSelector((state: RootState) => state.user.memberNo);
   const [activeTab, setActiveTab] = useState<"payment" | "history">("payment");
+  const [historyType, setHistoryType] = useState<"use" | "charge">("charge");
+  const [member, setMember] = useState<User>({
+    memberNo: 0,
+    nickname: "",
+    point: 0,
+    loginId: "",
+    urls: {
+      background: "",
+      profile: "",
+    },
+  });
+  console.log(member);
+
   const [paymentHistory, setPaymentHistory] = useState<PaymentHistory[]>([]);
+  const [chargeHistory, setChargeHistory] = useState<ChargeHistory[]>([]);
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
@@ -30,6 +57,13 @@ const PaymentManage = () => {
     const minutes = String(date.getMinutes()).padStart(2, "0");
 
     return `${year}.${month}.${day} ${hours}:${minutes}`;
+  };
+
+  // 꿀 계산 함수
+  const calculateHoney = (amount: number) => {
+    // 여기에 실제 계산식 적용
+    // 1000원 + 부가세 10% 당 1꿀 (1100원)
+    return Math.floor(amount / 1100);
   };
 
   const fetchPaymentHistory = async () => {
@@ -43,11 +77,40 @@ const PaymentManage = () => {
     }
   };
 
+  const fetchChargeHistory = async () => {
+    try {
+      const response = await api.get(
+        `/point/payment/history?memberNo=${memberNo}`
+      );
+      if (response.data.code === 0) {
+        setChargeHistory(response.data.data);
+      }
+    } catch (error) {
+      console.error("포인트 충전 내역 조회 실패:", error);
+    }
+  };
+
+  useEffect(() => {
+    const fetchMemberData = async () => {
+      try {
+        const response = await api.get(`member?memberNo=${memberNo}`);
+        setMember(response.data.data);
+      } catch (error) {
+        console.error("멤버 조회 실패 :", error);
+      }
+    };
+    fetchMemberData();
+  }, [memberNo]);
+
   useEffect(() => {
     if (activeTab === "history") {
-      fetchPaymentHistory();
+      if (historyType === "use") {
+        fetchPaymentHistory();
+      } else {
+        fetchChargeHistory();
+      }
     }
-  }, [activeTab]);
+  }, [activeTab, historyType]);
 
   return (
     <Container>
@@ -75,7 +138,7 @@ const PaymentManage = () => {
         <PaymentMethodContainer>
           <HoneyInfoContainer>
             <HoneyLabel>보유 꿀</HoneyLabel>
-            <HoneyAmount>9 🍯</HoneyAmount>
+            <HoneyAmount>{member.point} 🍯</HoneyAmount>
           </HoneyInfoContainer>
           <AddPaymentButton>
             <PlusIcon>+</PlusIcon>
@@ -83,20 +146,62 @@ const PaymentManage = () => {
           </AddPaymentButton>
         </PaymentMethodContainer>
       ) : (
-        <HistoryContainer>
-          {paymentHistory.map((item, index) => (
-            <HistoryItem key={index}>
-              <HistoryContent>
-                <HistoryHeader>
-                  <CreatorName>{item.creatorNickname}</CreatorName>
-                  <PointAmount>{item.pointAmount} 🍯</PointAmount>
-                </HistoryHeader>
-                <FileName>{item.fileName}</FileName>
-              </HistoryContent>
-              <DateText>{formatDate(item.createdAt)}</DateText>
-            </HistoryItem>
-          ))}
-        </HistoryContainer>
+        <>
+          <HistoryTabContainer>
+            <HistoryTab
+              active={historyType === "charge"}
+              onClick={() => setHistoryType("charge")}
+            >
+              포인트 충전 내역
+            </HistoryTab>
+            <HistoryTab
+              active={historyType === "use"}
+              onClick={() => setHistoryType("use")}
+            >
+              콘텐츠 구매 내역
+            </HistoryTab>
+          </HistoryTabContainer>
+
+          {historyType === "use" ? (
+            <HistoryContainer>
+              {paymentHistory.map((item, index) => (
+                <HistoryItem key={index}>
+                  <HistoryContent>
+                    <HistoryHeader>
+                      <CreatorName>{item.creatorNickname}</CreatorName>
+                      <PointAmount>{item.pointAmount} 🍯</PointAmount>
+                    </HistoryHeader>
+                    <FileName>{item.fileName}</FileName>
+                  </HistoryContent>
+                  <DateText>{formatDate(item.createdAt)}</DateText>
+                </HistoryItem>
+              ))}
+            </HistoryContainer>
+          ) : (
+            <HistoryContainer>
+              {chargeHistory.map((item, index) => (
+                <ChargeItem key={index}>
+                  <ChargeContent>
+                    <ChargeHeader>
+                      <CardInfo>{item.payInfo}</CardInfo>
+                      <AmountContainer>
+                        <ChargeAmount>
+                          {item.amount.toLocaleString()}원
+                        </ChargeAmount>
+                        <HoneyAmount2>
+                          {calculateHoney(item.amount)} 🍯
+                        </HoneyAmount2>
+                      </AmountContainer>
+                    </ChargeHeader>
+                    <CardNumber>{item.cardInfo}</CardNumber>
+                    <OrderNumber>주문번호: {item.orderNo}</OrderNumber>
+                  </ChargeContent>
+                  <DateText>{formatDate(item.chargeAt)}</DateText>
+                </ChargeItem>
+              ))}
+            </HistoryContainer>
+          )}
+        </>
       )}
     </Container>
   );
@@ -139,6 +244,27 @@ const Tab = styled.div<{ active: boolean }>`
   color: ${(props) => (props.active ? "#000" : "#6b7280")};
   border-bottom: 2px solid
     ${(props) => (props.active ? "#eb3553" : "transparent")};
+`;
+
+const HistoryTabContainer = styled.div`
+  display: flex;
+  margin: 0 12px 20px 12px;
+  background-color: #f3f4f6;
+  border-radius: 8px;
+  padding: 4px;
+`;
+
+const HistoryTab = styled.div<{ active: boolean }>`
+  flex: 1;
+  text-align: center;
+  padding: 8px 12px;
+  cursor: pointer;
+  font-size: 1.3rem;
+  font-weight: ${(props) => (props.active ? "600" : "400")};
+  color: ${(props) => (props.active ? "#fff" : "#6b7280")};
+  background-color: ${(props) => (props.active ? "#eb3553" : "transparent")};
+  border-radius: 6px;
+  transition: all 0.2s ease-in-out;
 `;
 
 const PaymentMethodContainer = styled.div`
@@ -224,6 +350,63 @@ const PointAmount = styled.span`
 const FileName = styled.p`
   font-size: 14px;
   color: #6b7280;
+  margin: 0;
+`;
+
+const ChargeItem = styled.div`
+  position: relative;
+  padding: 16px 0;
+  border-bottom: 1px solid #e5e7eb;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+`;
+
+const ChargeHeader = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start; // 변경: center에서 flex-start로
+  margin-bottom: 8px;
+`;
+
+const AmountContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 4px;
+`;
+
+const ChargeAmount = styled.span`
+  font-size: 16px;
+  font-weight: 600;
+  color: #eb3553;
+`;
+
+const HoneyAmount2 = styled.span`
+  font-size: 14px;
+  font-weight: 500;
+  color: #f59e0b; // 꿀 색상
+`;
+
+const ChargeContent = styled.div`
+  flex: 1;
+`;
+
+const CardInfo = styled.span`
+  font-size: 16px;
+  font-weight: 500;
+`;
+
+const CardNumber = styled.p`
+  font-size: 14px;
+  color: #6b7280;
+  margin: 0 0 4px 0;
+`;
+
+const OrderNumber = styled.p`
+  font-size: 13px;
+  color: #9ca3af;
   margin: 0;
 `;
 
