@@ -171,6 +171,7 @@ const BaseSidebar = ({
             <BusinessText>{t("sidebar.footer.info.company")}</BusinessText>
             <BusinessText>{t("sidebar.footer.info.registration")}</BusinessText>
             <BusinessText>{t("sidebar.footer.info.address")}</BusinessText>
+            <BusinessText>{"고객센터 : 1533-4965"}</BusinessText>
             <Copyright>{t("sidebar.footer.info.copyright")}</Copyright>
           </BusinessInfo>
         </Footer>

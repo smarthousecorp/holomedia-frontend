@@ -1,6 +1,6 @@
 import { useTranslation } from "react-i18next";
 import styled from "styled-components";
-import { ChevronLeft, Camera } from "lucide-react";
+import { ChevronLeft, Camera, X } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { ChangeEvent, useState, useEffect } from "react";
 import { useSelector } from "react-redux";
@@ -29,6 +29,10 @@ const ProfileSetting = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const memberNo = useSelector((state: RootState) => state.user.memberNo);
+  const [showModal, setShowModal] = useState(false);
+  const [modalType, setModalType] = useState<"success" | "withdrawal">(
+    "success"
+  );
 
   const [values, setValues] = useState<ProfileValues>({
     userId: "",
@@ -126,12 +130,31 @@ const ProfileSetting = () => {
       });
 
       if (response.data.code === 0) {
-        alert("프로필이 성공적으로 수정되었습니다.");
-        navigate("/settings");
+        setModalType("success");
+        setShowModal(true);
+        // 모달에서 확인 버튼 클릭 시 navigate("/settings")로 이동
       }
     } catch (error) {
       alert("프로필 수정 중 오류가 발생했습니다.");
       console.error(error);
+    }
+  };
+
+  const handleWithdrawal = () => {
+    setModalType("withdrawal");
+    setShowModal(true);
+  };
+
+  const confirmWithdrawal = async () => {
+    try {
+      // 회원탈퇴 API 호출 로직 추가
+      const response = await api.delete(`/member/${memberNo}`);
+      console.log(response);
+
+      // 탈퇴 성공 시 로그인 페이지로 이동
+      navigate("/");
+    } catch (error) {
+      console.error("회원탈퇴 중 오류가 발생했습니다:", error);
     }
   };
 
@@ -197,7 +220,51 @@ const ProfileSetting = () => {
         </InputContainer>
 
         <SaveButton onClick={handleSave}>저장</SaveButton>
+        <WithdrawalLink onClick={handleWithdrawal}>회원탈퇴</WithdrawalLink>
       </FormContainer>
+
+      {/* 모달 */}
+      {showModal && (
+        <ModalOverlay>
+          <ModalContainer>
+            <ModalCloseButton onClick={() => setShowModal(false)}>
+              <X size={20} />
+            </ModalCloseButton>
+
+            {modalType === "success" ? (
+              <>
+                <ModalTitle>프로필 수정 완료</ModalTitle>
+                <ModalContent>프로필이 성공적으로 수정되었습니다.</ModalContent>
+                <ModalButton
+                  onClick={() => {
+                    setShowModal(false);
+                    navigate("/settings");
+                  }}
+                >
+                  확인
+                </ModalButton>
+              </>
+            ) : (
+              <>
+                <ModalTitle>회원탈퇴</ModalTitle>
+                <ModalContent>
+                  정말 회원탈퇴를 진행하시겠습니까?
+                  <br />
+                  탈퇴 시 계정 정보가 모두 삭제됩니다.
+                </ModalContent>
+                <ModalButtonGroup>
+                  <ModalCancelButton onClick={() => setShowModal(false)}>
+                    취소
+                  </ModalCancelButton>
+                  <ModalConfirmButton onClick={confirmWithdrawal}>
+                    탈퇴하기
+                  </ModalConfirmButton>
+                </ModalButtonGroup>
+              </>
+            )}
+          </ModalContainer>
+        </ModalOverlay>
+      )}
     </Container>
   );
 };
@@ -249,10 +316,6 @@ const BackgroundImage = styled.div<{ url: string }>`
 
 const ProfileImageContainer = styled.div`
   position: absolute;
-  /* top: 150px; // 위치 조정
-  left: 50%; // 중앙 정렬을 위해
-  transform: translateX(-50%); // 중앙 정렬을 위해 */
-
   top: 200px;
   left: 40px;
   z-index: 1;
@@ -308,10 +371,7 @@ const InputContainer = styled.div`
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
-  margin-top: ${(props) =>
-    props.className === "nickname"
-      ? "30px"
-      : "0"}; // 첫 번째 입력 필드의 마진 조정
+  margin-top: ${(props) => (props.className === "nickname" ? "30px" : "0")};
 `;
 
 const StyledInput = styled.input`
@@ -344,36 +404,10 @@ const InputLabel = styled.label`
   margin-bottom: 4px;
 `;
 
-// const StyledTextArea = styled.textarea`
-//   width: 100%;
-//   min-height: 120px;
-//   padding: 12px;
-//   border: 1px solid #e5e7eb;
-//   border-radius: 8px;
-//   font-size: 14px;
-//   resize: vertical;
-//   line-height: 1.5;
-
-//   &:focus {
-//     outline: none;
-//     border-color: #94a3b8;
-//   }
-
-//   &::placeholder {
-//     color: #9ca3af;
-//   }
-// `;
-
-// const CharCount = styled.span`
-//   font-size: 12px;
-//   color: #6b7280;
-//   text-align: right;
-// `;
-
 const SaveButton = styled.button`
   width: 100%;
   padding: 14px;
-  background-color: #8b5cf6;
+  background-color: #ef4444;
   color: white;
   border: none;
   border-radius: 8px;
@@ -383,6 +417,124 @@ const SaveButton = styled.button`
   margin-top: 1rem;
 
   &:hover {
-    background-color: #7c3aed;
+    background-color: #dc2626;
+  }
+`;
+
+const WithdrawalLink = styled.span`
+  font-size: 12px;
+  color: #6b7280;
+  text-align: center;
+  margin-top: 8px;
+  cursor: pointer;
+
+  &:hover {
+    text-decoration: underline;
+    color: #ef4444;
+  }
+`;
+
+// 모달 관련 스타일
+const ModalOverlay = styled.div`
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+`;
+
+const ModalContainer = styled.div`
+  background-color: white;
+  border-radius: 12px;
+  width: 90%;
+  max-width: 400px;
+  padding: 24px;
+  position: relative;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+`;
+
+const ModalCloseButton = styled.button`
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #6b7280;
+
+  &:hover {
+    color: #374151;
+  }
+`;
+
+const ModalTitle = styled.h2`
+  font-size: 18px;
+  font-weight: 600;
+  margin-bottom: 16px;
+  color: #111827;
+`;
+
+const ModalContent = styled.p`
+  font-size: 14px;
+  line-height: 1.5;
+  color: #4b5563;
+  margin-bottom: 24px;
+`;
+
+const ModalButton = styled.button`
+  width: 100%;
+  padding: 12px;
+  background-color: #ef4444;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+
+  &:hover {
+    background-color: #dc2626;
+  }
+`;
+
+const ModalButtonGroup = styled.div`
+  display: flex;
+  gap: 12px;
+`;
+
+const ModalCancelButton = styled.button`
+  flex: 1;
+  padding: 12px;
+  background-color: #f3f4f6;
+  color: #4b5563;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+
+  &:hover {
+    background-color: #e5e7eb;
+  }
+`;
+
+const ModalConfirmButton = styled.button`
+  flex: 1;
+  padding: 12px;
+  background-color: #ef4444;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+
+  &:hover {
+    background-color: #dc2626;
   }
 `;
