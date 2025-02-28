@@ -142,10 +142,12 @@ const ProfileSetting = () => {
   const confirmWithdrawal = async () => {
     try {
       // 회원탈퇴 API 호출 로직 추가
-      await api.delete(`/member?memberNo=${memberNo}`);
+      const response = await api.delete(`/member?memberNo=${memberNo}`);
 
       // 탈퇴 성공 시 로그인 페이지로 이동
-      navigate("/");
+      if (response.data.code === 0) {
+        navigate("/");
+      }
     } catch (error) {
       console.error("회원탈퇴 중 오류가 발생했습니다:", error);
     }
