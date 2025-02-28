@@ -1,5 +1,5 @@
 import { Outlet } from "react-router";
-import { css, styled } from "styled-components";
+import { styled } from "styled-components";
 import Header from "../commons/Header";
 import DefaultSidebar from "../commons/sidebar/DefaultSidebar";
 import BottomSidebar from "../commons/sidebar/BottomSidebar";
@@ -52,8 +52,10 @@ const PublicLayout = () => {
   return (
     <LayoutContainer>
       <Header />
-      <LayoutInner $path={location.pathname}>
-        <DefaultSidebarStyled onPaymentClick={handlePaymentModalOpen} />
+      <LayoutContent>
+        <DefaultSidebarWrapper>
+          <DefaultSidebarStyled onPaymentClick={handlePaymentModalOpen} />
+        </DefaultSidebarWrapper>
         <MainContentWrapper $path={location.pathname}>
           <ContentContainer
             $isSettingsPage={location.pathname.startsWith("/settings")}
@@ -69,7 +71,7 @@ const PublicLayout = () => {
           )}
         </MainContentWrapper>
         <BottomSidebar onProfileClick={toggleBottomSidebar} />
-      </LayoutInner>
+      </LayoutContent>
       {isOpenBS && (
         <OverlayBackground onClick={toggleBottomSidebar}>
           <MobileSidebar
@@ -89,18 +91,51 @@ export default PublicLayout;
 const LayoutContainer = styled.div`
   position: relative;
   width: 100%;
+  height: 100vh;
+  overflow: hidden;
   display: flex;
   flex-direction: column;
 `;
 
-const LayoutInner = styled.div<{ $path?: string }>`
-  width: 100%;
-  height: 100vh;
-  background-color: #ededed;
+const LayoutContent = styled.div`
+  position: relative;
   display: flex;
-  overflow-y: auto;
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
+  background-color: #ededed;
+`;
 
-  /* 웹킷 스크롤바 스타일링 */
+const DefaultSidebarWrapper = styled.div`
+  position: fixed;
+  left: 0;
+  top: 0;
+  height: 100vh;
+  width: 250px; /* BaseSidebar에서 가져온 너비 */
+  z-index: 10;
+
+  @media (max-width: 900px) {
+    display: none;
+  }
+`;
+
+const DefaultSidebarStyled = styled(DefaultSidebar)`
+  height: 100vh;
+
+  @media (max-width: 900px) {
+    display: none;
+  }
+`;
+
+const MainContentWrapper = styled.div<{ $path?: string }>`
+  display: flex;
+  flex: 1;
+  margin-left: 350px; /* 사이드바 너비 */
+  height: 100vh;
+  overflow-y: auto;
+  gap: 2rem;
+
+  /* 스크롤바 스타일링 */
   &::-webkit-scrollbar {
     width: 10px;
   }
@@ -119,70 +154,45 @@ const LayoutInner = styled.div<{ $path?: string }>`
     background: linear-gradient(180deg, #d42e4a 0%, #eb3553 100%);
   }
 
-  @media (max-width: 900px) {
-    ${({ $path }) => {
-      const isVideoPath = /^\/video\/[^/]+$/.test($path || "");
-      return (
-        !isVideoPath &&
-        css`
-          padding-top: 7rem;
-        `
-      );
-    }}
-    overflow-y: visible;
-  }
-`;
-
-const MainContentWrapper = styled.div<{ $path?: string }>`
-  display: flex;
-  width: 100%;
-  padding-top: ${({ $path }) =>
-    $path?.startsWith("/settings") ? "0" : "2rem"};
-  /* Content와 배너 사이의 간격을 flex gap으로 설정 */
-  gap: 2rem;
-
   @media (max-width: 1150px) {
-    /* 배너가 사라지는 시점에서 gap 제거 */
     gap: 0;
   }
 
   @media (max-width: 900px) {
+    margin-left: 0;
+    height: calc(100vh - 70px); /* 모바일 헤더 높이 70px 고려 */
+    padding-top: 70px; /* 모바일 헤더 높이만큼 패딩 추가 */
     flex-direction: column;
-    padding-top: 0;
   }
 `;
 
 const ContentContainer = styled.main<{ $isSettingsPage: boolean }>`
   flex: 1;
-  overflow-y: auto;
+  max-width: ${(props) => (props.$isSettingsPage ? "none" : "950px")};
   background-color: ${(props) => (props.$isSettingsPage ? "#fff" : "#ededed")};
   border-left: ${(props) =>
     props.$isSettingsPage ? "2px solid #eee" : "none"};
-  /* 컨텐츠 영역 가운데 정렬을 위한 설정 */
   display: flex;
-  /* justify-content: center; */
 `;
 
 const MainSection = styled.div`
   width: 100%;
-  max-width: 1050px;
-  /* 여백은 유지하되 가로 스크롤 문제 해결 */
-  padding: 0 4rem 5rem;
+  max-width: 950px;
+  padding: 2rem 4rem 5rem;
 
-  /* 1200px 이하에서 패딩 조정 */
   @media (max-width: 1200px) {
-    padding: 0 2rem 5rem;
+    padding: 2rem 2rem 5rem;
   }
 
   @media (max-width: 900px) {
     max-width: 100%;
-    padding: 0 1rem 10rem;
+    padding: 1rem 1rem 10rem;
   }
 `;
 
 const SideBannerContainer = styled.aside`
-  width: 300px; /* 배너 너비 고정 */
-  flex-shrink: 0; /* 배너 크기 축소 방지 */
+  width: 300px;
+  flex-shrink: 0;
   margin-right: 4rem;
   position: sticky;
   top: 2rem;
@@ -190,12 +200,6 @@ const SideBannerContainer = styled.aside`
   align-self: flex-start;
 
   @media (max-width: 1400px) {
-    display: none;
-  }
-`;
-
-const DefaultSidebarStyled = styled(DefaultSidebar)`
-  @media (max-width: 900px) {
     display: none;
   }
 `;

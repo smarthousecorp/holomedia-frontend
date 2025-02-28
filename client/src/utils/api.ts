@@ -33,6 +33,23 @@ api.interceptors.response.use(
       // 이후 코드 실행 방지
       return new Promise(() => {});
     }
+
+    // 502 에러 발생시 (서버가 닫힌 경우)
+    if (error.response?.status === 502) {
+      // 모든 요청 취소
+      const cancelToken = axios.CancelToken.source();
+      api.defaults.cancelToken = cancelToken.token;
+      cancelToken.cancel("서버 연결 불가로 인한 모든 요청 취소");
+
+      // 알림 표시
+      alert("서버에 연결할 수 없습니다. 잠시 후 다시 시도해주세요.");
+
+      // 선택적: 홈페이지나 오류 페이지로 리다이렉트
+      window.location.href = "/";
+
+      // 이후 코드 실행 방지
+      return new Promise(() => {});
+    }
     return Promise.reject(error);
   }
 );
