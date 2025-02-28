@@ -370,10 +370,6 @@ const SignUp: React.FC = () => {
               verificationType={"signup"}
             />
 
-            {/* <VerificationButton type="button" onClick={handleClickPaymentBtn}>
-              결제하기
-            </VerificationButton> */}
-
             {/* 약관 동의 섹션 */}
             <TermsSection>
               <CustomCheckbox
@@ -427,7 +423,9 @@ const SignUp: React.FC = () => {
                 !validationResults.idValid ||
                 !validationResults.passwordValid ||
                 !validationResults.passwordsMatch ||
-                !validationResults.nicknameValid
+                !validationResults.nicknameValid ||
+                !inputVal.termsAgreed ||
+                !verificationData
               }
             >
               {t("auth.signup.button")}

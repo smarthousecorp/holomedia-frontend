@@ -7,7 +7,7 @@ import { api } from "../utils/api";
 import { useSelector } from "react-redux";
 import { RootState } from "../store";
 import { User } from "../types/user";
-import Pagination from "../components/commons/Pagination"; // 페이지네이션 컴포넌트 불러오기
+import Pagination from "../components/commons/Pagination";
 
 interface PaymentHistory {
   creatorNickname: string;

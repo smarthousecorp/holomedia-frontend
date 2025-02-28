@@ -69,7 +69,10 @@ const Login: React.FC = () => {
   const onClickLoginBtn = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!inputVal.id || !inputVal.password) {
+    // 로그인 시도 전에 입력값의 앞뒤 공백 제거
+    const trimmedId = inputVal.id.trim();
+
+    if (!trimmedId || !inputVal.password) {
       setErrorMsg((prev) => ({
         ...prev,
         id: t("auth.login.errors.requiredFields"),
@@ -78,10 +81,13 @@ const Login: React.FC = () => {
     }
 
     try {
-      const res = await api.post<ApiResponse>(`/login`, inputVal);
+      const res = await api.post<ApiResponse>(`/login`, {
+        id: trimmedId,
+        password: inputVal.password,
+      });
 
       if (rememberID) {
-        localStorage.setItem("remembered_id", inputVal.id);
+        localStorage.setItem("remembered_id", trimmedId);
       } else {
         localStorage.removeItem("remembered_id");
       }
