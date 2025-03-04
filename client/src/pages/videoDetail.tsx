@@ -14,6 +14,8 @@ import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import { api } from "../utils/api";
 
 import VideoPlayer from "../components/commons/media/VideoPlayer";
+import { useSelector } from "react-redux";
+import { RootState } from "../store";
 
 interface PaymentStatus {
   message?: string;
@@ -27,6 +29,7 @@ const VideoDetail = () => {
 
   // const isAdmin = useSelector((state: RootState) => state.user.is_admin);
   const isAdmin = false;
+  const memberNo = useSelector((state: RootState) => state.user.memberNo);
 
   const [media, setMedia] = useState<board>();
   const [showPaymentDialog, setShowPaymentDialog] = useState<boolean>(false);
@@ -60,8 +63,6 @@ const VideoDetail = () => {
   const fetchMediaData = async () => {
     try {
       const response = await api.get(`/board?boardNo=${id}`);
-
-      console.log(response);
       setMedia(response.data.data);
     } catch (error) {
       const { response } = error as any;
@@ -72,9 +73,48 @@ const VideoDetail = () => {
     }
   };
 
+  const fetchViewCount = async () => {
+    try {
+      if (!media?.boardNo) return; // boardNo가 없으면 실행하지 않음
+
+      const viewedBoards = JSON.parse(
+        localStorage.getItem("viewedBoards") || "[]"
+      );
+
+      if (!viewedBoards.includes(media?.boardNo)) {
+        await api.post(`/board/view`, {
+          boardNo: media?.boardNo,
+          memberNo: memberNo,
+          creatorNo: media?.creatorNo,
+        });
+
+        viewedBoards.push(media?.boardNo);
+
+        // 50개까지만 저장 (오래된 기록 삭제)
+        if (viewedBoards.length > 50) {
+          viewedBoards.shift();
+        }
+
+        localStorage.setItem("viewedBoards", JSON.stringify(viewedBoards));
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   useEffect(() => {
-    fetchMediaData();
+    const fetchData = async () => {
+      await fetchMediaData();
+    };
+
+    fetchData();
   }, [id]);
+
+  useEffect(() => {
+    if (media?.boardNo) {
+      fetchViewCount();
+    }
+  }, [media]);
 
   return (
     <VideoDetailContainer>
