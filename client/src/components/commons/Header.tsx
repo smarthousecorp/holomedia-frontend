@@ -1,6 +1,7 @@
 import styled, { css } from "styled-components";
 import logo from "../../assets/logo_test.png";
 import { useLocation, useNavigate } from "react-router-dom";
+import { navigateOrScrollTop } from "../../utils/navigation";
 
 const Header = () => {
   const navigate = useNavigate();
@@ -10,7 +11,13 @@ const Header = () => {
     <>
       <Container $path={location.pathname}>
         <Logo>
-          <img src={logo} alt="로고" onClick={() => navigate("/main")} />
+          <img
+            src={logo}
+            alt="로고"
+            onClick={() =>
+              navigateOrScrollTop(navigate, location.pathname, "/main")
+            }
+          />
         </Logo>
       </Container>
     </>

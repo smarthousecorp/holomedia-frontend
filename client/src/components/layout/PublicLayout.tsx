@@ -56,7 +56,7 @@ const PublicLayout = () => {
         <DefaultSidebarWrapper>
           <DefaultSidebarStyled onPaymentClick={handlePaymentModalOpen} />
         </DefaultSidebarWrapper>
-        <MainContentWrapper $path={location.pathname}>
+        <MainContentWrapper id="main-content-wrapper" $path={location.pathname}>
           <ContentContainer
             $isSettingsPage={location.pathname.startsWith("/settings")}
           >
@@ -72,15 +72,15 @@ const PublicLayout = () => {
         </MainContentWrapper>
         <BottomSidebar onProfileClick={toggleBottomSidebar} />
       </LayoutContent>
-      {isOpenBS && (
-        <OverlayBackground onClick={toggleBottomSidebar}>
-          <MobileSidebar
-            isOpen={isOpenBS}
-            onClose={toggleBottomSidebar}
-            onPaymentClick={handlePaymentModalOpen}
-          />
-        </OverlayBackground>
-      )}
+      <>
+        {/* 오버레이와 사이드바 모두 항상 렌더링하되, 오버레이의 visibility나 opacity를 조절 */}
+        <OverlayBackground $isOpen={isOpenBS} onClick={toggleBottomSidebar} />
+        <MobileSidebar
+          isOpen={isOpenBS}
+          onClose={toggleBottomSidebar}
+          onPaymentClick={handlePaymentModalOpen}
+        />
+      </>
       {showPaymentModal && <PaymentModal onClose={handlePaymentModalClose} />}
     </LayoutContainer>
   );
@@ -204,14 +204,17 @@ const SideBannerContainer = styled.aside`
   }
 `;
 
-const OverlayBackground = styled.div`
+const OverlayBackground = styled.div<{ $isOpen: boolean }>`
   position: fixed;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
   background-color: rgba(0, 0, 0, 0.5);
-  z-index: 1000;
+  z-index: 999;
   display: flex;
   justify-content: flex-end;
+  opacity: ${({ $isOpen }) => ($isOpen ? 1 : 0)};
+  visibility: ${({ $isOpen }) => ($isOpen ? "visible" : "hidden")};
+  transition: opacity 0.35s ease, visibility 0.35s ease;
 `;

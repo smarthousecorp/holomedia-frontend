@@ -30,6 +30,7 @@ import PaymentManage from "./pages/PaymentManage";
 import FindAccount from "./pages/FindAccount";
 import FindPassword from "./pages/FindPassword";
 import ModalExamplePage from "./pages/ModalExample";
+import ScrollToTop from "./components/commons/ScrollToTop";
 // interface ErrorMessageProps {
 //   message?: string;
 // }
@@ -57,6 +58,7 @@ function App() {
 
   return (
     <>
+      <ScrollToTop />
       <Routes>
         <Route element={<MainLayout />}>
           <Route path="/" element={<Login />} />
