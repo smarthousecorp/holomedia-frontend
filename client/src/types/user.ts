@@ -28,9 +28,14 @@ export interface Creator {
   loginId: string;
   nickname: string;
   content: string;
-  createdAt: string;
+  modifier: number;
   profile: string;
   background: string;
+  totalBoardCount: number;
+  totalViewCount: number;
+  createdAt: string;
+  updatedAt: string;
+  deletedAt: string;
 }
 
 export interface UploaderResponse {

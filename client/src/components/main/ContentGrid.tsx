@@ -25,8 +25,6 @@ const ContentGrid: React.FC<ContentGridProps> = ({
     return creators.find((creator) => creator.no === creatorNo);
   };
 
-  console.log(boards);
-
   return (
     <GridContainer>
       {boards.map((board) => (
@@ -107,8 +105,12 @@ const ContentGrid: React.FC<ContentGridProps> = ({
                   <Username>{findCreator(board.creatorNo)?.nickname}</Username>
                   <UploaderStats>
                     <span>@{findCreator(board.creatorNo)?.loginId}</span>
-                    <span>1개의 영상</span>
-                    <span>총 조회수 0</span>
+                    <span>{`${
+                      findCreator(board.creatorNo)?.totalBoardCount
+                    }개의 영상`}</span>
+                    <span>{`총 조회수 ${
+                      findCreator(board.creatorNo)?.totalViewCount
+                    }`}</span>
                   </UploaderStats>
                 </GradientOverlay>
               </CreatorContent>
