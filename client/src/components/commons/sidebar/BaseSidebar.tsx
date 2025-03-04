@@ -17,6 +17,7 @@ import { RootState } from "../../../store";
 import GgulImg from "../../../assets/Ggul.png";
 import PaymentModal from "../../main/PaymentModal";
 import { useUserInfo } from "../../../hooks/useUserInfo";
+import { navigateOrScrollTop } from "../../../utils/navigation";
 
 interface BaseSidebarProps {
   isOpen?: boolean;
@@ -75,7 +76,9 @@ const BaseSidebar = ({
             <img
               src={logo}
               alt={t("sidebar.logo.alt")}
-              onClick={() => navigate("/main")}
+              onClick={() =>
+                navigateOrScrollTop(navigate, location.pathname, "/main")
+              }
             />
             {variant === "mobile" && (
               <SvgIcon
@@ -109,9 +112,9 @@ const BaseSidebar = ({
           </LanguageSwitcherWrapper>
           <NavList>
             <SidebarLi
-              onClick={() => {
-                navigate("/main");
-              }}
+              onClick={() =>
+                navigateOrScrollTop(navigate, location.pathname, "/main")
+              }
             >
               <img src={homeIcon} alt="홈" />
               <p>{t("sidebar.nav.home")}</p>
@@ -218,19 +221,19 @@ const SidebarContainer = styled.nav<{
       position: fixed;
       top: 0;
       height: 100vh;
-      right: -26rem;
-      transition: left 0.35s ease;
+      right: ${$isOpen ? "0" : "-26rem"}; /* 오른쪽에서 슬라이드 */
+      transition: right 0.35s ease;
       box-shadow: 2px 0 5px rgba(0, 0, 0, 0.5);
       z-index: 999;
 
-      @media (min-width: 900px) {
+      /* @media (min-width: 900px) {
         display: none;
-      }
+      } */
 
-      ${$isOpen &&
+      /* ${$isOpen &&
       css`
         right: 0;
-      `}
+      `} */
     `}
 `;
 
