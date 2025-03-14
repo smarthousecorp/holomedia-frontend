@@ -37,9 +37,14 @@ const User = () => {
     loginId: "",
     nickname: "",
     content: "",
-    createdAt: "",
+    modifier: 0,
     profile: "",
     background: "",
+    totalBoardCount: 0,
+    totalViewCount: 0,
+    updatedAt: "",
+    createdAt: "",
+    deletedAt: "",
   });
   // 영상 결제시도 시 상태 관리
   const [selectedBoard, setSelectedBoard] = useState<board | null>(null);

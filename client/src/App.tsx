@@ -1,4 +1,4 @@
-import { Routes, Route, useLocation } from "react-router-dom";
+import { Routes, Route, useLocation, Navigate } from "react-router-dom";
 import Main from "./pages/main";
 import MainLayout from "./components/layout/MainLayout";
 import "./index.css";
@@ -70,8 +70,11 @@ function App() {
           <Route path="/nice/password" element={<NiceReturnPage />} />
           <Route path="/api/payment/success" element={<PaymentReturn />} />
           <Route path="/payment/success" element={<PaymentSuccess />} />
-          <Route path="/*" element={<ErrorPage error="404" />} />
-          <Route path="/error" element={<ErrorPage error="500" />} />
+          <Route
+            path="/*"
+            element={<Navigate to="/error?type=404" replace />}
+          />
+          <Route path="/error" element={<ErrorPage />} />
           <Route path="/dev-tools-alert" element={<DevToolsAlert />} />
           <Route path="modal-example" element={<ModalExamplePage />} />
         </Route>
