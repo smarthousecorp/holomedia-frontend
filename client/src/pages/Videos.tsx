@@ -6,6 +6,7 @@ import { board } from "../types/board";
 import PointUseModal from "../components/commons/media/PointUseModal";
 import { Creator } from "../types/user";
 import badgeIcon from "../assets/19_badge.png"; // 19 뱃지 이미지 import
+import { SkeletonCard } from "../components/commons/Skeleton";
 
 interface DataResponse {
   pagination: {
@@ -104,7 +105,18 @@ const Videos: React.FC = () => {
     fetchData();
   }, []);
 
-  if (isLoading) return <LoadingWrapper>로딩중...</LoadingWrapper>;
+  if (isLoading)
+    return (
+      <Container>
+        <VideoTitleH2>영상 목록</VideoTitleH2>
+        <GridContainer>
+          {[...Array(8)].map((_, index) => (
+            <SkeletonCard key={index} />
+          ))}
+        </GridContainer>
+      </Container>
+    );
+
   if (error) return <ErrorWrapper>{error}</ErrorWrapper>;
 
   return (
@@ -251,15 +263,6 @@ const PointAmount = styled.div`
   background-color: rgba(0, 0, 0, 0.6);
   padding: 8px 16px;
   border-radius: 8px;
-`;
-
-const LoadingWrapper = styled.div`
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 200px;
-  font-size: 18px;
-  color: #666;
 `;
 
 const ErrorWrapper = styled.div`

@@ -3,6 +3,7 @@ import styled from "styled-components";
 import { api } from "../utils/api";
 import badgeIcon from "../assets/19_badge.png";
 import { useNavigate } from "react-router-dom";
+import { SkeletonCard } from "../components/commons/Skeleton";
 
 interface Creator {
   no: number;
@@ -59,7 +60,18 @@ const Creators: React.FC = () => {
     fetchCreators();
   }, []);
 
-  if (isLoading) return <LoadingWrapper>로딩중...</LoadingWrapper>;
+  if (isLoading)
+    return (
+      <Container>
+        <CreatorTitle>크리에이터</CreatorTitle>
+        <GridContainer>
+          {[...Array(8)].map((_, index) => (
+            <SkeletonCard key={index} />
+          ))}
+        </GridContainer>
+      </Container>
+    );
+
   if (error) return <ErrorWrapper>{error}</ErrorWrapper>;
 
   return (
@@ -141,15 +153,6 @@ const BadgeIcon = styled.img`
   top: 1rem;
   width: 35px;
   height: 35px;
-`;
-
-const LoadingWrapper = styled.div`
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 200px;
-  font-size: 18px;
-  color: #666;
 `;
 
 const ErrorWrapper = styled.div`
