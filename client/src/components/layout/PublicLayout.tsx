@@ -20,8 +20,12 @@ const PublicLayout = () => {
     location.pathname.startsWith(path)
   );
 
-  const toggleBottomSidebar = () => {
-    setIsOpenBS(!isOpenBS);
+  const openBottomSidebar = () => {
+    setIsOpenBS(true);
+  };
+
+  const closeBottomSidebar = () => {
+    setIsOpenBS(false);
   };
 
   const handlePaymentModalOpen = () => {
@@ -70,14 +74,13 @@ const PublicLayout = () => {
             </SideBannerContainer>
           )}
         </MainContentWrapper>
-        <BottomSidebar onProfileClick={toggleBottomSidebar} />
+        <BottomSidebar onProfileClick={openBottomSidebar} />
       </LayoutContent>
       <>
-        {/* 오버레이와 사이드바 모두 항상 렌더링하되, 오버레이의 visibility나 opacity를 조절 */}
-        <OverlayBackground $isOpen={isOpenBS} onClick={toggleBottomSidebar} />
+        <OverlayBackground $isOpen={isOpenBS} onClick={closeBottomSidebar} />
         <MobileSidebar
           isOpen={isOpenBS}
-          onClose={toggleBottomSidebar}
+          onClose={closeBottomSidebar}
           onPaymentClick={handlePaymentModalOpen}
         />
       </>

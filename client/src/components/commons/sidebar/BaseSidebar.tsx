@@ -52,7 +52,9 @@ const BaseSidebar = ({
 
   useEffect(() => {
     const handleLanguageChange = () => {
-      onClose?.();
+      if (variant === "mobile") {
+        onClose?.();
+      }
     };
 
     i18n.on("languageChanged", handleLanguageChange);
@@ -60,7 +62,7 @@ const BaseSidebar = ({
     return () => {
       i18n.off("languageChanged", handleLanguageChange);
     };
-  }, [i18n, onClose]);
+  }, [i18n, onClose, variant]);
 
   return (
     <>
