@@ -31,6 +31,7 @@ import FindAccount from "./pages/FindAccount";
 import FindPassword from "./pages/FindPassword";
 import ModalExamplePage from "./pages/ModalExample";
 import ScrollToTop from "./components/commons/ScrollToTop";
+import VideoLayout from "./components/layout/VideoLayout";
 // interface ErrorMessageProps {
 //   message?: string;
 // }
@@ -80,14 +81,6 @@ function App() {
         </Route>
         <Route element={<PublicLayout />}>
           <Route path="/main" element={<Main />} />
-          <Route
-            path="/video/:id"
-            element={
-              <ProtectedRoute>
-                <VideoDetail />
-              </ProtectedRoute>
-            }
-          />
           <Route path="/user/:id" element={<User />} />
           <Route path="/alarm" element={<NotificationPage />} />
           <Route path="/creators" element={<Creators />} />
@@ -103,6 +96,16 @@ function App() {
             element={<PasswordChange />}
           />
           <Route path="/settings/payment-manage" element={<PaymentManage />} />
+        </Route>
+        <Route element={<VideoLayout />}>
+          <Route
+            path="/video/:id"
+            element={
+              <ProtectedRoute>
+                <VideoDetail />
+              </ProtectedRoute>
+            }
+          />
         </Route>
       </Routes>
       <ToastContainer style={{ fontSize: "1.4rem" }} limit={1} />

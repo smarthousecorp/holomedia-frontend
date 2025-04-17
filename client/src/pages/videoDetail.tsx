@@ -16,6 +16,7 @@ import { api } from "../utils/api";
 import VideoPlayer from "../components/commons/media/VideoPlayer";
 import { useSelector } from "react-redux";
 import { RootState } from "../store";
+import HomeIcon from "@mui/icons-material/Home";
 
 interface PaymentStatus {
   message?: string;
@@ -36,6 +37,19 @@ const VideoDetail = () => {
 
   const [paymentInfo, setPaymentInfo] = useState<PaymentStatus | null>(null);
 
+  // ESC 키 처리
+  useEffect(() => {
+    const handleKeyPress = (e: KeyboardEvent) => {
+      if (e.key === "Escape" || e.key === "Backspace") {
+        handleGoBack();
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyPress);
+    return () => window.removeEventListener("keydown", handleKeyPress);
+  }, []);
+
+  // 뒤로가기 처리
   const handleGoBack = () => {
     navigate(-1);
   };
@@ -116,22 +130,43 @@ const VideoDetail = () => {
     }
   }, [media]);
 
+  const handleHomeClick = () => {
+    navigate("/main");
+  };
+
   return (
     <VideoDetailContainer>
+      {/* 모바일 뒤로가기 버튼 */}
       <BackButtonContainer>
         <IconButton
           onClick={handleGoBack}
           sx={{
             color: "white",
-            padding: "12px", // 버튼 패딩 증가
+            padding: "12px",
             "&:hover": {
-              backgroundColor: "rgba(255, 255, 255, 0.1)", // 호버 효과
+              backgroundColor: "rgba(255, 255, 255, 0.1)",
             },
           }}
         >
           <ArrowBackIcon sx={{ fontSize: "2.4rem" }} />
         </IconButton>
       </BackButtonContainer>
+
+      {/* PC 뒤로가기 인디케이터 */}
+      <PCNavigationHint>ESC 또는 Backspace를 눌러 뒤로가기</PCNavigationHint>
+
+      {/* 새로운 컨트롤 바 추가 */}
+      <ControlBar>
+        <ControlButton onClick={handleGoBack}>
+          <ArrowBackIcon sx={{ fontSize: "2rem" }} />
+          <ButtonLabel>뒤로가기</ButtonLabel>
+        </ControlButton>
+        <ControlButton onClick={handleHomeClick}>
+          <HomeIcon sx={{ fontSize: "2rem" }} />
+          <ButtonLabel>홈</ButtonLabel>
+        </ControlButton>
+      </ControlBar>
+
       <VideoPlayContainer>
         <VideoPlayerDiv>
           {!showPaymentDialog && media?.urls.video && (
@@ -177,14 +212,9 @@ export default VideoDetail;
 
 const VideoDetailContainer = styled.section`
   width: 100%;
-  height: 100vh;
+  height: 100%;
   background-color: #000;
-  overflow: hidden;
-
-  @media (min-width: 901px) {
-    min-height: calc(100vh - 13.5rem); // 헤더(7rem) + 푸터(6.5rem)
-    padding: 2rem;
-  }
+  position: relative;
 
   @media (max-width: 900px) {
     height: 100vh;
@@ -192,14 +222,25 @@ const VideoDetailContainer = styled.section`
 `;
 
 const BackButtonContainer = styled.div`
-  display: none;
   position: absolute;
-  top: 1rem;
-  left: 1rem;
+  top: 2rem;
+  left: 2rem;
   z-index: 1000;
+  opacity: 0;
+  transition: opacity 0.3s ease;
 
   @media (max-width: 900px) {
     display: block;
+    opacity: 1;
+  }
+
+  @media (min-width: 901px) {
+    display: block;
+    opacity: 0;
+
+    &:hover {
+      opacity: 1;
+    }
   }
 `;
 
@@ -209,14 +250,12 @@ const VideoPlayContainer = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
+  position: relative;
 
   @media (min-width: 901px) {
     max-width: 1200px;
     margin: 0 auto;
-  }
-
-  @media (max-width: 900px) {
-    height: 100vh;
+    padding: 2rem;
   }
 `;
 
@@ -250,4 +289,113 @@ const CustomDialogContent = styled(DialogContent)`
   & > p {
     margin-bottom: 0.5rem;
   }
+`;
+
+const PCNavigationHint = styled.div`
+  display: none;
+  position: fixed;
+  bottom: 2rem;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(0, 0, 0, 0.7);
+  color: white;
+  padding: 0.8rem 1.6rem;
+  border-radius: 2rem;
+  font-size: 1.4rem;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  z-index: 1000;
+
+  @media (min-width: 901px) {
+    display: block;
+    animation: fadeInOut 5s forwards;
+  }
+
+  @keyframes fadeInOut {
+    0% {
+      opacity: 0;
+    }
+    10% {
+      opacity: 1;
+    }
+    80% {
+      opacity: 1;
+    }
+    100% {
+      opacity: 0;
+    }
+  }
+
+  &:hover {
+    opacity: 1;
+    animation: none;
+  }
+
+  ${VideoPlayContainer}:hover & {
+    opacity: 1;
+    animation: none;
+  }
+`;
+
+const ControlBar = styled.div`
+  position: fixed;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%) translateY(-100%);
+  display: flex;
+  gap: 2rem;
+  background: rgba(0, 0, 0, 0.7);
+  padding: 1rem 2rem;
+  border-radius: 0 0 1.5rem 1.5rem;
+  transition: transform 0.3s ease;
+  z-index: 1000;
+
+  @media (min-width: 901px) {
+    &:hover {
+      transform: translateX(-50%) translateY(0);
+    }
+
+    ${VideoDetailContainer}:hover & {
+      transform: translateX(-50%) translateY(0);
+    }
+  }
+
+  @media (max-width: 900px) {
+    display: none;
+  }
+`;
+
+const ControlButton = styled.button`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  background: none;
+  border: none;
+  color: white;
+  cursor: pointer;
+  padding: 1rem 1.5rem;
+  border-radius: 0.8rem;
+  transition: all 0.2s ease;
+
+  &:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+    transform: translateY(2px);
+  }
+
+  svg {
+    transition: transform 0.2s ease;
+  }
+
+  &:hover svg {
+    transform: scale(1.1);
+  }
+`;
+
+const ButtonLabel = styled.span`
+  font-size: 1.2rem;
+  color: white;
+  opacity: 0.8;
+  font-weight: 500;
+  margin-top: 0.2rem;
 `;
