@@ -1,5 +1,6 @@
 import { ReactNode } from "react";
 import styled from "styled-components";
+import { useTranslation } from "react-i18next";
 // import { X } from "lucide-react";
 
 // Types
@@ -24,15 +25,21 @@ const Modal = ({
   title,
   content,
   type = "info",
-  confirmText = "확인",
-  cancelText = "취소",
+  confirmText,
+  cancelText,
   onConfirm,
   children,
 }: ModalProps) => {
+  const { t } = useTranslation();
+
   if (!isOpen) return null;
 
   // Determine if it's a confirmation modal that needs two buttons
   const isConfirmation = type === "confirmation" || onConfirm;
+
+  // Use provided text or default translations
+  const finalConfirmText = confirmText || t("common.modal.buttons.confirm");
+  const finalCancelText = cancelText || t("common.modal.buttons.cancel");
 
   return (
     <ModalOverlay>
@@ -50,14 +57,14 @@ const Modal = ({
         {isConfirmation ? (
           <ModalButtonGroup>
             <ModalCancelButton onClick={onClose}>
-              {cancelText}
+              {finalCancelText}
             </ModalCancelButton>
             <ModalConfirmButton onClick={onConfirm}>
-              {confirmText}
+              {finalConfirmText}
             </ModalConfirmButton>
           </ModalButtonGroup>
         ) : (
-          <ModalButton onClick={onClose}>{confirmText}</ModalButton>
+          <ModalButton onClick={onClose}>{finalConfirmText}</ModalButton>
         )}
       </ModalContainer>
     </ModalOverlay>

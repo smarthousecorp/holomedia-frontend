@@ -19,22 +19,19 @@ const FindAccount = () => {
 
   const handleVerificationComplete = (data: VerificationData & FoundIds) => {
     console.log("Verification completed:", data);
-    // foundIds가 있는지 명확하게 체크
     if (data.foundIds && Array.isArray(data.foundIds)) {
       setFoundIds(data.foundIds);
       setIsVerified(true);
     } else {
-      setVerificationError("아이디를 찾을 수 없습니다.");
+      setVerificationError(t("auth.findAccount.verification.error"));
     }
   };
 
-  // 인증 에러 메시지 설정
   const handleVerificationError = (message: string) => {
     setVerificationError(message);
   };
 
   const handleIdClick = (id: string) => {
-    // 비밀번호 찾기 페이지로 이동하면서 선택한 아이디를 state로 전달
     navigate("/find-password", {
       state: { selectedId: id },
     });
@@ -47,20 +44,22 @@ const FindAccount = () => {
           <img src={logo} alt={t("auth.social.loginTitle")} />
         </Logo>
         <HeaderSection>
-          <Title>아이디 찾기</Title>
+          <Title>{t("auth.findAccount.title")}</Title>
           <SubTitle>
             {isVerified
-              ? "확인된 아이디 목록입니다"
-              : "아이디를 찾는 방법을 선택해주세요"}
+              ? t("auth.findAccount.subtitle.verified")
+              : t("auth.findAccount.subtitle.default")}
           </SubTitle>
         </HeaderSection>
 
         {!isVerified ? (
           <VerificationSection>
             <VerificationOption>
-              <OptionTitle>본인명의 휴대전화로 인증</OptionTitle>
+              <OptionTitle>
+                {t("auth.findAccount.verification.phoneTitle")}
+              </OptionTitle>
               <OptionDescription>
-                본인명의로 등록된 휴대전화로 인증하여 아이디를 찾을 수 있습니다.
+                {t("auth.findAccount.verification.phoneDescription")}
               </OptionDescription>
               <ButtonWrapper>
                 <NiceVerificationButton
@@ -78,7 +77,7 @@ const FindAccount = () => {
           <IdListSection>
             {foundIds.length > 0 ? (
               <>
-                <IdListTitle>등록된 아이디 목록</IdListTitle>
+                <IdListTitle>{t("auth.findAccount.idList.title")}</IdListTitle>
                 <IdList>
                   {foundIds.map((id, index) => (
                     <IdItem key={index} onClick={() => handleIdClick(id)}>
@@ -91,21 +90,21 @@ const FindAccount = () => {
                           color: "#666",
                         }}
                       >
-                        클릭하여 비밀번호 찾기
+                        {t("auth.findAccount.idList.clickToReset")}
                       </small>
                     </IdItem>
                   ))}
                 </IdList>
               </>
             ) : (
-              <NoIdsMessage>등록된 아이디가 없습니다.</NoIdsMessage>
+              <NoIdsMessage>{t("auth.findAccount.idList.empty")}</NoIdsMessage>
             )}
           </IdListSection>
         )}
 
         <Footer>
           <BackButton onClick={() => navigate("/")}>
-            로그인 페이지로 돌아가기
+            {t("auth.findAccount.backToLogin")}
           </BackButton>
         </Footer>
       </FindAccountBox>

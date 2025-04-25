@@ -76,6 +76,62 @@ i18n.use(initReactI18next).init({
             },
             success: "Sign up completed!",
           },
+          findAccount: {
+            title: "Find Account",
+            subtitle: {
+              default: "Please select how to find your ID",
+              verified: "Here are your verified IDs",
+            },
+            verification: {
+              phoneTitle: "Verify with your phone number",
+              phoneDescription:
+                "You can find your ID by verifying with your registered phone number",
+              error: "Could not find your ID",
+            },
+            idList: {
+              title: "Registered ID List",
+              empty: "No registered IDs found",
+              clickToReset: "Click to find password",
+            },
+            backToLogin: "Back to Login Page",
+          },
+          verification: {
+            button: "Verify with NICE",
+            processing: "Processing verification...",
+            complete: "Verified",
+            error: "Verification failed",
+          },
+          findPassword: {
+            title: "Find Password",
+            subtitle: {
+              enterId: "Please enter your ID",
+              verifyIdentity: "Please verify your identity",
+              enterNewPassword: "Please enter a new password",
+            },
+            form: {
+              idPlaceholder: "Enter your ID",
+              newPasswordPlaceholder:
+                "New password (8-15 characters: letters, numbers, special characters)",
+              confirmPasswordPlaceholder: "Confirm new password",
+              next: "Next",
+              changePassword: "Change Password",
+            },
+            verification: {
+              phoneTitle: "Verify with your phone number",
+              phoneDescription:
+                "You can change your password by verifying with your registered phone number",
+            },
+            errors: {
+              idVerificationFailed: "ID verification failed",
+              verificationFailed: "Identity verification failed",
+              passwordFormat:
+                "Password must be 8-15 characters combining letters, numbers, and special characters",
+              passwordMismatch: "Passwords do not match",
+              changePasswordFailed: "Failed to change password",
+            },
+            success: "Password has been changed successfully",
+            backToLogin: "Back to Login Page",
+          },
         },
         header: {
           search: {
@@ -107,7 +163,7 @@ i18n.use(initReactI18next).init({
           nav: {
             home: "HOME",
             creator: "CREATOR",
-            vod: "VOD",
+            vod: "VIDEO",
             setting: "SETTING",
             membership: "MEMBERSHIP",
           },
@@ -121,6 +177,7 @@ i18n.use(initReactI18next).init({
               registration: "Business Registration Number: 256-81-03803",
               address:
                 "Room 3012-40, Building A, 323, Incheontawerdae-ro, Yeonsu-gu, Incheon, Republic of Korea",
+              customerService: "Customer Service: 1533-4965",
               copyright: "©HOLOMEDIA All Rights Reserved.",
             },
           },
@@ -182,9 +239,61 @@ i18n.use(initReactI18next).init({
             title: "Logout",
             message: "Are you sure you want to logout?",
           },
+          profileSettings: {
+            userId: "User ID",
+            nickname: "Nickname",
+            save: "Save Changes",
+            withdrawal: "Delete Account",
+            successModal: {
+              title: "Success",
+              content: "Profile has been updated successfully.",
+              confirm: "OK",
+            },
+            withdrawalConfirm: {
+              title: "Delete Account",
+              message:
+                "Are you sure you want to delete your account? This action cannot be undone.",
+              confirm: "Delete",
+              cancel: "Cancel",
+            },
+          },
+          paymentSettings: {
+            paymentMethods: "Payment Methods",
+            billingHistory: "Billing History",
+            honey: "Honey",
+            addNewCard: "Add New Payment Method",
+            chargeHistory: "Charge History",
+            purchaseHistory: "Purchase History",
+            noPurchaseHistory: "No purchase history",
+            noChargeHistory: "No charge history",
+            orderNumber: "Order No",
+          },
+          passwordSettings: {
+            currentPassword: "Current Password",
+            newPassword: "New Password",
+            confirmPassword: "Confirm New Password",
+            currentPasswordPlaceholder: "Enter current password",
+            newPasswordPlaceholder: "Enter new password",
+            confirmPasswordPlaceholder: "Confirm new password",
+            change: "Change Password",
+            errors: {
+              currentPasswordMismatch: "Current password is incorrect",
+              passwordMismatch: "New passwords do not match",
+            },
+          },
         },
         common: {
           cancel: "Cancel",
+          confirm: "Confirm",
+          modal: {
+            buttons: {
+              confirm: "OK",
+              cancel: "Cancel",
+              delete: "Delete",
+              save: "Save",
+              close: "Close",
+            },
+          },
         },
         prepare: {
           message: "We are preparing the",
@@ -208,6 +317,42 @@ i18n.use(initReactI18next).init({
         },
         loading: {
           message: "Loading...",
+        },
+        creators: {
+          title: "Creator",
+        },
+        videos: {
+          title: "Video Content",
+        },
+        payment: {
+          modal: {
+            title: "Charge Honey",
+            sections: {
+              productSelection: "Select Product",
+              paymentMethod: "Payment Method",
+              totalAmount: "Total Amount",
+            },
+            customAmount: {
+              placeholder: "Enter amount (honey count)",
+            },
+            paymentLocation: {
+              domestic: "Pay from Korea",
+              foreign: "Pay from Overseas",
+            },
+            priceBreakdown: {
+              price: "Price",
+              vat: "VAT",
+              total: "Total Payment Amount",
+            },
+            button: {
+              pay: "Pay Now",
+              processing: "Processing payment...",
+            },
+            alerts: {
+              inProgress:
+                "Payment is in progress. Please complete or close the payment window.",
+            },
+          },
         },
       },
     },
@@ -268,6 +413,62 @@ i18n.use(initReactI18next).init({
             },
             success: "회원가입이 완료되었습니다!",
           },
+          findAccount: {
+            title: "아이디 찾기",
+            subtitle: {
+              default: "아이디를 찾는 방법을 선택해주세요",
+              verified: "확인된 아이디 목록입니다",
+            },
+            verification: {
+              phoneTitle: "본인명의 휴대전화로 인증",
+              phoneDescription:
+                "본인명의로 등록된 휴대전화로 인증하여 아이디를 찾을 수 있습니다",
+              error: "아이디를 찾을 수 없습니다",
+            },
+            idList: {
+              title: "등록된 아이디 목록",
+              empty: "등록된 아이디가 없습니다",
+              clickToReset: "클릭하여 비밀번호 찾기",
+            },
+            backToLogin: "로그인 페이지로 돌아가기",
+          },
+          verification: {
+            button: "본인인증",
+            processing: "인증 처리중...",
+            complete: "인증완료",
+            error: "인증에 실패했습니다",
+          },
+          findPassword: {
+            title: "비밀번호 찾기",
+            subtitle: {
+              enterId: "아이디를 입력해주세요",
+              verifyIdentity: "본인인증을 진행해주세요",
+              enterNewPassword: "새로운 비밀번호를 입력해주세요",
+            },
+            form: {
+              idPlaceholder: "아이디를 입력하세요",
+              newPasswordPlaceholder:
+                "새 비밀번호 (8~15자 영문, 숫자, 특수문자 조합)",
+              confirmPasswordPlaceholder: "새 비밀번호 확인",
+              next: "다음",
+              changePassword: "비밀번호 변경",
+            },
+            verification: {
+              phoneTitle: "본인명의 휴대전화로 인증",
+              phoneDescription:
+                "본인명의로 등록된 휴대전화로 인증하여 비밀번호를 변경할 수 있습니다",
+            },
+            errors: {
+              idVerificationFailed: "아이디 검증에 실패했습니다",
+              verificationFailed: "본인인증에 실패했습니다",
+              passwordFormat:
+                "비밀번호는 8~15자의 영문, 숫자, 특수문자 조합이어야 합니다",
+              passwordMismatch: "비밀번호가 일치하지 않습니다",
+              changePasswordFailed: "비밀번호 변경에 실패했습니다",
+            },
+            success: "비밀번호가 성공적으로 변경되었습니다",
+            backToLogin: "로그인 페이지로 돌아가기",
+          },
         },
         header: {
           search: {
@@ -299,7 +500,7 @@ i18n.use(initReactI18next).init({
           nav: {
             home: "홈",
             creator: "크리에이터",
-            vod: "vod",
+            vod: "동영상",
             setting: "설정",
             membership: "멤버십",
           },
@@ -312,6 +513,7 @@ i18n.use(initReactI18next).init({
               company: "홀로미디어(주)    대표이사: 차윤태",
               registration: "사업자등록번호: 256-81-03803",
               address: "인천광역시 연수구 인천타워대로 323, 에이동 3012-40호",
+              customerService: "고객센터: 1533-4965",
               copyright: "©HOLOMEDIA All Rights Reserved.",
             },
           },
@@ -373,9 +575,60 @@ i18n.use(initReactI18next).init({
             title: "로그아웃",
             message: "정말 로그아웃 하시겠습니까?",
           },
+          profileSettings: {
+            userId: "아이디",
+            nickname: "닉네임",
+            save: "변경사항 저장",
+            withdrawal: "회원탈퇴",
+            successModal: {
+              title: "성공",
+              content: "프로필이 성공적으로 업데이트되었습니다.",
+              confirm: "확인",
+            },
+            withdrawalConfirm: {
+              title: "회원탈퇴",
+              message: "정말 탈퇴하시겠습니까? 이 작업은 되돌릴 수 없습니다.",
+              confirm: "탈퇴",
+              cancel: "취소",
+            },
+          },
+          paymentSettings: {
+            paymentMethods: "결제 수단",
+            billingHistory: "결제 내역",
+            honey: "꿀",
+            addNewCard: "새 결제 수단 추가",
+            chargeHistory: "충전 내역",
+            purchaseHistory: "구매 내역",
+            noPurchaseHistory: "구매 내역이 없습니다",
+            noChargeHistory: "충전 내역이 없습니다",
+            orderNumber: "주문번호",
+          },
+          passwordSettings: {
+            currentPassword: "현재 비밀번호",
+            newPassword: "새 비밀번호",
+            confirmPassword: "새 비밀번호 확인",
+            currentPasswordPlaceholder: "현재 비밀번호를 입력하세요",
+            newPasswordPlaceholder: "새 비밀번호를 입력하세요",
+            confirmPasswordPlaceholder: "새 비밀번호를 다시 입력하세요",
+            change: "비밀번호 변경",
+            errors: {
+              currentPasswordMismatch: "현재 비밀번호가 일치하지 않습니다",
+              passwordMismatch: "새 비밀번호가 일치하지 않습니다",
+            },
+          },
         },
         common: {
           cancel: "취소",
+          confirm: "확인",
+          modal: {
+            buttons: {
+              confirm: "확인",
+              cancel: "취소",
+              delete: "삭제",
+              save: "저장",
+              close: "닫기",
+            },
+          },
         },
         prepare: {
           message: "기능을",
@@ -399,6 +652,42 @@ i18n.use(initReactI18next).init({
         },
         loading: {
           message: "로딩중입니다...",
+        },
+        creators: {
+          title: "크리에이터",
+        },
+        videos: {
+          title: "동영상",
+        },
+        payment: {
+          modal: {
+            title: "꿀 충전",
+            sections: {
+              productSelection: "상품 선택",
+              paymentMethod: "결제 수단",
+              totalAmount: "전체 금액",
+            },
+            customAmount: {
+              placeholder: "직접 입력 (꿀 개수)",
+            },
+            paymentLocation: {
+              domestic: "한국에서 결제",
+              foreign: "해외에서 결제",
+            },
+            priceBreakdown: {
+              price: "가격",
+              vat: "부가세",
+              total: "최종 결제 금액",
+            },
+            button: {
+              pay: "결제하기",
+              processing: "결제 진행 중...",
+            },
+            alerts: {
+              inProgress:
+                "결제가 진행 중입니다. 결제창을 닫거나 완료 후 이용해주세요.",
+            },
+          },
         },
       },
     },
@@ -460,6 +749,62 @@ i18n.use(initReactI18next).init({
             },
             success: "会員登録が完了しました！",
           },
+          findAccount: {
+            title: "アカウント検索",
+            subtitle: {
+              default: "IDを探す方法を選択してください",
+              verified: "確認されたIDリストです",
+            },
+            verification: {
+              phoneTitle: "携帯電話番号で認証",
+              phoneDescription:
+                "登録された携帯電話番号で認証してIDを探すことができます",
+              error: "IDが見つかりません",
+            },
+            idList: {
+              title: "登録済みIDリスト",
+              empty: "登録されたIDがありません",
+              clickToReset: "クリックしてパスワードを探す",
+            },
+            backToLogin: "ログインページに戻る",
+          },
+          verification: {
+            button: "本人認証",
+            processing: "認証処理中...",
+            complete: "認証完了",
+            error: "認証に失敗しました",
+          },
+          findPassword: {
+            title: "パスワード検索",
+            subtitle: {
+              enterId: "IDを入力してください",
+              verifyIdentity: "本人認証を行ってください",
+              enterNewPassword: "新しいパスワードを入力してください",
+            },
+            form: {
+              idPlaceholder: "IDを入力",
+              newPasswordPlaceholder:
+                "新しいパスワード（8～15文字の英数字、特殊文字の組み合わせ）",
+              confirmPasswordPlaceholder: "新しいパスワードを確認",
+              next: "次へ",
+              changePassword: "パスワード変更",
+            },
+            verification: {
+              phoneTitle: "携帯電話番号で認証",
+              phoneDescription:
+                "登録された携帯電話番号で認証してパスワードを変更できます",
+            },
+            errors: {
+              idVerificationFailed: "ID検証に失敗しました",
+              verificationFailed: "本人認証に失敗しました",
+              passwordFormat:
+                "パスワードは8～15文字の英数字と特殊文字の組み合わせが必要です",
+              passwordMismatch: "パスワードが一致しません",
+              changePasswordFailed: "パスワードの変更に失敗しました",
+            },
+            success: "パスワードが正常に変更されました",
+            backToLogin: "ログインページに戻る",
+          },
         },
         header: {
           search: {
@@ -491,7 +836,7 @@ i18n.use(initReactI18next).init({
           nav: {
             home: "ホーム",
             creator: "クリエイター",
-            vod: "vod",
+            vod: "動画",
             setting: "設定",
             membership: "メンバーシップ",
           },
@@ -504,6 +849,7 @@ i18n.use(initReactI18next).init({
               company: "HOLOMEDIA株式会社    代表取締役：チャ・ユンテ",
               registration: "事業者登録番号：256-81-03803",
               address: "仁川広域市延寿区仁川タワー大路323、A棟3012-40号",
+              customerService: "カスタマーサービス：1533-4965",
               copyright: "©HOLOMEDIA All Rights Reserved.",
             },
           },
@@ -565,9 +911,61 @@ i18n.use(initReactI18next).init({
             title: "ログアウト",
             message: "本当にログアウトしますか？",
           },
+          profileSettings: {
+            userId: "ユーザーID",
+            nickname: "ニックネーム",
+            save: "変更を保存",
+            withdrawal: "退会",
+            successModal: {
+              title: "成功",
+              content: "プロフィールが正常に更新されました。",
+              confirm: "確認",
+            },
+            withdrawalConfirm: {
+              title: "退会",
+              message:
+                "本当に退会しますか？この操作は取り消すことができません。",
+              confirm: "退会",
+              cancel: "キャンセル",
+            },
+          },
+          paymentSettings: {
+            paymentMethods: "決済方法",
+            billingHistory: "決済履歴",
+            honey: "ハニー",
+            addNewCard: "新しい決済方法を追加",
+            chargeHistory: "チャージ履歴",
+            purchaseHistory: "購入履歴",
+            noPurchaseHistory: "購入履歴がありません",
+            noChargeHistory: "チャージ履歴がありません",
+            orderNumber: "注文番号",
+          },
+          passwordSettings: {
+            currentPassword: "現在のパスワード",
+            newPassword: "新しいパスワード",
+            confirmPassword: "新しいパスワード（確認）",
+            currentPasswordPlaceholder: "現在のパスワードを入力",
+            newPasswordPlaceholder: "新しいパスワードを入力",
+            confirmPasswordPlaceholder: "新しいパスワードを再入力",
+            change: "パスワードを変更",
+            errors: {
+              currentPasswordMismatch: "現在のパスワードが一致しません",
+              passwordMismatch: "新しいパスワードが一致しません",
+            },
+          },
         },
         common: {
           cancel: "キャンセル",
+          confirm: "確認",
+          modal: {
+            buttons: {
+              confirm: "確認",
+              cancel: "キャンセル",
+              delete: "削除",
+              save: "保存",
+              close: "閉じる",
+            },
+          },
         },
         prepare: {
           message: "機能を",
@@ -591,6 +989,42 @@ i18n.use(initReactI18next).init({
         },
         loading: {
           message: "読み込み中...",
+        },
+        creators: {
+          title: "クリエイター",
+        },
+        videos: {
+          title: "動画",
+        },
+        payment: {
+          modal: {
+            title: "ハニーチャージ",
+            sections: {
+              productSelection: "商品選択",
+              paymentMethod: "お支払い方法",
+              totalAmount: "合計金額",
+            },
+            customAmount: {
+              placeholder: "直接入力（ハニー数）",
+            },
+            paymentLocation: {
+              domestic: "韓国から支払い",
+              foreign: "海外から支払い",
+            },
+            priceBreakdown: {
+              price: "価格",
+              vat: "消費税",
+              total: "最終支払金額",
+            },
+            button: {
+              pay: "支払う",
+              processing: "決済処理中...",
+            },
+            alerts: {
+              inProgress:
+                "決済が進行中です。決済ウィンドウを閉じるか完了してからご利用ください。",
+            },
+          },
         },
       },
     },
@@ -650,6 +1084,59 @@ i18n.use(initReactI18next).init({
             },
             success: "注册成功！",
           },
+          findAccount: {
+            title: "查找账号",
+            subtitle: {
+              default: "请选择查找ID的方式",
+              verified: "以下是已验证的ID列表",
+            },
+            verification: {
+              phoneTitle: "通过手机号码验证",
+              phoneDescription: "您可以通过验证已注册的手机号码来查找ID",
+              error: "找不到ID",
+            },
+            idList: {
+              title: "已注册的ID列表",
+              empty: "没有已注册的ID",
+              clickToReset: "点击找回密码",
+            },
+            backToLogin: "返回登录页面",
+          },
+          verification: {
+            button: "身份认证",
+            processing: "验证处理中...",
+            complete: "验证完成",
+            error: "验证失败",
+          },
+          findPassword: {
+            title: "找回密码",
+            subtitle: {
+              enterId: "请输入账号",
+              verifyIdentity: "请进行身份验证",
+              enterNewPassword: "请输入新密码",
+            },
+            form: {
+              idPlaceholder: "请输入账号",
+              newPasswordPlaceholder:
+                "新密码（8-15位字母、数字、特殊字符组合）",
+              confirmPasswordPlaceholder: "确认新密码",
+              next: "下一步",
+              changePassword: "修改密码",
+            },
+            verification: {
+              phoneTitle: "通过手机号码验证",
+              phoneDescription: "您可以通过验证已注册的手机号码来修改密码",
+            },
+            errors: {
+              idVerificationFailed: "账号验证失败",
+              verificationFailed: "身份验证失败",
+              passwordFormat: "密码必须为8-15位字母、数字和特殊字符的组合",
+              passwordMismatch: "两次输入的密码不一致",
+              changePasswordFailed: "密码修改失败",
+            },
+            success: "密码修改成功",
+            backToLogin: "返回登录页面",
+          },
         },
         header: {
           search: {
@@ -681,7 +1168,7 @@ i18n.use(initReactI18next).init({
           nav: {
             home: "首页",
             creator: "创作者",
-            vod: "vod",
+            vod: "视频",
             setting: "设置",
             membership: "会员",
           },
@@ -694,6 +1181,7 @@ i18n.use(initReactI18next).init({
               company: "HOLOMEDIA有限公司    董事长：车允泰",
               registration: "营业执照号：256-81-03803",
               address: "仁川广域市延寿区仁川塔大路323号A栋3012-40室",
+              customerService: "客服中心：1533-4965",
               copyright: "©HOLOMEDIA All Rights Reserved.",
             },
           },
@@ -755,9 +1243,60 @@ i18n.use(initReactI18next).init({
             title: "退出登录",
             message: "确定要退出登录吗？",
           },
+          profileSettings: {
+            userId: "用户ID",
+            nickname: "昵称",
+            save: "保存更改",
+            withdrawal: "注销账号",
+            successModal: {
+              title: "成功",
+              content: "个人资料已成功更新。",
+              confirm: "确定",
+            },
+            withdrawalConfirm: {
+              title: "注销账号",
+              message: "确定要注销账号吗？此操作无法撤销。",
+              confirm: "注销",
+              cancel: "取消",
+            },
+          },
+          paymentSettings: {
+            paymentMethods: "支付方式",
+            billingHistory: "支付记录",
+            honey: "蜂蜜",
+            addNewCard: "添加新支付方式",
+            chargeHistory: "充值记录",
+            purchaseHistory: "购买记录",
+            noPurchaseHistory: "暂无购买记录",
+            noChargeHistory: "暂无充值记录",
+            orderNumber: "订单号",
+          },
+          passwordSettings: {
+            currentPassword: "当前密码",
+            newPassword: "新密码",
+            confirmPassword: "确认新密码",
+            currentPasswordPlaceholder: "请输入当前密码",
+            newPasswordPlaceholder: "请输入新密码",
+            confirmPasswordPlaceholder: "请再次输入新密码",
+            change: "修改密码",
+            errors: {
+              currentPasswordMismatch: "当前密码不正确",
+              passwordMismatch: "两次输入的新密码不一致",
+            },
+          },
         },
         common: {
           cancel: "取消",
+          confirm: "确认",
+          modal: {
+            buttons: {
+              confirm: "确认",
+              cancel: "取消",
+              delete: "删除",
+              save: "保存",
+              close: "关闭",
+            },
+          },
         },
         prepare: {
           message: "功能",
@@ -781,6 +1320,41 @@ i18n.use(initReactI18next).init({
         },
         loading: {
           message: "加载中...",
+        },
+        creators: {
+          title: "创作者",
+        },
+        videos: {
+          title: "视频",
+        },
+        payment: {
+          modal: {
+            title: "蜂蜜充值",
+            sections: {
+              productSelection: "选择商品",
+              paymentMethod: "支付方式",
+              totalAmount: "总金额",
+            },
+            customAmount: {
+              placeholder: "直接输入（蜂蜜数量）",
+            },
+            paymentLocation: {
+              domestic: "在韩国支付",
+              foreign: "在海外支付",
+            },
+            priceBreakdown: {
+              price: "价格",
+              vat: "增值税",
+              total: "最终支付金额",
+            },
+            button: {
+              pay: "立即支付",
+              processing: "支付处理中...",
+            },
+            alerts: {
+              inProgress: "支付正在进行中。请完成或关闭支付窗口后再使用。",
+            },
+          },
         },
       },
     },

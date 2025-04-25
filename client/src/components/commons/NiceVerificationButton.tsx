@@ -3,6 +3,7 @@ import axios from "axios";
 import styled from "styled-components";
 import { VerificationData } from "../../types/nice";
 import { FoundIds } from "../../pages/FindAccount";
+import { useTranslation } from "react-i18next";
 
 interface ApiResponse {
   code: number;
@@ -24,6 +25,7 @@ const NiceVerificationButton: React.FC<NiceVerificationProps> = ({
   verificationType,
   returnUrl = `${import.meta.env.VITE_CLIENT_DOMAIN}`,
 }) => {
+  const { t } = useTranslation();
   const [isVerifying, setIsVerifying] = useState(false);
   const [isVerified, setIsVerified] = useState(false);
   const formRef = useRef<HTMLFormElement>(null);
@@ -65,13 +67,13 @@ const NiceVerificationButton: React.FC<NiceVerificationProps> = ({
         }
       } catch (error) {
         console.error("인증 데이터 처리 중 오류:", error);
-        onError("인증 처리 중 오류가 발생했습니다.");
+        onError(t("auth.verification.error"));
       } finally {
         setIsVerifying(false);
         window.removeEventListener("message", handleMessage);
       }
     },
-    [onVerificationComplete, onError]
+    [onVerificationComplete, onError, t]
   );
 
   const handleVerification = useCallback(async () => {
@@ -97,7 +99,7 @@ const NiceVerificationButton: React.FC<NiceVerificationProps> = ({
         !authData.data.integrity_value ||
         !authData.data.token_version_id
       ) {
-        throw new Error("필수 인증 정보가 누락되었습니다.");
+        throw new Error(t("auth.verification.error"));
       }
 
       // postMessage 이벤트 리스너 등록
@@ -116,14 +118,14 @@ const NiceVerificationButton: React.FC<NiceVerificationProps> = ({
       );
 
       if (!popup) {
-        throw new Error("팝업이 차단되었습니다.");
+        throw new Error(t("auth.verification.error"));
       }
 
       popupRef.current = popup;
       console.log("팝업 창 열림");
 
       if (!formRef.current) {
-        throw new Error("폼 요소를 찾을 수 없습니다.");
+        throw new Error(t("auth.verification.error"));
       }
 
       const form = formRef.current;
@@ -141,7 +143,7 @@ const NiceVerificationButton: React.FC<NiceVerificationProps> = ({
       ) as HTMLInputElement;
 
       if (!encDataInput || !tokenInput || !integrityInput) {
-        throw new Error("필수 폼 입력 요소가 없습니다.");
+        throw new Error(t("auth.verification.error"));
       }
 
       encDataInput.value = enc_data;
@@ -160,7 +162,7 @@ const NiceVerificationButton: React.FC<NiceVerificationProps> = ({
 
           // 인증이 완료되지 않은 상태에서 팝업이 닫혔다면 에러 처리
           if (!isVerified) {
-            onError("인증이 완료되지 않았습니다.");
+            onError(t("auth.verification.error"));
           }
         }
       }, 500);
@@ -170,11 +172,11 @@ const NiceVerificationButton: React.FC<NiceVerificationProps> = ({
       console.log("폼 제출 완료");
     } catch (error) {
       console.error("본인인증 처리 중 오류 발생:", error);
-      onError("본인인증 처리 중 오류가 발생했습니다.");
+      onError(t("auth.verification.error"));
       setIsVerifying(false);
       window.removeEventListener("message", handleMessage);
     }
-  }, [onVerificationComplete, onError, handleMessage]);
+  }, [onVerificationComplete, onError, handleMessage, t]);
 
   return (
     <>
@@ -202,21 +204,24 @@ const NiceVerificationButton: React.FC<NiceVerificationProps> = ({
         />
       </form>
 
-      <VerificationButton
-        type="button"
+      <VerifyButton
         onClick={handleVerification}
         disabled={isVerifying || isVerified}
       >
-        {isVerifying ? "인증 처리중..." : isVerified ? "인증완료" : "본인인증"}
+        {isVerifying
+          ? t("auth.verification.processing")
+          : isVerified
+          ? t("auth.verification.complete")
+          : t("auth.verification.button")}
         <VerificationStatus verified={isVerified}>
           {isVerified && "✓"}
         </VerificationStatus>
-      </VerificationButton>
+      </VerifyButton>
     </>
   );
 };
 
-const VerificationButton = styled.button<{ disabled?: boolean }>`
+const VerifyButton = styled.button<{ disabled?: boolean }>`
   background-color: white;
   color: ${(props) => (props.disabled ? "#cccccc" : "#eb3553")};
   border: 2px solid ${(props) => (props.disabled ? "#cccccc" : "#eb3553")};
@@ -227,6 +232,10 @@ const VerificationButton = styled.button<{ disabled?: boolean }>`
   width: 100%;
   min-width: 100px;
   cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
 
   &:hover:not(:disabled) {
     background-color: #eb3553;
@@ -240,8 +249,9 @@ const VerificationButton = styled.button<{ disabled?: boolean }>`
 `;
 
 const VerificationStatus = styled.span<{ verified: boolean }>`
-  margin-left: 8px;
   color: ${(props) => (props.verified ? "#4CAF50" : "#cccccc")};
+  font-size: 1.4rem;
+  font-weight: bold;
 `;
 
 export default NiceVerificationButton;

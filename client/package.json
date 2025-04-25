@@ -7,7 +7,7 @@
     "dev": "vite",
     "build": "tsc -b && vite build",
     "deploy": "tsc -b && vite build --mode production && aws s3 sync ./dist s3://holomedia.co.kr --profile=holomedia-s3",
-    "deploy_dev": "tsc -b && vite build --mode staging && aws s3 sync ./dist s3://dev.holomedia.co.kr --profile=s3-react",
+    "deploy_dev": "tsc -b && vite build --mode staging && aws s3 sync ./dist s3://dev.holomedia.co.kr --profile=s3-react && aws cloudfront create-invalidation --distribution-id E1ISNTOR92FA4F --paths '/*' --profile=s3-react",
     "lint": "eslint .",
     "preview": "vite preview"
   },

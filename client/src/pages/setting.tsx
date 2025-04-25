@@ -64,8 +64,8 @@ const Settings = () => {
           onConfirm={handleLogout}
           title={t("settings.logoutModal.title")}
           content={t("settings.logoutModal.message")}
-          confirmText="확인"
-          cancelText="취소"
+          confirmText={t("common.modal.buttons.confirm")}
+          cancelText={t("common.modal.buttons.cancel")}
         />
       )}
     </Container>

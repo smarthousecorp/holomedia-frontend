@@ -6,6 +6,9 @@ import { api } from "../../utils/api";
 import { useSelector } from "react-redux";
 import { RootState } from "../../store";
 import { useUserInfo } from "../../hooks/useUserInfo";
+import { useTranslation } from "react-i18next";
+import { getCurrencyInfo } from "../../utils/currencyConverter";
+import { useCountryDetector } from "../../hooks/useCountryDetector";
 
 interface PaymentModalProps {
   onClose: () => void;
@@ -14,15 +17,22 @@ interface PaymentModalProps {
 const HONEY_TO_WON_RATE = 1000; // 1꿀 = 1000원
 const VAT_RATE = 0.1; // 10% 부가세
 
+type Currency = "USD" | "JPY";
+
 const PaymentModal = ({ onClose }: PaymentModalProps) => {
+  const { t } = useTranslation();
   const [selectedAmount, setSelectedAmount] = useState<number | null>(null);
   const [customAmount, setCustomAmount] = useState("");
   const [isPaymentPending, setIsPaymentPending] = useState(false);
   const [paymentWindow, setPaymentWindow] = useState<Window | null>(null);
+  const [isForeignPayment, setIsForeignPayment] = useState(false);
+  const [convertedAmount, setConvertedAmount] = useState<number | null>(null);
+  const [exchangeRate, setExchangeRate] = useState<number | null>(null);
+  const [selectedCurrency, setSelectedCurrency] = useState<Currency>("USD");
 
   const memberNo = useSelector((state: RootState) => state.user.memberNo);
-  const { userInfo, isLoading } = useUserInfo(memberNo);
-  console.log(userInfo, isLoading);
+  const { userInfo } = useUserInfo(memberNo);
+  const { countryInfo, isLoading: isCountryLoading } = useCountryDetector();
 
   const amounts = [5, 10, 50, 100, 300];
 
@@ -39,6 +49,75 @@ const PaymentModal = ({ onClose }: PaymentModalProps) => {
   const vat = Math.floor(basePrice * VAT_RATE);
   const totalPrice = basePrice + vat;
 
+  // 통화 변환
+  useEffect(() => {
+    const convertCurrency = async () => {
+      if (isForeignPayment && totalPrice > 0) {
+        try {
+          console.log("Converting currency with params:", {
+            amountInKrw: totalPrice,
+            currency: selectedCurrency,
+          });
+
+          const result = await getCurrencyInfo({
+            amountInKrw: totalPrice,
+            currency: selectedCurrency,
+          });
+
+          console.log("Currency conversion result:", result);
+
+          if (result && result.data) {
+            const rawAmount = result.data.rawAmountInForeignCurrency;
+            const exchangeRateStr = result.data.exchangeRate;
+
+            console.log("Parsed values:", {
+              rawAmount,
+              exchangeRateStr,
+            });
+
+            setConvertedAmount(rawAmount || null);
+            setExchangeRate(
+              exchangeRateStr ? parseFloat(exchangeRateStr) : null
+            );
+          }
+        } catch (error) {
+          console.error("Currency conversion failed:", error);
+          setConvertedAmount(null);
+          setExchangeRate(null);
+        }
+      } else {
+        setConvertedAmount(null);
+        setExchangeRate(null);
+      }
+    };
+
+    convertCurrency();
+  }, [isForeignPayment, totalPrice, selectedCurrency]);
+
+  // 위치 기반 결제 설정
+  useEffect(() => {
+    if (countryInfo && !isCountryLoading) {
+      const countryCode = countryInfo.countryCode.toLowerCase();
+
+      // 한국이 아닌 경우 자동으로 해외 결제 선택
+      if (countryCode !== "kr") {
+        setIsForeignPayment(true);
+
+        // 국가별 통화 설정
+        switch (countryCode) {
+          case "jp":
+            setSelectedCurrency("JPY");
+            break;
+          case "us":
+            setSelectedCurrency("USD");
+            break;
+          default:
+            setSelectedCurrency("USD"); // 기본값
+        }
+      }
+    }
+  }, [countryInfo, isCountryLoading]);
+
   const handleAmountSelect = (amount: number) => {
     setSelectedAmount(amount);
     setCustomAmount(amount.toString());
@@ -52,9 +131,24 @@ const PaymentModal = ({ onClose }: PaymentModalProps) => {
     }
   };
 
+  const handlePaymentLocationChange = (
+    e: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    setIsForeignPayment(e.target.id === "foreign");
+  };
+
+  const handleCurrencyChange = (currency: Currency) => {
+    setSelectedCurrency(currency);
+  };
+
   // 가격 포맷팅 함수
   const formatPrice = (price: number) => {
     return new Intl.NumberFormat("ko-KR").format(price);
+  };
+
+  const formatExchangeRate = (rate: number | null) => {
+    if (rate === null) return "0.00";
+    return rate.toFixed(2);
   };
 
   const handleClickPaymentBtn = () => {
@@ -62,10 +156,12 @@ const PaymentModal = ({ onClose }: PaymentModalProps) => {
       .post(
         "/api/payment/request",
         {
-          pgcode: "creditcard",
+          pgcode: isForeignPayment ? "creditcard_global" : "creditcard",
           memberId: userInfo?.loginId,
           productName: selectedAmount?.toString() || customAmount,
           price: totalPrice,
+          currency: isForeignPayment ? "USD" : "KRW",
+          convertedAmount: isForeignPayment ? convertedAmount : null,
         },
         {
           withCredentials: true,
@@ -102,13 +198,11 @@ const PaymentModal = ({ onClose }: PaymentModalProps) => {
       }
     }, 500);
 
-    // 결제 창이 열려있는 동안 메인 창 클릭 이벤트 방지
     const handleMainWindowClick = (e: MouseEvent) => {
       if (isPaymentPending) {
         e.preventDefault();
         e.stopPropagation();
-        // 선택적: 사용자에게 결제 진행 중임을 알림
-        alert("결제가 진행 중입니다. 결제창을 닫거나 완료 후 이용해주세요.");
+        alert(t("payment.modal.alerts.inProgress"));
       }
     };
 
@@ -122,7 +216,7 @@ const PaymentModal = ({ onClose }: PaymentModalProps) => {
       document.removeEventListener("mousedown", handleMainWindowClick, true);
       document.removeEventListener("mouseup", handleMainWindowClick, true);
     };
-  }, [paymentWindow, isPaymentPending]);
+  }, [paymentWindow, isPaymentPending, t]);
 
   return (
     <Background>
@@ -131,10 +225,12 @@ const PaymentModal = ({ onClose }: PaymentModalProps) => {
           <X size={24} />
         </CloseButton>
 
-        <Header>꿀 충전</Header>
+        <Header>{t("payment.modal.title")}</Header>
 
         <Content>
-          <SectionTitle>상품 선택</SectionTitle>
+          <SectionTitle>
+            {t("payment.modal.sections.productSelection")}
+          </SectionTitle>
           <AmountGrid>
             {amounts.map((amount) => (
               <AmountButton
@@ -152,40 +248,97 @@ const PaymentModal = ({ onClose }: PaymentModalProps) => {
             type="number"
             value={customAmount}
             onChange={handleCustomAmountChange}
-            placeholder="직접 입력 (꿀 개수)"
+            placeholder={t("payment.modal.customAmount.placeholder")}
           />
 
-          <SectionTitle>결제 수단</SectionTitle>
+          <SectionTitle>
+            {t("payment.modal.sections.paymentMethod")}
+          </SectionTitle>
           <PaymentContainer>
             <CheckboxContainer>
-              <CheckboxLabel id="domestic">
-                <span>한국에서 결제</span>
-                <RadioInput name="payment" id="domestic" defaultChecked />
+              <CheckboxLabel htmlFor="domestic">
+                <span>{t("payment.modal.paymentLocation.domestic")}</span>
+                <RadioInput
+                  type="radio"
+                  id="domestic"
+                  name="payment"
+                  checked={!isForeignPayment}
+                  onChange={handlePaymentLocationChange}
+                />
               </CheckboxLabel>
             </CheckboxContainer>
             <CheckboxContainer>
-              <CheckboxLabel id="foreign">
-                <span>해외에서 결제</span>
-                <RadioInput name="payment" id="foreign" />
+              <CheckboxLabel htmlFor="foreign">
+                <span>{t("payment.modal.paymentLocation.foreign")}</span>
+                <RadioInput
+                  type="radio"
+                  id="foreign"
+                  name="payment"
+                  checked={isForeignPayment}
+                  onChange={handlePaymentLocationChange}
+                />
               </CheckboxLabel>
             </CheckboxContainer>
           </PaymentContainer>
 
+          {isForeignPayment && (
+            <CurrencySelector>
+              <CurrencyButton
+                selected={selectedCurrency === "USD"}
+                onClick={() => handleCurrencyChange("USD")}
+              >
+                USD
+              </CurrencyButton>
+              <CurrencyButton
+                selected={selectedCurrency === "JPY"}
+                onClick={() => handleCurrencyChange("JPY")}
+              >
+                JPY
+              </CurrencyButton>
+            </CurrencySelector>
+          )}
+
           <PriceSection>
-            <SectionTitle>전체 금액</SectionTitle>
+            <SectionTitle>
+              {t("payment.modal.sections.totalAmount")}
+            </SectionTitle>
             <PriceRow>
-              {/* 단위 표시 필요하면 추가 (₩{formatPrice(HONEY_TO_WON_RATE)}/꿀) */}
-              <span>가격</span>
+              <span>{t("payment.modal.priceBreakdown.price")}</span>
               <span>₩ {formatPrice(basePrice)}</span>
             </PriceRow>
             <PriceRow>
-              {/* (10%) */}
-              <span>부가세</span>
+              <span>{t("payment.modal.priceBreakdown.vat")}</span>
               <span>₩ {formatPrice(vat)}</span>
             </PriceRow>
+            {isForeignPayment &&
+              convertedAmount !== null &&
+              exchangeRate !== null && (
+                <>
+                  <PriceRow>
+                    <span>환율</span>
+                    <span>
+                      1 {selectedCurrency} = ₩{" "}
+                      {formatExchangeRate(exchangeRate)}
+                    </span>
+                  </PriceRow>
+                  <PriceRow>
+                    <span>변환 금액</span>
+                    <span>
+                      {selectedCurrency === "USD" ? "$" : "¥"}{" "}
+                      {convertedAmount?.toFixed(2) || "0.00"}
+                    </span>
+                  </PriceRow>
+                </>
+              )}
             <TotalRow>
-              <span>최종 결제 금액</span>
-              <span>₩ {formatPrice(totalPrice)}</span>
+              <span>{t("payment.modal.priceBreakdown.total")}</span>
+              <span>
+                {isForeignPayment && convertedAmount !== null
+                  ? `${selectedCurrency === "USD" ? "$" : "¥"} ${
+                      convertedAmount.toFixed(2) || "0.00"
+                    }`
+                  : `₩ ${formatPrice(totalPrice)}`}
+              </span>
             </TotalRow>
           </PriceSection>
 
@@ -193,7 +346,9 @@ const PaymentModal = ({ onClose }: PaymentModalProps) => {
             onClick={handleClickPaymentBtn}
             disabled={isPaymentPending}
           >
-            {isPaymentPending ? "결제 진행 중..." : "결제하기"}
+            {isPaymentPending
+              ? t("payment.modal.button.processing")
+              : t("payment.modal.button.pay")}
           </PayButton>
         </Content>
       </Container>
@@ -409,5 +564,27 @@ const PayButton = styled.button<{ disabled?: boolean }>`
 
   &:hover {
     background-color: ${(props) => (props.disabled ? "#ccc" : "#f55c75")};
+  }
+`;
+
+const CurrencySelector = styled.div`
+  display: flex;
+  gap: 1rem;
+  margin: 1rem 0;
+`;
+
+const CurrencyButton = styled.button<{ selected: boolean }>`
+  flex: 1;
+  padding: 0.5rem;
+  border: 1px solid #eb3553;
+  border-radius: 0.25rem;
+  background-color: ${(props) => (props.selected ? "#eb3553" : "white")};
+  color: ${(props) => (props.selected ? "white" : "#eb3553")};
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+
+  &:hover {
+    background-color: ${(props) => (props.selected ? "#eb3553" : "#fff5f7")};
   }
 `;

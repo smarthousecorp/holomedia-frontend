@@ -39,8 +39,10 @@ const FindPassword = () => {
       }
     } catch (error: any) {
       console.log(error.response);
-
-      setError(error.response?.message || "아이디 검증에 실패했습니다.");
+      setError(
+        error.response?.message ||
+          t("auth.findPassword.errors.idVerificationFailed")
+      );
     }
   };
 
@@ -48,24 +50,23 @@ const FindPassword = () => {
   const handleVerificationComplete = (
     data: VerificationData & { isVerified?: boolean }
   ) => {
-    // 본인인증 팝업에서 전달받은 데이터 확인
     if (data.isVerified) {
       setCurrentStep("password-change");
       setError("");
     } else {
-      setError("본인인증에 실패했습니다.");
+      setError(t("auth.findPassword.errors.verificationFailed"));
     }
   };
 
   // 비밀번호 변경
   const handlePasswordChange = async () => {
     if (!checkPassword(newPassword)) {
-      setError("비밀번호는 8~15자의 영문, 숫자, 특수문자 조합이어야 합니다.");
+      setError(t("auth.findPassword.errors.passwordFormat"));
       return;
     }
 
     if (newPassword !== confirmPassword) {
-      setError("비밀번호가 일치하지 않습니다.");
+      setError(t("auth.findPassword.errors.passwordMismatch"));
       return;
     }
 
@@ -78,12 +79,13 @@ const FindPassword = () => {
       });
 
       if (response.data.code === 0) {
-        alert("비밀번호가 성공적으로 변경되었습니다.");
+        alert(t("auth.findPassword.success"));
         navigate("/");
       }
     } catch (error: any) {
       setError(
-        error.response?.data?.message || "비밀번호 변경에 실패했습니다."
+        error.response?.data?.message ||
+          t("auth.findPassword.errors.changePasswordFailed")
       );
     }
   };
@@ -115,12 +117,14 @@ const FindPassword = () => {
         </Logo>
 
         <HeaderSection>
-          <Title>비밀번호 찾기</Title>
+          <Title>{t("auth.findPassword.title")}</Title>
           <SubTitle>
-            {currentStep === "id-verify" && "아이디를 입력해주세요"}
-            {currentStep === "nice-verify" && "본인인증을 진행해주세요"}
+            {currentStep === "id-verify" &&
+              t("auth.findPassword.subtitle.enterId")}
+            {currentStep === "nice-verify" &&
+              t("auth.findPassword.subtitle.verifyIdentity")}
             {currentStep === "password-change" &&
-              "새로운 비밀번호를 입력해주세요"}
+              t("auth.findPassword.subtitle.enterNewPassword")}
           </SubTitle>
         </HeaderSection>
 
@@ -129,20 +133,23 @@ const FindPassword = () => {
             <Input
               type="text"
               value={memberId}
-              onChange={handleIdChange} // 변경된 부분
-              placeholder="아이디를 입력하세요"
+              onChange={handleIdChange}
+              placeholder={t("auth.findPassword.form.idPlaceholder")}
             />
-            <Button onClick={handleIdVerify}>다음</Button>
+            <Button onClick={handleIdVerify}>
+              {t("auth.findPassword.form.next")}
+            </Button>
           </FormSection>
         )}
 
         {currentStep === "nice-verify" && (
           <VerificationSection>
             <VerificationOption>
-              <OptionTitle>본인명의 휴대전화로 인증</OptionTitle>
+              <OptionTitle>
+                {t("auth.findPassword.verification.phoneTitle")}
+              </OptionTitle>
               <OptionDescription>
-                본인명의로 등록된 휴대전화로 인증하여 비밀번호를 변경할 수
-                있습니다.
+                {t("auth.findPassword.verification.phoneDescription")}
               </OptionDescription>
               <ButtonWrapper>
                 <NiceVerificationButton
@@ -160,16 +167,20 @@ const FindPassword = () => {
             <Input
               type="password"
               value={newPassword}
-              onChange={handleNewPasswordChange} // 변경된 부분
-              placeholder="새 비밀번호 (8~15자 영문, 숫자, 특수문자 조합)"
+              onChange={handleNewPasswordChange}
+              placeholder={t("auth.findPassword.form.newPasswordPlaceholder")}
             />
             <Input
               type="password"
               value={confirmPassword}
-              onChange={handleConfirmPasswordChange} // 변경된 부분
-              placeholder="새 비밀번호 확인"
+              onChange={handleConfirmPasswordChange}
+              placeholder={t(
+                "auth.findPassword.form.confirmPasswordPlaceholder"
+              )}
             />
-            <Button onClick={handlePasswordChange}>비밀번호 변경</Button>
+            <Button onClick={handlePasswordChange}>
+              {t("auth.findPassword.form.changePassword")}
+            </Button>
           </FormSection>
         )}
 
@@ -177,7 +188,7 @@ const FindPassword = () => {
 
         <Footer>
           <BackButton onClick={() => navigate("/")}>
-            로그인 페이지로 돌아가기
+            {t("auth.findPassword.backToLogin")}
           </BackButton>
         </Footer>
       </FindPasswordBox>
