@@ -289,7 +289,7 @@ const SignUp: React.FC = () => {
           <Title>{t("auth.modal.title.signup")}</Title>
           <Form onSubmit={onSubmitSignUp}>
             <InputContainer>
-              <InputLabel>아이디</InputLabel>
+              <InputLabel>{t("auth.signup.id")}</InputLabel>
               <InputWrapper>
                 <Input
                   name="id"
@@ -303,7 +303,7 @@ const SignUp: React.FC = () => {
             </InputContainer>
 
             <InputContainer>
-              <InputLabel>비밀번호</InputLabel>
+              <InputLabel>{t("auth.signup.password")}</InputLabel>
               <InputWrapper>
                 <Input
                   type={showPassword ? "text" : "password"}
@@ -326,7 +326,7 @@ const SignUp: React.FC = () => {
             </InputContainer>
 
             <InputContainer>
-              <InputLabel>비밀번호 확인</InputLabel>
+              <InputLabel>{t("auth.signup.passwordCheck")}</InputLabel>
               <InputWrapper>
                 <Input
                   type={showPasswordCheck ? "text" : "password"}
@@ -349,7 +349,7 @@ const SignUp: React.FC = () => {
             </InputContainer>
 
             <InputContainer>
-              <InputLabel>닉네임</InputLabel>
+              <InputLabel>{t("auth.signup.username")}</InputLabel>
               <InputWrapper>
                 <Input
                   name="nickname"
@@ -384,9 +384,9 @@ const SignUp: React.FC = () => {
                         openModal("terms");
                       }}
                     >
-                      이용약관
+                      {t("auth.signup.terms.termsOfService")}
                     </span>{" "}
-                    및{" "}
+                    {t("auth.signup.terms.and")}{" "}
                     <span
                       onClick={(e) => {
                         e.preventDefault();
@@ -394,25 +394,25 @@ const SignUp: React.FC = () => {
                         openModal("privacy");
                       }}
                     >
-                      개인정보처리방침
+                      {t("auth.signup.terms.privacyPolicy")}
                     </span>
-                    에 동의하며, 19세 이상임을 확인합니다.
+                    {t("auth.signup.terms.agree")}
+                    {t("auth.signup.terms.ageVerification")}
                   </TermsText>
                 }
               />
 
               <MarketingSection>
                 <MarketingTitle>
-                  마케팅 활용 동의 및 광고 수신 동의
+                  {t("auth.signup.marketing.title")}
                 </MarketingTitle>
                 <MarketingDescription>
-                  서비스와 관련된 신상품 소식, 이벤트 안내, 고객 혜택 등 다양한
-                  정보를 제공합니다.
+                  {t("auth.signup.marketing.description")}
                 </MarketingDescription>
                 <CustomCheckbox
                   checked={inputVal.smsAgreed}
                   onChange={() => handleCheckboxChange("smsAgreed")}
-                  label="SMS 수신 동의 (선택)"
+                  label={t("auth.signup.marketing.smsAgreement")}
                 />
               </MarketingSection>
             </TermsSection>

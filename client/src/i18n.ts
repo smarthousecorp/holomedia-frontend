@@ -63,6 +63,21 @@ i18n.use(initReactI18next).init({
             button: "Sign Up",
             alreadyMember: "Already a member?",
             goToLogin: "page",
+            marketing: {
+              title:
+                "Marketing Utilization Agreement and Advertising Receipt Agreement",
+              description:
+                "We provide various information related to services, such as new product news, event announcements, and customer benefits.",
+              smsAgreement: "SMS Receipt Agreement (Optional)",
+            },
+            terms: {
+              title: "Terms of Service Agreement",
+              termsOfService: "Terms of Service",
+              privacyPolicy: "Privacy Policy",
+              ageVerification: "I confirm that I am 19 years or older.",
+              and: "and",
+              agree: "agree to the",
+            },
             errors: {
               idFormat:
                 "Must be 6-15 characters including English lowercase and numbers",
@@ -410,6 +425,20 @@ i18n.use(initReactI18next).init({
             button: "회원가입",
             alreadyMember: "이미 회원이신가요?",
             goToLogin: "",
+            marketing: {
+              title: "마케팅 활용 동의 및 광고 수신 동의",
+              description:
+                "서비스와 관련된 신상품 소식, 이벤트 안내, 고객 혜택 등 다양한 정보를 제공합니다.",
+              smsAgreement: "SMS 수신 동의 (선택)",
+            },
+            terms: {
+              title: "약관 동의",
+              termsOfService: "이용약관",
+              privacyPolicy: "개인정보처리방침",
+              ageVerification: "19세 이상임을 확인합니다.",
+              and: "및",
+              agree: "에 동의하며, ",
+            },
             errors: {
               idFormat: "6~15자의 영문 소문자 및 숫자가 포함되어야 합니다",
               passwordFormat:
@@ -753,6 +782,20 @@ i18n.use(initReactI18next).init({
             button: "登録",
             alreadyMember: "すでに会員ですか？",
             goToLogin: "ページへ",
+            marketing: {
+              title: "マーケティング利用同意及び広告受信同意",
+              description:
+                "サービスに関連する新製品情報、イベント案内、顧客特典など様々な情報を提供します。",
+              smsAgreement: "SMS受信同意（任意）",
+            },
+            terms: {
+              title: "利用規約に同意する",
+              termsOfService: "利用規約",
+              privacyPolicy: "プライバシーポリシー",
+              ageVerification: "19歳以上であることを確認します。",
+              and: "そして",
+              agree: "に同意する",
+            },
             errors: {
               idFormat: "6~15文字の英字小文字と数字を含める必要があります",
               passwordFormat:
@@ -1098,6 +1141,20 @@ i18n.use(initReactI18next).init({
             button: "注册",
             alreadyMember: "已经是会员了吗？",
             goToLogin: "页面",
+            marketing: {
+              title: "营销利用同意及广告接收同意",
+              description:
+                "我们提供与服务相关的新产品信息、活动通知、客户优惠等多样信息。",
+              smsAgreement: "SMS接收同意（可选）",
+            },
+            terms: {
+              title: "使用条款",
+              termsOfService: "服务条款",
+              privacyPolicy: "隐私政策",
+              ageVerification: "我确认我已满19岁。",
+              and: "并",
+              agree: "同意",
+            },
             errors: {
               idFormat: "必须包含6-15位英文小写字母和数字",
               passwordFormat: "必须包含8-15位英文大小写字母、数字和特殊符号",

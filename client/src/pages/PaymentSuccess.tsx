@@ -31,7 +31,7 @@ const PaymentSuccess = () => {
   const memberNo = useSelector((state: RootState) => state.user.memberNo);
 
   useEffect(() => {
-    const fetchPaymentInfo = async (): Promise<void> => {
+    const fetchPaymentInfo = async (): Promise<boolean> => {
       try {
         const response = await api.post("/api/payment/member/info", {
           memberNo: memberNo,
@@ -42,19 +42,36 @@ const PaymentSuccess = () => {
         }
 
         const result: ApiResponse = await response.data;
-        setPaymentInfo(result.data);
+        if (result.data) {
+          setPaymentInfo(result.data);
+          setIsLoading(false);
+          return true; // 데이터를 성공적으로 받아왔음을 표시
+        }
+        return false;
       } catch (err) {
-        setError(
-          err instanceof Error ? err.message : "알 수 없는 오류가 발생했습니다."
-        );
         console.error("Error:", err);
-      } finally {
-        setIsLoading(false);
+        return false;
       }
     };
 
-    fetchPaymentInfo();
-  }, []);
+    // 폴링 로직 추가
+    let retryCount = 0;
+    const maxRetries = 5;
+    const pollingInterval = setInterval(async () => {
+      const success = await fetchPaymentInfo();
+      retryCount++;
+
+      if (success || retryCount >= maxRetries) {
+        clearInterval(pollingInterval);
+        if (!success && retryCount >= maxRetries) {
+          setError("결제 정보를 불러오는데 실패했습니다.");
+          setIsLoading(false);
+        }
+      }
+    }, 1000); // 1초마다 시도
+
+    return () => clearInterval(pollingInterval);
+  }, [memberNo]);
 
   const formatCardNumber = (cardInfo: string): string => {
     return cardInfo.replace(/(\d{4})(\d{6})(\d{4})/, "$1 •••••• $3");
