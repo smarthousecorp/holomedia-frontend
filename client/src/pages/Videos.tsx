@@ -7,6 +7,7 @@ import PointUseModal from "../components/commons/media/PointUseModal";
 import { Creator } from "../types/user";
 import badgeIcon from "../assets/19_badge.png"; // 19 뱃지 이미지 import
 import { SkeletonCard } from "../components/commons/Skeleton";
+import { useTranslation } from "react-i18next";
 
 interface DataResponse {
   pagination: {
@@ -39,6 +40,7 @@ interface CreatorApiResponse {
 }
 
 const Videos: React.FC = () => {
+  const { t } = useTranslation();
   const [videos, setVideos] = useState<board[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -108,7 +110,7 @@ const Videos: React.FC = () => {
   if (isLoading)
     return (
       <Container>
-        <VideoTitleH2>영상 목록</VideoTitleH2>
+        <VideoTitleH2>{t("videos.title")}</VideoTitleH2>
         <GridContainer>
           {[...Array(8)].map((_, index) => (
             <SkeletonCard key={index} />
@@ -122,7 +124,7 @@ const Videos: React.FC = () => {
   return (
     <>
       <Container>
-        <VideoTitleH2>영상 목록</VideoTitleH2>
+        <VideoTitleH2>{t("videos.title")}</VideoTitleH2>
         <GridContainer>
           {videos.map((video) => (
             <ImageCard

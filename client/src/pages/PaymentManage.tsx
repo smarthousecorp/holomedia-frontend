@@ -176,25 +176,25 @@ const PaymentManage = () => {
           active={activeTab === "payment"}
           onClick={() => setActiveTab("payment")}
         >
-          결제 수단
+          {t("settings.paymentSettings.paymentMethods")}
         </Tab>
         <Tab
           active={activeTab === "history"}
           onClick={() => setActiveTab("history")}
         >
-          결제 내역
+          {t("settings.paymentSettings.billingHistory")}
         </Tab>
       </TabContainer>
 
       {activeTab === "payment" ? (
         <PaymentMethodContainer>
           <HoneyInfoContainer>
-            <HoneyLabel>보유 꿀</HoneyLabel>
+            <HoneyLabel>{t("settings.paymentSettings.honey")}</HoneyLabel>
             <HoneyAmount>{member.point} 🍯</HoneyAmount>
           </HoneyInfoContainer>
           <AddPaymentButton>
             <PlusIcon>+</PlusIcon>
-            신용/체크 카드 추가
+            {t("settings.paymentSettings.addNewCard")}
           </AddPaymentButton>
         </PaymentMethodContainer>
       ) : (
@@ -204,13 +204,13 @@ const PaymentManage = () => {
               active={historyType === "charge"}
               onClick={() => setHistoryType("charge")}
             >
-              포인트 충전 내역
+              {t("settings.paymentSettings.chargeHistory")}
             </HistoryTab>
             <HistoryTab
               active={historyType === "use"}
               onClick={() => setHistoryType("use")}
             >
-              콘텐츠 구매 내역
+              {t("settings.paymentSettings.purchaseHistory")}
             </HistoryTab>
           </HistoryTabContainer>
 
@@ -231,7 +231,9 @@ const PaymentManage = () => {
                     </HistoryItem>
                   ))
                 ) : (
-                  <EmptyHistory>구매 내역이 없습니다.</EmptyHistory>
+                  <EmptyHistory>
+                    {t("settings.paymentSettings.noPurchaseHistory")}
+                  </EmptyHistory>
                 )}
               </HistoryContainer>
 
@@ -262,13 +264,18 @@ const PaymentManage = () => {
                           </AmountContainer>
                         </ChargeHeader>
                         <CardNumber>{item.cardInfo}</CardNumber>
-                        <OrderNumber>주문번호: {item.orderNo}</OrderNumber>
+                        <OrderNumber>
+                          {t("settings.paymentSettings.orderNumber")}:{" "}
+                          {item.orderNo}
+                        </OrderNumber>
                       </ChargeContent>
                       <DateText>{formatDate(item.chargeAt)}</DateText>
                     </ChargeItem>
                   ))
                 ) : (
-                  <EmptyHistory>충전 내역이 없습니다.</EmptyHistory>
+                  <EmptyHistory>
+                    {t("settings.paymentSettings.noChargeHistory")}
+                  </EmptyHistory>
                 )}
               </HistoryContainer>
 

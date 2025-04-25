@@ -4,6 +4,7 @@ import { api } from "../utils/api";
 import badgeIcon from "../assets/19_badge.png";
 import { useNavigate } from "react-router-dom";
 import { SkeletonCard } from "../components/commons/Skeleton";
+import { useTranslation } from "react-i18next";
 
 interface Creator {
   no: number;
@@ -27,6 +28,7 @@ interface ApiResponse {
 }
 
 const Creators: React.FC = () => {
+  const { t } = useTranslation();
   const [creators, setCreators] = useState<Creator[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
@@ -63,7 +65,7 @@ const Creators: React.FC = () => {
   if (isLoading)
     return (
       <Container>
-        <CreatorTitle>크리에이터</CreatorTitle>
+        <CreatorTitle>{t("creators.title")}</CreatorTitle>
         <GridContainer>
           {[...Array(8)].map((_, index) => (
             <SkeletonCard key={index} />
@@ -76,7 +78,7 @@ const Creators: React.FC = () => {
 
   return (
     <Container>
-      <CreatorTitle>크리에이터</CreatorTitle>
+      <CreatorTitle>{t("creators.title")}</CreatorTitle>
       <GridContainer>
         {creators.map((creator) => (
           <ImageCard

@@ -1,5 +1,19 @@
 import i18n from "i18next";
 import { initReactI18next } from "react-i18next";
+import axios from "axios";
+
+const detectUserLanguage = (): string => {
+  try {
+    const browserLang = navigator.language.split("-")[0].toLowerCase();
+    return ["ko", "jp", "zh", "en"].includes(browserLang) ? browserLang : "ko";
+  } catch (error) {
+    console.error("Language detection failed:", error);
+    return "ko";
+  }
+};
+
+// 초기 언어 설정
+const defaultLanguage = detectUserLanguage();
 
 i18n.use(initReactI18next).init({
   resources: {
@@ -32,7 +46,6 @@ i18n.use(initReactI18next).init({
             findPassword: "Find Password",
             errors: {
               userNotFound: "Account does not exist",
-              // wrongPassword: "Password is incorrect",
               retypeFields: "Please enter your ID or password again",
               requiredFields: "Please enter ID and password",
             },
@@ -194,7 +207,7 @@ i18n.use(initReactI18next).init({
           },
         },
         loading: {
-          message: "로딩중입니다...",
+          message: "Loading...",
         },
       },
     },
@@ -228,7 +241,6 @@ i18n.use(initReactI18next).init({
             errors: {
               retypeFields: "아이디 또는 비밀번호를 다시 입력해주세요",
               userNotFound: "존재하지 않는 계정입니다",
-              // wrongPassword: "비밀번호가 일치하지 않습니다",
               requiredFields: "아이디와 비밀번호를 입력하세요",
             },
           },
@@ -386,7 +398,7 @@ i18n.use(initReactI18next).init({
           },
         },
         loading: {
-          message: "読み込み中...",
+          message: "로딩중입니다...",
         },
       },
     },
@@ -420,7 +432,6 @@ i18n.use(initReactI18next).init({
             errors: {
               retypeFields: " IDまたはパスワードを再入力してください",
               userNotFound: "アカウントが存在しません",
-              // wrongPassword: "パスワードが一致しません",
               requiredFields: "IDとパスワードを入力してください",
             },
           },
@@ -533,8 +544,8 @@ i18n.use(initReactI18next).init({
               placeholder: "クリエイター名を入力してください",
             },
             description: {
-              label: "영상 내용",
-              placeholder: "영상 내용을 입력하세요",
+              label: "動画の説明",
+              placeholder: "動画の説明を入力してください",
             },
             submit: "アップロード",
           },
@@ -579,7 +590,7 @@ i18n.use(initReactI18next).init({
           },
         },
         loading: {
-          message: "加载中...",
+          message: "読み込み中...",
         },
       },
     },
@@ -613,7 +624,6 @@ i18n.use(initReactI18next).init({
             errors: {
               retypeFields: "请重新输入您的ID或密码",
               userNotFound: "账号不存在",
-              // wrongPassword: "密码不正确",
               requiredFields: "请输入账号和密码",
             },
           },
@@ -643,17 +653,17 @@ i18n.use(initReactI18next).init({
         },
         header: {
           search: {
-            placeholder: "検索キーワードを入力してください",
+            placeholder: "请输入搜索关键词",
           },
           auth: {
-            loginSignup: "ログイン / 新規登録",
-            profile: "{{username}}様",
-            settings: "設定",
-            upload: "アップロード",
-            logout: "ログアウト",
+            loginSignup: "登录 / 注册",
+            profile: "{{username}}",
+            settings: "设置",
+            upload: "上传",
+            logout: "退出登录",
           },
           toast: {
-            logoutSuccess: "ログアウトが完了しました。",
+            logoutSuccess: "已成功退出登录。",
           },
         },
         sidebar: {
@@ -670,7 +680,7 @@ i18n.use(initReactI18next).init({
           },
           nav: {
             home: "首页",
-            creator: "创造者",
+            creator: "创作者",
             vod: "vod",
             setting: "设置",
             membership: "会员",
@@ -719,17 +729,13 @@ i18n.use(initReactI18next).init({
               label: "缩略图",
               uploadText: "点击上传图片",
             },
-            memberThumbnail: {
-              label: "会员缩略图",
-              uploadText: "点击上传图片",
-            },
             creatorName: {
               label: "创作者名称",
               placeholder: "请输入创作者名称",
             },
             description: {
-              label: "영상 내용",
-              placeholder: "입력",
+              label: "视频说明",
+              placeholder: "请输入视频说明",
             },
             submit: "上传",
           },
@@ -774,16 +780,46 @@ i18n.use(initReactI18next).init({
           },
         },
         loading: {
-          message: "Loading...",
+          message: "加载中...",
         },
       },
     },
   },
-  lng: "ko", // 기본 언어
-  fallbackLng: "en", // 폴백 언어
+  lng: defaultLanguage,
+  fallbackLng: "ko",
   interpolation: {
     escapeValue: false,
   },
+  react: {
+    useSuspense: false,
+  },
 });
+
+// IP 기반 언어 감지는 앱이 로드된 후에 비동기적으로 수행
+const updateLanguageBasedOnIP = async () => {
+  try {
+    const response = await axios.get("https://ipapi.co/json/");
+    const countryCode = response.data.country_code.toLowerCase();
+
+    const languageMap: Record<string, string> = {
+      jp: "jp",
+      kr: "ko",
+      cn: "zh",
+      tw: "zh",
+      hk: "zh",
+      sg: "zh",
+    };
+
+    const detectedLanguage = languageMap[countryCode] || defaultLanguage;
+    if (detectedLanguage !== i18n.language) {
+      await i18n.changeLanguage(detectedLanguage);
+    }
+  } catch (error) {
+    console.error("IP-based language detection failed:", error);
+  }
+};
+
+// 앱이 로드된 후 IP 기반 언어 감지 실행
+setTimeout(updateLanguageBasedOnIP, 0);
 
 export default i18n;

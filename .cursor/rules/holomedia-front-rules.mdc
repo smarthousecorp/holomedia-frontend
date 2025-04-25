@@ -1,0 +1,128 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
+📑 Code Style & Structure (Adjusted)
+General Rules
+Use double quotes " for strings.
+
+Always write semicolons.
+
+Favor functional and declarative programming; avoid classes.
+
+Prefer iteration and modularization over code duplication.
+
+Use descriptive variable names (e.g. isLoading, hasError).
+
+File structure: separate components, subcomponents, helpers, static content.
+
+Code Rules
+2-space indentation.
+
+Use === instead of ==.
+
+Add spaces around infix operators.
+
+Add a space after commas.
+
+Keep else statements on the same line as their closing curly brace.
+
+Always use curly braces for multi-line if statements.
+
+Always handle the err argument in callbacks.
+
+Use camelCase for variables and functions.
+
+Use PascalCase for React components.
+
+📦 React Best Practices
+Use functional components with prop-types for type checking.
+
+Follow the Rules of Hooks:
+call hooks at the top level, only inside React functions.
+
+Extract reusable logic with custom hooks.
+
+Optimize rendering with React.memo, useCallback, useMemo.
+
+Avoid inline functions inside renders.
+
+Prefer composition over inheritance (use children prop or render props).
+
+Implement code splitting using React.lazy() and Suspense.
+
+Use refs sparingly, only for DOM access.
+
+Favor controlled components for form inputs.
+
+Implement error boundaries to gracefully handle runtime errors.
+
+Always include cleanup functions in useEffect to avoid memory leaks.
+
+Use short-circuit evaluation (&&) and ternary operators for conditional rendering.
+
+🐻 State Management
+Use redux-toolkit for global state.
+
+Split state into multiple slices.
+
+Lift state up to share between components if necessary.
+
+Use Context when prop drilling gets cumbersome.
+
+🎨 UI & Styling
+Styling Tool
+Use styled-components for styling.
+
+Co-locate style definitions with components.
+
+Naming convention: PascalCase or ComponentNameElement
+(e.g. ButtonWrapper, CardTitle).
+
+Use shared theme variables.
+
+Styling Strategy
+Centralize shared values in a theme.js file.
+
+Use styled-components modules for complex or unique component styles.
+
+Limit global styles, using createGlobalStyle when needed.
+
+⚡️ Performance Optimization
+Minimize 'use client', useEffect, and useState.
+
+Prefer React Server Components whenever possible.
+
+Implement code splitting with dynamic import and Suspense.
+
+Optimize images: use WebP, lazy loading, and include size data.
+
+Optimize Web Vitals (LCP, CLS, FID).
+
+📋 Forms & Validation
+Use controlled components.
+
+Use react-hook-form with Zod or Joi for validation.
+
+Perform both client-side and server-side validation.
+
+🔐 Security & Error Handling
+Sanitize user inputs to prevent XSS.
+
+Avoid using dangerouslySetInnerHTML.
+
+Handle errors early with guard clauses and early returns.
+
+Avoid deep nesting of if statements.
+
+🌍 Internationalization (i18n)
+Use next-i18next or react-intl for i18n support.
+
+📏 Naming Conventions
+Directory names: lowercase with dashes (e.g. components/auth-wizard)
+
+State variables: isLoading, hasError, etc.
+
+
+Redux slice and action type names: lowerCamelCase.

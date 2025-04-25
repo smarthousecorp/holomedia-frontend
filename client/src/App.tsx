@@ -32,6 +32,8 @@ import FindPassword from "./pages/FindPassword";
 import ModalExamplePage from "./pages/ModalExample";
 import ScrollToTop from "./components/commons/ScrollToTop";
 import VideoLayout from "./components/layout/VideoLayout";
+import { I18nextProvider } from "react-i18next";
+import i18n from "./i18n"; // i18n 설정 import
 // interface ErrorMessageProps {
 //   message?: string;
 // }
@@ -58,7 +60,7 @@ function App() {
   // }, [location.pathname]);
 
   return (
-    <>
+    <I18nextProvider i18n={i18n}>
       <ScrollToTop />
       <Routes>
         <Route element={<MainLayout />}>
@@ -109,7 +111,7 @@ function App() {
         </Route>
       </Routes>
       <ToastContainer style={{ fontSize: "1.4rem" }} limit={1} />
-    </>
+    </I18nextProvider>
   );
 }
 

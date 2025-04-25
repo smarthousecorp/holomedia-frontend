@@ -192,7 +192,7 @@ const ProfileSetting = () => {
         </ProfileImageContainer>
 
         <InputContainer>
-          <InputLabel>사용자 ID</InputLabel>
+          <InputLabel>{t("settings.profileSettings.userId")}</InputLabel>
           <StyledInput
             type="text"
             name="userId"
@@ -204,19 +204,21 @@ const ProfileSetting = () => {
         </InputContainer>
 
         <InputContainer>
-          <InputLabel>닉네임</InputLabel>
+          <InputLabel>{t("settings.profileSettings.nickname")}</InputLabel>
           <StyledInput
             type="text"
             name="nickname"
             value={values.nickname}
             onChange={onChangeValues}
-            placeholder="닉네임"
+            placeholder={t("settings.profileSettings.nickname")}
           />
         </InputContainer>
 
-        <SaveButton onClick={handleSave}>저장</SaveButton>
+        <SaveButton onClick={handleSave}>
+          {t("settings.profileSettings.save")}
+        </SaveButton>
         <WithdrawalLink onClick={() => setShowWithdrawalModal(true)}>
-          회원탈퇴
+          {t("settings.profileSettings.withdrawal")}
         </WithdrawalLink>
       </FormContainer>
 
@@ -227,25 +229,19 @@ const ProfileSetting = () => {
           setShowSuccessModal(false);
           navigate("/settings");
         }}
-        title="프로필 수정 완료"
-        content="프로필이 성공적으로 수정되었습니다."
-        confirmText="확인"
+        title={t("settings.profileSettings.successModal.title")}
+        content={t("settings.profileSettings.successModal.content")}
+        confirmText={t("settings.profileSettings.successModal.confirm")}
       />
 
       {/* Withdrawal Confirmation Modal*/}
       <ConfirmationModal
         isOpen={showWithdrawalModal}
         onClose={() => setShowWithdrawalModal(false)}
-        title="회원탈퇴"
-        content={
-          <>
-            정말 회원탈퇴를 진행하시겠습니까?
-            <br />
-            탈퇴 시 계정 정보가 모두 삭제됩니다.
-          </>
-        }
-        confirmText="탈퇴하기"
-        cancelText="취소"
+        title={t("settings.profileSettings.withdrawalConfirm.title")}
+        content={<>{t("settings.profileSettings.withdrawalConfirm.message")}</>}
+        confirmText={t("settings.profileSettings.withdrawalConfirm.confirm")}
+        cancelText={t("settings.profileSettings.withdrawalConfirm.cancel")}
         onConfirm={confirmWithdrawal}
       />
     </Container>

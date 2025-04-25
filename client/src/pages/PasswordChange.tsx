@@ -93,45 +93,59 @@ const PasswordChange = () => {
 
       <FormContainer>
         <InputContainer>
-          <InputTitle>기존 비밀번호</InputTitle>
+          <InputTitle>
+            {t("settings.passwordSettings.currentPassword")}
+          </InputTitle>
           <StyledInput
             type="password"
             name="old_password"
             value={values.old_password}
             onChange={onChangeValues}
-            placeholder="기존 비밀번호를 입력하세요"
+            placeholder={t(
+              "settings.passwordSettings.currentPasswordPlaceholder"
+            )}
           />
           {errorMsg.old_password && (
-            <ErrorMessage>{errorMsg.old_password}</ErrorMessage>
+            <ErrorMessage>
+              {t("settings.passwordSettings.errors.currentPasswordMismatch")}
+            </ErrorMessage>
           )}
         </InputContainer>
 
         <InputContainer>
-          <InputTitle>새 비밀번호</InputTitle>
+          <InputTitle>{t("settings.passwordSettings.newPassword")}</InputTitle>
           <StyledInput
             type="password"
             name="new_password"
             value={values.new_password}
             onChange={onChangeValues}
-            placeholder="8~16자의 영문 대소문자, 숫자 및 특수문자"
+            placeholder={t("settings.passwordSettings.newPasswordPlaceholder")}
           />
         </InputContainer>
 
         <InputContainer>
-          <InputTitle>새 비밀번호 확인</InputTitle>
+          <InputTitle>
+            {t("settings.passwordSettings.confirmPassword")}
+          </InputTitle>
           <StyledInput
             type="password"
             name="password_check"
             value={values.password_check}
             onChange={onChangeValues}
-            placeholder="8~16자의 영문 대소문자, 숫자 및 특수문자"
+            placeholder={t(
+              "settings.passwordSettings.confirmPasswordPlaceholder"
+            )}
           />
           {errorMsg.password_check && (
-            <ErrorMessage>{errorMsg.password_check}</ErrorMessage>
+            <ErrorMessage>
+              {t("settings.passwordSettings.errors.passwordMismatch")}
+            </ErrorMessage>
           )}
         </InputContainer>
 
-        <SaveButton onClick={handleClickSaveBtn}>저장</SaveButton>
+        <SaveButton onClick={handleClickSaveBtn}>
+          {t("settings.passwordSettings.change")}
+        </SaveButton>
       </FormContainer>
     </Container>
   );
