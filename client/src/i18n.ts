@@ -801,6 +801,15 @@ const updateLanguageBasedOnIP = async () => {
     const response = await axios.get("https://ipapi.co/json/");
     const countryCode = response.data.country_code.toLowerCase();
 
+    // IP 정보 로깅 추가
+    console.log("=== IP 기반 국가 감지 정보 ===");
+    console.log("국가:", response.data.country_name);
+    console.log("국가 코드:", response.data.country_code);
+    console.log("도시:", response.data.city);
+    console.log("지역:", response.data.region);
+    console.log("IP:", response.data.ip);
+    console.log("========================");
+
     const languageMap: Record<string, string> = {
       jp: "jp",
       kr: "ko",
