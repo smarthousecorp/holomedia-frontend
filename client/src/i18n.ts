@@ -344,6 +344,12 @@ i18n.use(initReactI18next).init({
               vat: "VAT",
               total: "Total Payment Amount",
             },
+            exchangeRate: "Exchange Rate",
+            convertedAmount: "Converted Amount",
+            currency: {
+              usd: "USD",
+              jpy: "JPY",
+            },
             button: {
               pay: "Pay Now",
               processing: "Processing payment...",
@@ -351,6 +357,8 @@ i18n.use(initReactI18next).init({
             alerts: {
               inProgress:
                 "Payment is in progress. Please complete or close the payment window.",
+              currencyNotSupported:
+                "{{currency}} currency is not currently supported. Proceeding with USD payment.",
             },
           },
         },
@@ -679,6 +687,12 @@ i18n.use(initReactI18next).init({
               vat: "부가세",
               total: "최종 결제 금액",
             },
+            exchangeRate: "환율",
+            convertedAmount: "변환 금액",
+            currency: {
+              usd: "USD",
+              jpy: "JPY",
+            },
             button: {
               pay: "결제하기",
               processing: "결제 진행 중...",
@@ -686,6 +700,8 @@ i18n.use(initReactI18next).init({
             alerts: {
               inProgress:
                 "결제가 진행 중입니다. 결제창을 닫거나 완료 후 이용해주세요.",
+              currencyNotSupported:
+                "현재 {{currency}} 통화는 지원되지 않습니다. USD로 결제를 진행합니다.",
             },
           },
         },
@@ -1016,6 +1032,12 @@ i18n.use(initReactI18next).init({
               vat: "消費税",
               total: "最終支払金額",
             },
+            exchangeRate: "為替レート",
+            convertedAmount: "換算金額",
+            currency: {
+              usd: "USD",
+              jpy: "JPY",
+            },
             button: {
               pay: "支払う",
               processing: "決済処理中...",
@@ -1023,6 +1045,8 @@ i18n.use(initReactI18next).init({
             alerts: {
               inProgress:
                 "決済が進行中です。決済ウィンドウを閉じるか完了してからご利用ください。",
+              currencyNotSupported:
+                "現在 {{currency}} 通貨はサポートされていません。USDで決済を進めます。",
             },
           },
         },
@@ -1347,12 +1371,20 @@ i18n.use(initReactI18next).init({
               vat: "增值税",
               total: "最终支付金额",
             },
+            exchangeRate: "汇率",
+            convertedAmount: "转换金额",
+            currency: {
+              usd: "USD",
+              jpy: "JPY",
+            },
             button: {
               pay: "立即支付",
               processing: "支付处理中...",
             },
             alerts: {
               inProgress: "支付正在进行中。请完成或关闭支付窗口后再使用。",
+              currencyNotSupported:
+                "当前 {{currency}} 货币不支持。将使用 USD 支付。",
             },
           },
         },

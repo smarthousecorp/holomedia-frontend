@@ -152,38 +152,85 @@ const PaymentModal = ({ onClose }: PaymentModalProps) => {
   };
 
   const handleClickPaymentBtn = () => {
-    api
-      .post(
-        "/api/payment/request",
-        {
-          pgcode: isForeignPayment ? "creditcard_global" : "creditcard",
-          memberId: userInfo?.loginId,
-          productName: selectedAmount?.toString() || customAmount,
-          price: totalPrice,
-          currency: isForeignPayment ? "USD" : "KRW",
-          convertedAmount: isForeignPayment ? convertedAmount : null,
-        },
-        {
-          withCredentials: true,
-        }
-      )
-      .then((res) => {
-        const options =
-          "toolbar=no,scrollbars=no,resizable=yes,status=no,menubar=no,width=1200, height=800, top=0,left=0";
-        const newWindow = window.open(
-          res.data.data.urls.online_url,
-          "_blank",
-          options
+    if (isForeignPayment) {
+      // JPY는 지원하지 않으므로 USD로 전환
+      if (selectedCurrency === "JPY") {
+        alert(
+          t("payment.modal.alerts.currencyNotSupported", { currency: "JPY" })
         );
-        if (newWindow) {
-          setPaymentWindow(newWindow);
-          setIsPaymentPending(true);
-        }
-      })
-      .catch((error) => {
-        console.error("Payment request failed:", error);
-        setIsPaymentPending(false);
-      });
+        setSelectedCurrency("USD");
+        return;
+      }
+
+      // 해외 결제 요청
+      api
+        .post(
+          "/api/payment/global/request",
+          {
+            currency: selectedCurrency,
+            memberNo: memberNo,
+            price: convertedAmount,
+            amountInKrw: totalPrice,
+            productName: `${selectedHoney}꿀`,
+            email: userInfo?.loginId,
+            pgcode: "PLCreditCard",
+          },
+          {
+            withCredentials: true,
+          }
+        )
+        .then((res) => {
+          const options =
+            "toolbar=no,scrollbars=no,resizable=yes,status=no,menubar=no,width=1200, height=800, top=0,left=0";
+          const newWindow = window.open(
+            res.data.data.urls.online_url,
+            "_blank",
+            options
+          );
+          if (newWindow) {
+            setPaymentWindow(newWindow);
+            setIsPaymentPending(true);
+          }
+        })
+        .catch((error) => {
+          console.error("Payment request failed:", error);
+          setIsPaymentPending(false);
+        });
+    } else {
+      // 국내 결제 요청 (기존 로직)
+      api
+        .post(
+          "/api/payment/request",
+          {
+            pgcode: "creditcard",
+            memberId: userInfo?.loginId,
+            productName: selectedAmount?.toString() || customAmount,
+            price: totalPrice,
+            currency: "KRW",
+            convertedAmount: null,
+          },
+          {
+            withCredentials: true,
+          }
+        )
+        .then((res) => {
+          const options =
+            "toolbar=no,scrollbars=no,resizable=yes,status=no,menubar=no,width=1200, height=800, top=0,left=0";
+          const newWindow = window.open(
+            res.data.data.urls.online_url,
+            "_blank",
+            options
+          );
+          if (newWindow) {
+            setPaymentWindow(newWindow);
+            setIsPaymentPending(true);
+          }
+        })
+        .catch((error) => {
+          console.error("Payment request failed:", error);
+          setIsPaymentPending(false);
+        });
+    }
   };
 
   // 결제 창 모니터링
@@ -315,19 +362,19 @@ const PaymentModal = ({ onClose }: PaymentModalProps) => {
               exchangeRate !== null && (
                 <>
                   <PriceRow>
-                    <span>환율</span>
+                    <span>{t("payment.modal.exchangeRate")}</span>
                     <span>
                       1 {selectedCurrency} = ₩{" "}
                       {formatExchangeRate(exchangeRate)}
                     </span>
                   </PriceRow>
-                  <PriceRow>
-                    <span>변환 금액</span>
+                  {/* <PriceRow>
+                    <span>{t("payment.modal.convertedAmount")}</span>
                     <span>
                       {selectedCurrency === "USD" ? "$" : "¥"}{" "}
                       {convertedAmount?.toFixed(2) || "0.00"}
                     </span>
-                  </PriceRow>
+                  </PriceRow> */}
                 </>
               )}
             <TotalRow>
