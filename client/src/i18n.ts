@@ -377,6 +377,42 @@ i18n.use(initReactI18next).init({
             },
           },
         },
+        pointUseModal: {
+          title: "Purchase Content",
+          subtitle: "Purchase content with points",
+          paymentComplete: "Payment completed.",
+          paymentError: "An error occurred during payment processing.",
+          networkError: "A network error has occurred.",
+          productInfo: {
+            video: "'s video",
+          },
+          payment: {
+            amount: "Payment Amount",
+            points: "honey",
+          },
+          buttons: {
+            cancel: "Cancel",
+            pay: "Pay",
+            confirm: "Confirm",
+          },
+          result: {
+            success: "Payment Complete",
+            failure: "Payment Failed",
+          },
+        },
+        videoDetail: {
+          navigation: {
+            back: "Back",
+            home: "Home",
+            pcHint: "Press ESC or Backspace to go back",
+          },
+          payment: {
+            title: "Payment Required",
+            description: "Payment is required to watch this video.",
+            price: "Price: {{price}}",
+            back: "Go Back",
+          },
+        },
       },
     },
     ko: {
@@ -732,6 +768,42 @@ i18n.use(initReactI18next).init({
               currencyNotSupported:
                 "현재 {{currency}} 통화는 지원되지 않습니다. USD로 결제를 진행합니다.",
             },
+          },
+        },
+        pointUseModal: {
+          title: "콘텐츠 구매하기",
+          subtitle: "포인트로 콘텐츠를 구매합니다",
+          paymentComplete: "결제가 완료되었습니다.",
+          paymentError: "결제 처리 중 오류가 발생했습니다.",
+          networkError: "네트워크 오류가 발생했습니다.",
+          productInfo: {
+            video: "님의 영상",
+          },
+          payment: {
+            amount: "결제 금액",
+            points: "꿀",
+          },
+          buttons: {
+            cancel: "취소",
+            pay: "결제하기",
+            confirm: "확인",
+          },
+          result: {
+            success: "결제 완료",
+            failure: "결제 실패",
+          },
+        },
+        videoDetail: {
+          navigation: {
+            back: "뒤로가기",
+            home: "홈",
+            pcHint: "ESC 또는 Backspace를 눌러 뒤로가기",
+          },
+          payment: {
+            title: "결제가 필요한 영상입니다",
+            description: "이 영상을 시청하기 위해서는 결제가 필요합니다.",
+            price: "가격: {{price}}원",
+            back: "돌아가기",
           },
         },
       },
@@ -1093,6 +1165,42 @@ i18n.use(initReactI18next).init({
             },
           },
         },
+        pointUseModal: {
+          title: "コンテンツを購入",
+          subtitle: "ポイントでコンテンツを購入します",
+          paymentComplete: "決済が完了しました。",
+          paymentError: "決済処理中にエラーが発生しました。",
+          networkError: "ネットワークエラーが発生しました。",
+          productInfo: {
+            video: "様の動画",
+          },
+          payment: {
+            amount: "決済金額",
+            points: "蜂蜜",
+          },
+          buttons: {
+            cancel: "キャンセル",
+            pay: "決済する",
+            confirm: "確認",
+          },
+          result: {
+            success: "決済完了",
+            failure: "決済失敗",
+          },
+        },
+        videoDetail: {
+          navigation: {
+            back: "戻る",
+            home: "ホーム",
+            pcHint: "ESCまたはBackspaceキーを押して戻る",
+          },
+          payment: {
+            title: "決済が必要な動画です",
+            description: "この動画を視聴するには決済が必要です。",
+            price: "価格: {{price}}円",
+            back: "戻る",
+          },
+        },
       },
     },
     zh: {
@@ -1443,6 +1551,42 @@ i18n.use(initReactI18next).init({
               currencyNotSupported:
                 "当前 {{currency}} 货币不支持。将使用 USD 支付。",
             },
+          },
+        },
+        pointUseModal: {
+          title: "购买内容",
+          subtitle: "使用积分购买内容",
+          paymentComplete: "支付已完成。",
+          paymentError: "支付处理过程中发生错误。",
+          networkError: "发生网络错误。",
+          productInfo: {
+            video: "的视频",
+          },
+          payment: {
+            amount: "支付金额",
+            points: "蜂蜜",
+          },
+          buttons: {
+            cancel: "取消",
+            pay: "支付",
+            confirm: "确认",
+          },
+          result: {
+            success: "支付完成",
+            failure: "支付失败",
+          },
+        },
+        videoDetail: {
+          navigation: {
+            back: "返回",
+            home: "首页",
+            pcHint: "按ESC或Backspace返回",
+          },
+          payment: {
+            title: "需要支付",
+            description: "观看此视频需要支付。",
+            price: "价格: {{price}}元",
+            back: "返回",
           },
         },
       },

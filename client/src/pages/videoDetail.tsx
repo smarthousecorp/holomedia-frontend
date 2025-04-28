@@ -12,6 +12,7 @@ import {
 import { IconButton } from "@mui/material";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import { api } from "../utils/api";
+import { useTranslation } from "react-i18next";
 
 import VideoPlayer from "../components/commons/media/VideoPlayer";
 import { useSelector } from "react-redux";
@@ -25,6 +26,7 @@ interface PaymentStatus {
 }
 
 const VideoDetail = () => {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const id = useParams().id;
 
@@ -153,17 +155,17 @@ const VideoDetail = () => {
       </BackButtonContainer>
 
       {/* PC 뒤로가기 인디케이터 */}
-      <PCNavigationHint>ESC 또는 Backspace를 눌러 뒤로가기</PCNavigationHint>
+      <PCNavigationHint>{t("videoDetail.navigation.pcHint")}</PCNavigationHint>
 
       {/* 새로운 컨트롤 바 추가 */}
       <ControlBar>
         <ControlButton onClick={handleGoBack}>
           <ArrowBackIcon sx={{ fontSize: "2rem" }} />
-          <ButtonLabel>뒤로가기</ButtonLabel>
+          <ButtonLabel>{t("videoDetail.navigation.back")}</ButtonLabel>
         </ControlButton>
         <ControlButton onClick={handleHomeClick}>
           <HomeIcon sx={{ fontSize: "2rem" }} />
-          <ButtonLabel>홈</ButtonLabel>
+          <ButtonLabel>{t("videoDetail.navigation.home")}</ButtonLabel>
         </ControlButton>
       </ControlBar>
 
@@ -185,10 +187,14 @@ const VideoDetail = () => {
       </VideoPlayContainer>
 
       <CustomDialog open={showPaymentDialog} onClose={onClosePaymentDialog}>
-        <CustomDialogTitle>결제가 필요한 영상입니다</CustomDialogTitle>
+        <CustomDialogTitle>{t("videoDetail.payment.title")}</CustomDialogTitle>
         <CustomDialogContent>
-          <p>이 영상을 시청하기 위해서는 결제가 필요합니다.</p>
-          <p>가격: {paymentInfo?.price?.toLocaleString()}원</p>
+          <p>{t("videoDetail.payment.description")}</p>
+          <p>
+            {t("videoDetail.payment.price", {
+              price: paymentInfo?.price?.toLocaleString(),
+            })}
+          </p>
         </CustomDialogContent>
         <DialogActions>
           {/* <Button onClick={onClosePaymentDialog}>취소</Button>
@@ -200,7 +206,7 @@ const VideoDetail = () => {
             variant="contained"
             color="primary"
           >
-            돌아가기
+            {t("videoDetail.payment.back")}
           </Button>
         </DialogActions>
       </CustomDialog>

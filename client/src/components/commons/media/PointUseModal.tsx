@@ -4,6 +4,7 @@ import { api } from "../../../utils/api";
 import { useSelector } from "react-redux";
 import { RootState } from "../../../store";
 import { board } from "../../../types/board";
+import { useTranslation } from "react-i18next";
 
 interface Creator {
   nickname: string;
@@ -35,6 +36,7 @@ const PointUseModal: React.FC<PaymentModalProps> = ({
   creator,
   onPaymentComplete,
 }) => {
+  const { t } = useTranslation();
   const memberNo = useSelector((state: RootState) => state.user.memberNo);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [showResult, setShowResult] = useState<boolean>(false);
@@ -57,20 +59,20 @@ const PointUseModal: React.FC<PaymentModalProps> = ({
       if (response.data.code === 0) {
         setPaymentResult({
           success: true,
-          message: "결제가 완료되었습니다.",
+          message: t("pointUseModal.paymentComplete"),
         });
         onPaymentComplete();
       } else {
         setPaymentResult({
           success: false,
-          message: response.data.message || "결제 처리 중 오류가 발생했습니다.",
+          message: response.data.message || t("pointUseModal.paymentError"),
         });
       }
     } catch (error) {
       console.log(error);
       setPaymentResult({
         success: false,
-        message: "네트워크 오류가 발생했습니다.",
+        message: t("pointUseModal.networkError"),
       });
     } finally {
       setIsLoading(false);
@@ -99,8 +101,8 @@ const PointUseModal: React.FC<PaymentModalProps> = ({
             </CloseButton>
 
             <ModalHeader>
-              <ModalTitle>콘텐츠 구매하기</ModalTitle>
-              <ModalSubtitle>포인트로 콘텐츠를 구매합니다</ModalSubtitle>
+              <ModalTitle>{t("pointUseModal.title")}</ModalTitle>
+              <ModalSubtitle>{t("pointUseModal.subtitle")}</ModalSubtitle>
             </ModalHeader>
 
             <ContentSection>
@@ -108,23 +110,31 @@ const PointUseModal: React.FC<PaymentModalProps> = ({
                 <ProductIcon>🎬</ProductIcon>
                 <ProductDetails>
                   <ProductTitle>{board.title}</ProductTitle>
-                  <ProductCreator>{creator.nickname}님의 영상</ProductCreator>
+                  <ProductCreator>
+                    {creator.nickname}
+                    {t("pointUseModal.productInfo.video")}
+                  </ProductCreator>
                 </ProductDetails>
               </ProductInfo>
 
               <Divider />
 
               <PriceSection>
-                <PriceLabel>결제 금액</PriceLabel>
+                <PriceLabel>{t("pointUseModal.payment.amount")}</PriceLabel>
                 <PriceAmount>
                   <PointIcon>🍯</PointIcon>
-                  <PointValue>{board.point.toLocaleString()} 꿀</PointValue>
+                  <PointValue>
+                    {board.point.toLocaleString()}{" "}
+                    {t("pointUseModal.payment.points")}
+                  </PointValue>
                 </PriceAmount>
               </PriceSection>
             </ContentSection>
 
             <ActionButtons>
-              <CancelButton onClick={onClose}>취소</CancelButton>
+              <CancelButton onClick={onClose}>
+                {t("pointUseModal.buttons.cancel")}
+              </CancelButton>
               <PayButton
                 onClick={handlePayment}
                 disabled={isLoading}
@@ -150,7 +160,7 @@ const PointUseModal: React.FC<PaymentModalProps> = ({
                     </svg>
                   </LoadingSpinner>
                 ) : (
-                  "결제하기"
+                  t("pointUseModal.buttons.pay")
                 )}
               </PayButton>
             </ActionButtons>
@@ -200,7 +210,9 @@ const PointUseModal: React.FC<PaymentModalProps> = ({
               )}
             </ResultIcon>
             <ResultTitle success={paymentResult.success}>
-              {paymentResult.success ? "결제 완료" : "결제 실패"}
+              {paymentResult.success
+                ? t("pointUseModal.result.success")
+                : t("pointUseModal.result.failure")}
             </ResultTitle>
             <ResultMessage>{paymentResult.message}</ResultMessage>
             <ConfirmButton
@@ -212,7 +224,7 @@ const PointUseModal: React.FC<PaymentModalProps> = ({
               }}
               success={paymentResult.success}
             >
-              확인
+              {t("pointUseModal.buttons.confirm")}
             </ConfirmButton>
           </ResultModalContainer>
         </ModalOverlay>
