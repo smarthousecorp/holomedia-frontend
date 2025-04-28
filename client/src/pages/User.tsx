@@ -13,6 +13,10 @@ import MovieList from "../components/main/MovieList";
 import { Creator } from "../types/user";
 import { board } from "../types/board";
 import PointUseModal from "../components/commons/media/PointUseModal";
+import { useTranslation } from "../utils/translation_google";
+import { Button } from "@mui/material";
+import TranslateIcon from "@mui/icons-material/Translate";
+import i18n from "../i18n";
 
 type LoadingState = "loading" | "error" | "success";
 type TabType = "free" | "premium";
@@ -54,6 +58,10 @@ const User = () => {
   const [isExpandedBio, setIsExpandedBio] = useState(false);
   const [showExpandButton, setShowExpandButton] = useState(false);
   const quillRef = useRef<HTMLDivElement | null>(null);
+  const [translatedContent, setTranslatedContent] = useState<string>("");
+  const [isTranslating, setIsTranslating] = useState<boolean>(false);
+  const [isTranslated, setIsTranslated] = useState<boolean>(false);
+  const { translate } = useTranslation();
 
   const handleCreatorClick = (creator: Creator): void => {
     navigate(`/user/${creator.no}`);
@@ -130,6 +138,52 @@ const User = () => {
     }
   });
 
+  const handleTranslateContent = async () => {
+    if (!creator.content) return;
+
+    setIsTranslating(true);
+    try {
+      // i18n 언어 코드를 Google Cloud Translation API 언어 코드로 변환
+      const getGoogleLanguageCode = (lang: string) => {
+        switch (lang) {
+          case "ko":
+            return "ko";
+          case "en":
+            return "en";
+          case "jp":
+            return "ja";
+          case "zh":
+            return "zh";
+          default:
+            return "en";
+        }
+      };
+
+      const targetLang = getGoogleLanguageCode(i18n.language);
+
+      console.log("번역 시도:", {
+        text: creator.content,
+        targetLang,
+        apiKey: import.meta.env.VITE_GOOGLE_API_KEY,
+      });
+
+      const translated = await translate(creator.content, targetLang);
+      console.log("번역 결과:", translated);
+
+      // HTML 형식의 텍스트를 ReactQuill이 처리할 수 있는 형식으로 변환
+      const formattedContent = translated
+        .replace(/\\u003c/g, "<")
+        .replace(/\\u003e/g, ">");
+      setTranslatedContent(formattedContent);
+      setIsTranslated(true);
+    } catch (error) {
+      console.error("번역 실패 상세:", error);
+      Toast(ToastType.error, "번역에 실패했습니다.");
+    } finally {
+      setIsTranslating(false);
+    }
+  };
+
   if (loadingState === "loading") {
     return <Loading />;
   }
@@ -156,7 +210,7 @@ const User = () => {
           <StyledQuillWrapper $isExpanded={isExpandedBio}>
             <div className="quill-container" ref={quillRef}>
               <ReactQuill
-                value={creator.content}
+                value={translatedContent || creator.content}
                 readOnly={true}
                 theme="bubble"
                 modules={{
@@ -164,6 +218,21 @@ const User = () => {
                 }}
               />
             </div>
+            <TranslateButtonContainer>
+              <Button
+                variant="outlined"
+                startIcon={<TranslateIcon />}
+                onClick={handleTranslateContent}
+                disabled={isTranslating || !creator.content}
+                size="small"
+              >
+                {isTranslating
+                  ? "번역 중..."
+                  : isTranslated
+                  ? "번역됨"
+                  : "번역하기"}
+              </Button>
+            </TranslateButtonContainer>
             {showExpandButton && (
               <ExpandButton onClick={() => setIsExpandedBio(!isExpandedBio)}>
                 {isExpandedBio ? "접기" : "더보기"}
@@ -425,4 +494,11 @@ const StyledQuillWrapper = styled.div<{ $isExpanded: boolean }>`
       text-decoration: underline;
     }
   }
+`;
+
+const TranslateButtonContainer = styled.div`
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 1rem;
+  margin-bottom: 1rem;
 `;

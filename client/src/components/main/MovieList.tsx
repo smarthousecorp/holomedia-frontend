@@ -4,6 +4,10 @@ import ReactQuill from "react-quill";
 import "react-quill/dist/quill.bubble.css";
 import { Creator } from "../../types/user";
 import { board } from "../../types/board";
+import { useTranslation } from "../../utils/translation_google";
+import { Button } from "@mui/material";
+import TranslateIcon from "@mui/icons-material/Translate";
+import i18n from "../../i18n";
 // import VisibilityIcon from "@mui/icons-material/Visibility";
 // import { SvgIcon } from "@mui/material";
 // import LikeButton from "./LikeButton";
@@ -36,6 +40,22 @@ const MovieList: React.FC<MovieListProps> = ({
     [key: number]: boolean;
   }>({});
   const quillRefs = useRef<{ [key: number]: HTMLDivElement | null }>({});
+  const [translatedContents, setTranslatedContents] = useState<{
+    [key: number]: string;
+  }>({});
+  const [isTranslating, setIsTranslating] = useState<{
+    [key: number]: boolean;
+  }>({});
+  const [isTranslated, setIsTranslated] = useState<{ [key: number]: boolean }>(
+    {}
+  );
+  const { translate } = useTranslation();
+
+  // 탭이 변경될 때 번역된 내용 초기화
+  useEffect(() => {
+    setTranslatedContents({});
+    setIsTranslated({});
+  }, [shouldBlur]);
 
   const findCreator = (id: number) => {
     return creators.find((creator) => creator.no === id);
@@ -98,6 +118,59 @@ const MovieList: React.FC<MovieListProps> = ({
     );
   };
 
+  const handleTranslateContent = async (boardId: number, content: string) => {
+    if (!content) {
+      console.log("번역할 내용이 없습니다.");
+      return;
+    }
+
+    console.log("번역 시작:", { boardId, content });
+    setIsTranslating((prev) => ({ ...prev, [boardId]: true }));
+
+    try {
+      // i18n 언어 코드를 Google Cloud Translation API 언어 코드로 변환
+      const getGoogleLanguageCode = (lang: string) => {
+        switch (lang) {
+          case "ko":
+            return "ko";
+          case "en":
+            return "en";
+          case "jp":
+            return "ja";
+          case "zh":
+            return "zh";
+          default:
+            return "en";
+        }
+      };
+
+      const targetLang = getGoogleLanguageCode(i18n.language);
+      console.log("번역 시도:", { targetLang, content });
+
+      const translated = await translate(content, targetLang);
+      console.log("번역 결과:", translated);
+
+      const formattedContent = translated
+        .replace(/\\u003c/g, "<")
+        .replace(/\\u003e/g, ">");
+
+      setTranslatedContents((prev) => ({
+        ...prev,
+        [boardId]: formattedContent,
+      }));
+
+      // 번역 완료 상태 설정
+      setIsTranslated((prev) => ({
+        ...prev,
+        [boardId]: true,
+      }));
+    } catch (error) {
+      console.error("번역 실패:", error);
+    } finally {
+      setIsTranslating((prev) => ({ ...prev, [boardId]: false }));
+    }
+  };
+
   useEffect(() => {
     // 각 게시글의 내용 높이를 체크하여 expandButton 표시 여부 결정
     boards.forEach((board) => {
@@ -123,6 +196,7 @@ const MovieList: React.FC<MovieListProps> = ({
         const isVideo = shouldBlur;
         const mediaUrl = isVideo ? board.urls.thumbnail : board.urls.image;
         const shouldApplyBlur = isVideo && !board.paid && board.point !== 0;
+        const content = isVideo ? board.contents.video : board.contents.image;
 
         if (!creator || !mediaUrl) return null;
 
@@ -146,9 +220,7 @@ const MovieList: React.FC<MovieListProps> = ({
                     ref={(el) => (quillRefs.current[board.boardNo] = el)}
                   >
                     <ReactQuill
-                      value={
-                        isVideo ? board.contents.video : board.contents.image
-                      }
+                      value={translatedContents[board.boardNo] || content}
                       readOnly={true}
                       theme="bubble"
                       modules={{
@@ -156,13 +228,30 @@ const MovieList: React.FC<MovieListProps> = ({
                       }}
                     />
                   </div>
-                  {showExpandButtons[board.boardNo] && (
-                    <ExpandButton
-                      onClick={() => toggleDescription(board.boardNo)}
+                  <ButtonContainer>
+                    <TranslateButton
+                      variant="outlined"
+                      startIcon={<TranslateIcon />}
+                      onClick={() =>
+                        handleTranslateContent(board.boardNo, content)
+                      }
+                      disabled={isTranslating[board.boardNo] || !content}
+                      size="small"
                     >
-                      {isExpanded ? "접기" : "더보기"}
-                    </ExpandButton>
-                  )}
+                      {isTranslating[board.boardNo]
+                        ? "번역 중..."
+                        : isTranslated[board.boardNo]
+                        ? "번역됨"
+                        : "번역하기"}
+                    </TranslateButton>
+                    {showExpandButtons[board.boardNo] && (
+                      <ExpandButton
+                        onClick={() => toggleDescription(board.boardNo)}
+                      >
+                        {isExpanded ? "접기" : "더보기"}
+                      </ExpandButton>
+                    )}
+                  </ButtonContainer>
                 </StyledQuillWrapper>
               </PostHeader>
 
@@ -466,6 +555,22 @@ const NavButton = styled.button`
 const GalleryCounter = styled.div`
   color: white;
   font-size: 16px;
+`;
+
+const ButtonContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  margin-top: 1rem;
+  margin-bottom: 1rem;
+  gap: 0.5rem;
+`;
+
+const TranslateButton = styled(Button)`
+  && {
+    font-size: 1.2rem;
+    padding: 0.4rem 0.8rem;
+  }
 `;
 
 // const PlayIcon = styled.div`
