@@ -23,6 +23,7 @@ const Settings = () => {
     { id: 3, label: t("settings.payment"), link: "payment-manage" },
     { id: 4, label: t("settings.password"), link: "password-change" },
     { id: 5, label: t("settings.logout") },
+    
   ];
 
   const handleLogout = () => {

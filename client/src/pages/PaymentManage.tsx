@@ -8,6 +8,8 @@ import { useSelector } from "react-redux";
 import { RootState } from "../store";
 import { User } from "../types/user";
 import Pagination from "../components/commons/Pagination";
+import RefundRequestModal from "./RefundRequest";
+
 
 interface PaymentHistory {
   creatorNickname: string;
@@ -26,6 +28,7 @@ interface ChargeHistory {
   orderNo: string;
   paymentNo: number;
   chargeAt: string;
+  memberNo: number;
 }
 
 interface PaginationData<T> {
@@ -33,6 +36,15 @@ interface PaginationData<T> {
   currentPage: number;
   totalCount: number;
   list: T[];
+}
+// //////////////
+interface RefundItem {
+  memberNo: number;
+  paymentNo: number;
+  tid: string;
+  amount: number;
+  pgcode: string;
+  refundable: boolean;
 }
 
 const PaymentManage = () => {
@@ -75,6 +87,10 @@ const PaymentManage = () => {
     totalCount: 0,
     list: [],
   });
+
+  //환불 모달창
+  const [showRefundModal, setShowRefundModal] = useState(false);
+  const [selectedRefundItems, setSelectedRefundItems] = useState<RefundItem[]>([]);
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
@@ -277,19 +293,50 @@ const PaymentManage = () => {
                     {t("settings.paymentSettings.noChargeHistory")}
                   </EmptyHistory>
                 )}
-              </HistoryContainer>
 
-              {chargeHistoryData.totalPages > 0 && (
-                <Pagination
-                  currentPage={chargeHistoryData.currentPage}
-                  totalPages={chargeHistoryData.totalPages}
-                  onPageChange={handleChargePageChange}
-                />
-              )}
+              </HistoryContainer>
+              {/*    -------------------    */}
+              <RefundPaginationWrapper>
+ <RefundButton onClick={() => {
+ const refundableItems = chargeHistoryData.list
+  .filter(item => item.amount >= 1000)
+  .map(item => ({
+    ...item,
+    memberNo: member.memberNo, //  명시적으로 넣어야 undefined 방지
+    refundable: true,
+  }));
+
+setSelectedRefundItems(refundableItems);
+  setShowRefundModal(true);
+}}>
+  환불 요청
+</RefundButton>
+  <PaginationWrapper>
+    {chargeHistoryData.totalPages > 0 && (
+      <Pagination
+        currentPage={chargeHistoryData.currentPage}
+        totalPages={chargeHistoryData.totalPages}
+        onPageChange={handleChargePageChange}
+      />
+    )}
+  </PaginationWrapper>
+</RefundPaginationWrapper>
+           
             </>
           )}
         </>
       )}
+      {showRefundModal && (
+  <RefundRequestModal
+    refundItems={selectedRefundItems}
+    onClose={() => setShowRefundModal(false)}
+    onSuccess={() => {
+      setShowRefundModal(false);
+      fetchChargeHistory(chargePage);
+    }}
+  />
+)}
+
     </Container>
   );
 };
@@ -511,4 +558,38 @@ const EmptyHistory = styled.div`
   padding: 24px 0;
   color: #9ca3af;
   font-size: 14px;
+`;
+
+
+const RefundPaginationWrapper = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: space-between; /* 왼쪽 버튼 + 가운데 페이지네이션 */
+  margin-top: 24px;
+  padding: 0 12px;
+  position: relative;
+`;
+
+const PaginationWrapper = styled.div`
+  display: flex;
+  justify-content: center;
+  flex: 1;
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+`;
+
+const RefundButton = styled.button`
+  padding: 10px 16px;
+  background-color: #eb3553;
+  color: white;
+  font-size: 14px;
+  font-weight: 600;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+
+  &:hover {
+    background-color: #d52e4c;
+  }
 `;
