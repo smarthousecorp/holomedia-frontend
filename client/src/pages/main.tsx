@@ -55,8 +55,12 @@ const Main = () => {
         api.get(`/creator/list`),
       ]);
 
-      setMedias(boardResponse.data.data.list);
-      setUploaders(creatorResponse.data.data.list);
+      const boards = boardResponse?.data?.data?.list ?? [];
+    const creators = creatorResponse?.data?.data?.list ?? [];
+
+      setMedias(boards);
+    setUploaders(creators);
+
       setLoadingState("success");
     } catch (error) {
       console.error("Error fetching data:", error);
