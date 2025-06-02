@@ -34,6 +34,10 @@ import ScrollToTop from "./components/commons/ScrollToTop";
 import VideoLayout from "./components/layout/VideoLayout";
 import { I18nextProvider } from "react-i18next";
 import i18n from "./i18n"; // i18n 설정 import
+import Terms from "./pages/Terms";
+import Privacy from "./pages/Privacy";
+import Protection from "./pages/Protection";
+import BusinessTerms from "./pages/BusinessTerms";
 
 // interface ErrorMessageProps {
 //   message?: string;
@@ -74,6 +78,12 @@ function App() {
           <Route path="/nice/password" element={<NiceReturnPage />} />
           <Route path="/api/payment/success" element={<PaymentReturn />} />
           <Route path="/payment/success" element={<PaymentSuccess />} />
+
+          <Route path="/terms" element={<Terms />} />
+          <Route path="/privacy" element={<Privacy />} />
+          <Route path="/protection" element={<Protection />} />
+          <Route path="/business" element={<BusinessTerms />} />
+
           <Route
             path="/*"
             element={<Navigate to="/error?type=404" replace />}
