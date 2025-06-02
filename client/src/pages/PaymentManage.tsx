@@ -45,6 +45,7 @@ interface RefundItem {
   amount: number;
   pgcode: string;
   refundable: boolean;
+  chargeAt: string;
 }
 
 const PaymentManage = () => {

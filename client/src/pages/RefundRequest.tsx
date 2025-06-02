@@ -9,6 +9,7 @@ interface RefundItem {
   amount: number;
   pgcode: string;
   refundable: boolean;
+  chargeAt: string; 
 }
 
 interface RefundModalProps {
@@ -17,13 +18,12 @@ interface RefundModalProps {
   onSuccess: () => void;
 }
 
-const RefundRequest = ({ refundItems, onClose, onSuccess }: RefundModalProps) => {
+const RefundRequestModal = ({ refundItems, onClose, onSuccess }: RefundModalProps) => {
   const [items, setItems] = useState<RefundItem[]>([]);
   const [selectedItem, setSelectedItem] = useState<RefundItem | null>(null);
   const [reason, setReason] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
-  // props로 받은 목록을 상태로 복사
   useEffect(() => {
     setItems(refundItems);
   }, [refundItems]);
@@ -45,13 +45,8 @@ const RefundRequest = ({ refundItems, onClose, onSuccess }: RefundModalProps) =>
       });
 
       alert("환불 요청이 완료되었습니다.");
-
-      // ✅ 해당 항목의 refundable을 false로 설정
       selectedItem.refundable = false;
-
-      // ✅ 새 배열로 강제 렌더링
       setItems([...items]);
-
       setSelectedItem(null);
       setReason("");
       onSuccess();
@@ -63,7 +58,16 @@ const RefundRequest = ({ refundItems, onClose, onSuccess }: RefundModalProps) =>
     }
   };
 
-  // 필터링된 목록
+  const formatDate = (dateString: string): string => {
+    const date = new Date(dateString);
+    const y = date.getFullYear();
+    const m = String(date.getMonth() + 1).padStart(2, "0");
+    const d = String(date.getDate()).padStart(2, "0");
+    const h = String(date.getHours()).padStart(2, "0");
+    const min = String(date.getMinutes()).padStart(2, "0");
+    return `${y}.${m}.${d} ${h}:${min}`;
+  };
+
   const visibleItems = items.filter((item) => item.refundable);
 
   return (
@@ -83,8 +87,8 @@ const RefundRequest = ({ refundItems, onClose, onSuccess }: RefundModalProps) =>
                 <Value>{selectedItem.pgcode}</Value>
               </InfoRow>
               <InfoRow>
-                <Label>TID</Label>
-                <Value>{selectedItem.tid}</Value>
+                <Label>결제일시</Label>
+                <Value>{formatDate(selectedItem.chargeAt)}</Value>
               </InfoRow>
               <ReasonInput
                 placeholder="환불 사유를 입력하세요"
@@ -110,7 +114,10 @@ const RefundRequest = ({ refundItems, onClose, onSuccess }: RefundModalProps) =>
           <ItemList>
             {visibleItems.map((item) => (
               <ItemButton key={item.paymentNo} onClick={() => setSelectedItem(item)}>
-                {item.amount.toLocaleString()}원 - {item.tid}
+                 <ItemContent>
+    <ItemAmount>{item.amount.toLocaleString()}원</ItemAmount>
+    <ItemDate>결제일: {formatDate(item.chargeAt)}</ItemDate>
+  </ItemContent>
               </ItemButton>
             ))}
             {visibleItems.length === 0 && (
@@ -123,11 +130,7 @@ const RefundRequest = ({ refundItems, onClose, onSuccess }: RefundModalProps) =>
   );
 };
 
-export default RefundRequest;
-
-// ------------------------------
-// styled-components
-// ------------------------------
+export default RefundRequestModal;
 
 const ModalOverlay = styled.div`
   position: fixed;
@@ -289,4 +292,19 @@ const NoData = styled.div`
   color: #9ca3af;
   text-align: center;
   margin-top: 20px;
+`;
+
+const ItemContent = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+`;
+
+const ItemAmount = styled.strong`
+  font-size: 14px;
+`;
+
+const ItemDate = styled.span`
+  font-size: 12px;
+  color: #6b7280;
 `;
