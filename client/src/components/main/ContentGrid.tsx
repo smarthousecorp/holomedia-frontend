@@ -141,12 +141,13 @@ const ContentRow = styled.div`
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 0.5rem;
+  align-items: stretch;
 `;
 
 const VideoSection = styled.div`
   position: relative;
   width: 100%;
-  height: 100%;
+  max-height: 420px;
   border-radius: 1rem;
   overflow: hidden;
   cursor: pointer;
@@ -233,11 +234,10 @@ const RightColumn = styled.div`
 
 const ImageSection = styled.div`
   width: 100%;
-  height: 100%;
+  aspect-ratio: 1 / 1;
   border-radius: 1rem;
   overflow: hidden;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-
   transition: transform 0.2s ease;
 
   &:hover {
@@ -262,15 +262,13 @@ const ContentImage = styled.img<{ $shouldBlur: boolean }>`
 `;
 
 const CreatorSection = styled.div`
-  position: relative;
   width: 100%;
-  height: 100%;
+  aspect-ratio: 1 / 1;
   background: white;
   border-radius: 1rem;
   overflow: hidden;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   cursor: pointer;
-
   transition: transform 0.2s ease;
 
   &:hover {
