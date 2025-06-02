@@ -4,7 +4,6 @@ import { Eye } from "lucide-react";
 import { board } from "../../types/board";
 import { Creator } from "../../types/user";
 
-// 안녕하세요!
 interface ContentGridProps {
   boards: board[];
   creators: Creator[];
