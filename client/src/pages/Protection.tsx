@@ -1,7 +1,13 @@
 import styled from "styled-components";
-const Protection = () => {
+
+interface ProctectionModalProps{
+  onClose: () => void;
+}
+
+const Protection = ({ onClose }: ProctectionModalProps) => {
   return (
-    <Container>
+    <Wrapper>
+      <ModalBox>    
       <Title>청소년 보호정책</Title>
       <Content>
         HOLOMEDIA 청소년 보호정책<br/>
@@ -63,27 +69,52 @@ GDPR-K 및 COPPA(Children’s Online Privacy Protection Act) 기반 역외 아�
 [부칙]<br/>
 본 정책은 2025년 5월 27일부터 시행합니다.<br/>
       </Content>
-    </Container>
+    <CloseButton onClick={onClose}>닫기</CloseButton>
+    </ModalBox>
+    </Wrapper>
   );
 };
 
 export default Protection;
 
-const Container = styled.div`
-  min-height: 100vh;
-  width: 100%;
-  background-color: #fff;   
-  padding: 4rem 2rem;
-  box-sizing: border-box;
+
+const Wrapper = styled.div`
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  pointer-events: none;
 `;
 
-const Title = styled.h1`
-  font-size: 2.2rem;
-  margin-bottom: 2rem;
+const ModalBox = styled.div`
+  background: white;
+  padding: 2rem;
+  width: 90%;
+  max-width: 600px;
+  max-height: 80vh;
+  overflow-y: auto;
+  border-radius: 12px;
+  pointer-events: auto;
+`;
+
+const Title = styled.h2`
+  margin-bottom: 1rem;
 `;
 
 const Content = styled.div`
-  font-size: 1.4rem;
-  line-height: 2.2rem;
-  color: #444;
+  font-size: 14px;
+  line-height: 1.6;
 `;
+
+const CloseButton = styled.button`
+  margin-top: 1.5rem;
+  padding: 0.5rem 1rem;
+  background: black;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+`;
+

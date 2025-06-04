@@ -18,6 +18,10 @@ import GgulImg from "../../../assets/Ggul.png";
 import PaymentModal from "../../main/PaymentModal";
 import { useUserInfo } from "../../../hooks/useUserInfo";
 import { navigateOrScrollTop } from "../../../utils/navigation";
+import TermsModal from "../../../pages/Terms";
+import BusinessTermsModal from "../../../pages/BusinessTerms";
+import ProtectionModal from "../../../pages/Protection";
+import PrivacyModal from "../../../pages/Privacy";
 
 interface BaseSidebarProps {
   isOpen?: boolean;
@@ -63,6 +67,11 @@ const BaseSidebar = ({
       i18n.off("languageChanged", handleLanguageChange);
     };
   }, [i18n, onClose, variant]);
+
+  const [showTermsModal, setShowTermsModal] = useState(false);
+  const [showBusinessTermsModal, setShowBusinessTermsModal] = useState(false);
+  const [showProtectionModal, setShowProtectionModal]=useState(false);
+  const [showPrivacyModal, setShowPrivacyModal]=useState(false);
 
   return (
     <>
@@ -158,18 +167,44 @@ const BaseSidebar = ({
         <Footer $variant={variant}>
           <FooterLinks>
             <FooterRow>
-              <FooterLink href="/terms">{t("sidebar.footer.terms")}</FooterLink>
-              <FooterLink href="/privacy">
+              <FooterLink
+                  href="#"
+                  onClick={(e) => {
+                        e.preventDefault();
+                        setShowTermsModal(true);
+                          }}
+                          >
+                          {t("sidebar.footer.terms")}
+              </FooterLink>
+              <FooterLink
+                  href="#"
+                  onClick={(e) => {
+                        e.preventDefault();
+                        setShowPrivacyModal(true);
+                          }}
+                          >              
                 {t("sidebar.footer.privacy")}
               </FooterLink>
             </FooterRow>
             <FooterRow>
-              <FooterLink href="/protection">
+               <FooterLink
+                href="#"
+                onClick={(e) => {
+                      e.preventDefault();
+                      setShowProtectionModal(true); 
+                        }}
+                        >
                 {t("sidebar.footer.youth")}
               </FooterLink>
-              <FooterLink href="/business">
-                {t("sidebar.footer.business")}
-              </FooterLink>
+             <FooterLink
+                href="#"
+                onClick={(e) => {
+                      e.preventDefault();
+                      setShowBusinessTermsModal(true); 
+                        }}
+                        >
+                        {t("sidebar.footer.business")}
+            </FooterLink>
             </FooterRow>
           </FooterLinks>
           <BusinessInfo>
@@ -190,6 +225,22 @@ const BaseSidebar = ({
           }}
         />
       )}
+      {showTermsModal && (
+        <TermsModal onClose={() => setShowTermsModal(false)} />
+      )}
+
+      {showBusinessTermsModal && (
+        <BusinessTermsModal onClose={() => setShowBusinessTermsModal(false)} />
+      )}
+
+      {showProtectionModal && (
+        <ProtectionModal onClose={()=> setShowProtectionModal(false)}/>
+      )}
+
+      {showPrivacyModal && (
+        <PrivacyModal onClose={()=> setShowPrivacyModal(false)}/>
+      )}
+
     </>
   );
 };

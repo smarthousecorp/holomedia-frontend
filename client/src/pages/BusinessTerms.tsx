@@ -1,10 +1,18 @@
+// TermsModal.tsx
+import React from "react";
 import styled from "styled-components";
-const BusinessTerms = () => {
+
+interface BusinessTermsModalProps {
+  onClose: () => void;
+}
+
+const BusinessTerms = ({ onClose }: BusinessTermsModalProps) => {
   return (
-    <Container>
-      <Title>사업자 이용약관</Title>
-      <Content>
-         HOLOMEDIA 글로벌 사업자 이용약관<br/>
+    <Wrapper>
+      <ModalBox>
+        <Title>사업자 이용약관</Title>
+        <Content>
+    HOLOMEDIA 글로벌 사업자 이용약관<br/>
 시행일자: 2025년 5월 27일<br/>
 이 약관은 대한민국 법률을 기초로 하되, 다음을 모두 포함하여 전 세계 규제에 저촉되지 않으며, 어느 로펌·정부기관·조약기관에도 방어 가능한 수준으로 설계되었습니다:<br/>
 UNIDROIT 국제상거래원칙 / UNCITRAL 전자상거래법 / GDPR / DMCA / FATCA / CRS / OFAC / WIPO 저작권 가이드라인 / WTO TRIPS / ICC 모델조항 / EU 플랫폼법 (P2B)<br/>
@@ -57,28 +65,51 @@ NFT·블록체인 기반 음란물 토큰 유통 시도<br/>
 [부칙]<br/>
 본 약관은 2025년 5월 27일부터 시행됩니다.<br/>
 개정 시 30일 전 공지하며, 기존 사업자는 거부 시 즉시 계약 해지 및 데이터 삭제 가능<br/>
-      </Content>
-    </Container>
+        </Content>
+        <CloseButton onClick={onClose}>닫기</CloseButton>
+      </ModalBox>
+    </Wrapper>
   );
 };
 
 export default BusinessTerms;
 
-const Container = styled.div`
-  min-height: 100vh;
-  width: 100%;
-  background-color: #fff;   
-  padding: 4rem 2rem;
-  box-sizing: border-box;
+const Wrapper = styled.div`
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  pointer-events: none;
 `;
 
-const Title = styled.h1`
-  font-size: 2.2rem;
-  margin-bottom: 2rem;
+const ModalBox = styled.div`
+  background: white;
+  padding: 2rem;
+  width: 90%;
+  max-width: 600px;
+  max-height: 80vh;
+  overflow-y: auto;
+  border-radius: 12px;
+  pointer-events: auto;
+`;
+
+const Title = styled.h2`
+  margin-bottom: 1rem;
 `;
 
 const Content = styled.div`
-  font-size: 1.4rem;
-  line-height: 2.2rem;
-  color: #444;
+  font-size: 14px;
+  line-height: 1.6;
+`;
+
+const CloseButton = styled.button`
+  margin-top: 1.5rem;
+  padding: 0.5rem 1rem;
+  background: black;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
 `;

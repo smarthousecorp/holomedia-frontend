@@ -1,12 +1,18 @@
+// TermsModal.tsx
+import React from "react";
 import styled from "styled-components";
 
-const Terms = () => {
+interface TermsModalProps {
+  onClose: () => void;
+}
+
+const Terms = ({ onClose }: TermsModalProps) => {
   return (
-    <Container>
-      <Title>홀로미디어 이용약관</Title>
-      <Content>
-        
-       HOLOMEDIA 이용약관<br/>
+    <Wrapper>
+      <ModalBox>
+        <Title>이용약관</Title>
+        <Content>
+           HOLOMEDIA 이용약관<br/>
         시행일자: 2025년 5월 27일<br/>
 제1조 (목적) 이 약관은 HOLOMEDIA(이하 "회사")가 제공하는 디지털 플랫폼 서비스와 관련하여 회사와 회원 간의 권리, 의무 및 책임사항, 이용조건 및 절차 등을 규정함을 목적으로 합니다.<br/>
 제2조 (용어의 정의)<br/>
@@ -117,29 +123,51 @@ const Terms = () => {
 본 약관의 모든 조항은 국내외 법률에 우선하여 사전 계약적 구속력을 가지며, 이에 회원은 동의합니다.<br/>
 [부칙] 본 약관은 2025년 5월 27일부터 시행됩니다. 회원이 본 약관의 개정 내용에 동의하지 않는 경우, 시행일 이전까지 서비스 이용을 중단하고 탈퇴할 수 있으며, 계속 이용하는 경우 개정에 동의한 것으로 간주됩니다.<br/>
 
-
-      </Content>
-    </Container>
+        </Content>
+        <CloseButton onClick={onClose}>닫기</CloseButton>
+      </ModalBox>
+    </Wrapper>
   );
 };
 
 export default Terms;
 
-const Container = styled.div`
- min-height: 100vh;
-  width: 100%;
-  background-color: #fff;   
-  padding: 4rem 2rem;
-  box-sizing: border-box;
+const Wrapper = styled.div`
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  pointer-events: none;
 `;
 
-const Title = styled.h1`
-  font-size: 2.2rem;
-  margin-bottom: 2rem;
+const ModalBox = styled.div`
+  background: white;
+  padding: 2rem;
+  width: 90%;
+  max-width: 600px;
+  max-height: 80vh;
+  overflow-y: auto;
+  border-radius: 12px;
+  pointer-events: auto;
+`;
+
+const Title = styled.h2`
+  margin-bottom: 1rem;
 `;
 
 const Content = styled.div`
-  font-size: 1.4rem;
-  line-height: 2.2rem;
-  color: #444;
+  font-size: 14px;
+  line-height: 1.6;
+`;
+
+const CloseButton = styled.button`
+  margin-top: 1.5rem;
+  padding: 0.5rem 1rem;
+  background: black;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
 `;

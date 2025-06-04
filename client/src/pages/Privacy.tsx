@@ -1,8 +1,13 @@
 import styled from "styled-components";
 
-const Privacy = () => {
+interface PrivacyModalProps{
+  onClose: () => void;
+}
+
+const Privacy = ({ onClose }: PrivacyModalProps) => {
   return (
-    <Container>
+      <Wrapper>
+      <ModalBox> 
       <Title>개인정보처리방침</Title>
       <Content>
          HOLOMEDIA 개인정보 처리방침<br/>
@@ -74,27 +79,51 @@ RFC 3161 기반 타임스탬핑 / SHA-3 해시로 위변조 차단<br/>
 본 방침은 2025년 5월 27일부터 시행됩니다.<br/>
 방침 개정 시 최소 7일 전 공지하며, 중대한 변경은 30일 전부터 사전 고지합니다.<br/>      
       </Content>
-    </Container>
+     <CloseButton onClick={onClose}>닫기</CloseButton>
+    </ModalBox>
+    </Wrapper>
   );
 };
 
 export default Privacy;
 
-const Container = styled.div`
-  min-height: 100vh;
-  width: 100%;
-  background-color: #fff;   
-  padding: 4rem 2rem;
-  box-sizing: border-box;
+const Wrapper = styled.div`
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  pointer-events: none;
 `;
 
-const Title = styled.h1`
-  font-size: 2.2rem;
-  margin-bottom: 2rem;
+const ModalBox = styled.div`
+  background: white;
+  padding: 2rem;
+  width: 90%;
+  max-width: 600px;
+  max-height: 80vh;
+  overflow-y: auto;
+  border-radius: 12px;
+  pointer-events: auto;
+`;
+
+const Title = styled.h2`
+  margin-bottom: 1rem;
 `;
 
 const Content = styled.div`
-  font-size: 1.4rem;
-  line-height: 2.2rem;
-  color: #444;
+  font-size: 14px;
+  line-height: 1.6;
 `;
+
+const CloseButton = styled.button`
+  margin-top: 1.5rem;
+  padding: 0.5rem 1rem;
+  background: black;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+`;
+
