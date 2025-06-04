@@ -1,7 +1,8 @@
+import React from "react";
 import styled from "styled-components";
 
 interface PrivacyModalProps{
-  onClose: () => void;
+  onClose?: () => void;
 }
 
 const Privacy = ({ onClose }: PrivacyModalProps) => {

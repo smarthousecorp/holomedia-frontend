@@ -1,9 +1,8 @@
-// TermsModal.tsx
 import React from "react";
 import styled from "styled-components";
 
 interface TermsModalProps {
-  onClose: () => void;
+  onClose?: () => void;
 }
 
 const Terms = ({ onClose }: TermsModalProps) => {

@@ -1,9 +1,8 @@
-// TermsModal.tsx
 import React from "react";
 import styled from "styled-components";
 
 interface BusinessTermsModalProps {
-  onClose: () => void;
+  onClose?: () => void;
 }
 
 const BusinessTerms = ({ onClose }: BusinessTermsModalProps) => {
